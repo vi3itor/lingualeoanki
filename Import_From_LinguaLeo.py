@@ -18,9 +18,6 @@ class PluginWindow(QDialog):
     def initUI(self):
         self.setWindowTitle('Import From LinguaLeo')  
         
-        ####### TO DO ##########
-        #### Cursor on email field by default ########
-        
         # Window Icon
         path = os.path.join(os.path.dirname(__file__), 'import_from_lingualeo', 'favicon.ico')
         loc = locale.getdefaultlocale()[1] 
@@ -70,6 +67,9 @@ class PluginWindow(QDialog):
       
         # Set main layout
         self.setLayout(vbox)
+        # Set focus for typing from the keyboard
+        # You have to do it after creating all widgets
+        self.loginField.setFocus()
       
         self.show()
         
