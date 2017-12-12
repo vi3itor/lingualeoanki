@@ -127,10 +127,7 @@ class Download(QThread):
         lingualeo.get_all_words()
         words = lingualeo.userdict
         if self.unstudied:
-            # TO DO SOME FILTERING WITH WORDS
-            # word.get('progress_percent')
-            pass
-                     
+            words = [word for word in words if word.get('progress_percent') < 100]
         self.emit(SIGNAL('Length'), len(words))
         model = prepare_model(collection, fields, model_css)
         destination_folder = collection.media.dir()        
