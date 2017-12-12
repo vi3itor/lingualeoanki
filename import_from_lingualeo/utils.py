@@ -61,24 +61,25 @@ def download_media_file(destination_folder, url):
     media_file = resp.read()
     binfile = open(abs_path, "wb")
     binfile.write(media_file)
-    binfile.close()   
-   
+    binfile.close()
+    
 def send_to_download(word, destination_folder):
-    picture_url = word.get('pic_url')
+    picture_url = word.get('picture_url')
     if picture_url:
+        picture_url = 'http:' + picture_url
         download_media_file(destination_folder, picture_url)
     sound_url = word.get('sound_url')
     if sound_url:
-        download_media_file(destination_folder, sound_url)        
-    
+        download_media_file(destination_folder, sound_url) 
+ 
 def fill_note(word, note, destination_folder):
-    note['en'] = word.get('word_value')
-    note['ru'] = word.get('translate_value')    
+    note['en'] = word['word_value']
+    note['ru'] = word['user_translates'][0]['translate_value']   
     if word.get('transcription'):
         note['transcription'] = word.get('transcription')
-    if word.get('contexts'):
-        note['context'] = word.get('contexts')[0]    
-    picture_url = word.get('pic_url')
+    if word.get('context'):
+        note['context'] = word.get('context')   
+    picture_url = word.get('picture_url')
     if picture_url:
         picture_name = picture_url.split('/')[-1]
         note['picture_name'] = '<img src="%s" />' % picture_name

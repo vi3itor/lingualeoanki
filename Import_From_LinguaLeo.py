@@ -18,6 +18,9 @@ class PluginWindow(QDialog):
     def initUI(self):
         self.setWindowTitle('Import From LinguaLeo')  
         
+        ####### TO DO ##########
+        #### Cursor on email field by default ########
+        
         # Window Icon
         path = os.path.join(os.path.dirname(__file__), 'import_from_lingualeo', 'favicon.ico')
         loc = locale.getdefaultlocale()[1] 
@@ -121,8 +124,8 @@ class Download(QThread):
     def run(self):
         collection = mw.col        
         lingualeo = connect.Lingualeo(self.login, self.password)
-        lingualeo.auth()
-        words = lingualeo.get_words()
+        lingualeo.get_all_words()
+        words = lingualeo.userdict
         if self.unstudied:
             # TO DO SOME FILTERING WITH WORDS
             # word.get('progress_percent')
