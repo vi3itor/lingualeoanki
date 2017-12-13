@@ -9,7 +9,7 @@ class Lingualeo:
         self.email = email
         self.password = password
         self.cj = CookieJar()
-        self.json_url = 'http://lingualeo.com/userdict/json?&filter=all&page='
+        self.json_url = 'http://lingualeo.com/ru/userdict/json?&filter=all&page='
         self.userdict = []
         self.auth()             
 
