@@ -82,6 +82,7 @@ class PluginWindow(QDialog):
         password = self.passField.text()        
         unstudied = self.checkBox.checkState()
         self.checkBox.setEnabled(False)
+        self.progressBar.setValue(0)
         
         self.threadclass = Download(login, password, unstudied)
         self.threadclass.start()
