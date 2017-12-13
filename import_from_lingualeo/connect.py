@@ -10,22 +10,16 @@ class Lingualeo:
         self.password = password
         self.cj = CookieJar()
         self.json_url = 'http://lingualeo.com/ru/userdict/json?&filter=all&page='
-        # self.userdict = []
-        # self.auth()             
 
     def auth(self):
         url = "http://api.lingualeo.com/api/login"
         values = {"email": self.email, "password": self.password}
         return self.get_content(url, values)
 
-    def get_page(self, url):
-        ''' 
-        Downloads words from one page 
-        Returns: type == list of dictionaries         
-        '''                
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cj))
-        req = opener.open(url)
-        return json.loads(req.read())['userdict3']    
+    def get_page(self, page_number):
+        url = 'http://lingualeo.com/ru/userdict/json'
+        values = {'filter': 'all', 'page': page_number}
+        return self.get_content(url, values)['userdict3']
 
     def get_content(self, url, values):
         data = urllib.urlencode(values)
@@ -36,15 +30,15 @@ class Lingualeo:
     def get_all_words(self):
         '''
         The JSON consists of list "userdict3" on each page
-        Inside an each userdict there is a list of periods with names
-        like "October 2015" and so on. And inside of them lay our words.
+        Inside of each userdict there is a list of periods with names
+        such as "October 2015". And inside of them lay our words.
+        Returns: type == list of dictionaries
         '''
         words = []
         have_periods = True
         page_number = 1
         while have_periods:
-            url = self.json_url + str(page_number)
-            periods = self.get_page(url)
+            periods = self.get_page(page_number)
             if len(periods) > 0:
                 for period in periods:
                     words += period['words']                    
