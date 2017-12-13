@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import locale
 import os
+import urllib2
 from anki import notes
 from aqt import mw  
 from aqt.qt import QAction
@@ -80,6 +81,7 @@ class PluginWindow(QDialog):
         login = self.loginField.text()
         password = self.passField.text()        
         unstudied = self.checkBox.checkState()
+        self.checkBox.setEnabled(False)
         
         self.threadclass = Download(login, password, unstudied)
         self.threadclass.start()
@@ -140,7 +142,7 @@ class Download(QThread):
             # Also you cannot download files in the main thread because it will freeze GUI
             try:
                 send_to_download(word, destination_folder)           
-            except urllib2.HTTPError:
+            except (urllib2.HTTPError, urllib2.URLError):
                 # For rare cases of broken links for media files in LinguaLeo
                 # Does nothing but doesn't tolerate another type of exceptions
                 pass
