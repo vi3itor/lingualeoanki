@@ -10,8 +10,8 @@ class Lingualeo:
         self.password = password
         self.cj = CookieJar()
         self.json_url = 'http://lingualeo.com/ru/userdict/json?&filter=all&page='
-        self.userdict = []
-        self.auth()             
+        # self.userdict = []
+        # self.auth()             
 
     def auth(self):
         url = "http://api.lingualeo.com/api/login"
@@ -39,15 +39,16 @@ class Lingualeo:
         Inside an each userdict there is a list of periods with names
         like "October 2015" and so on. And inside of them lay our words.
         '''
-        still = True
-        n = 1
-        while still:
-            url = self.json_url + str(n)
+        words = []
+        have_periods = True
+        page_number = 1
+        while have_periods:
+            url = self.json_url + str(page_number)
             periods = self.get_page(url)
             if len(periods) > 0:
                 for period in periods:
-                    self.userdict += period['words']                    
+                    words += period['words']                    
             else:
-                still = False
-            n += 1
-            
+                have_periods = False
+            page_number += 1
+        return words

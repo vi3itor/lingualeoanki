@@ -90,6 +90,7 @@ class PluginWindow(QDialog):
         self.connect(self.threadclass, SIGNAL('Word'), self.addWord)
         self.connect(self.threadclass, SIGNAL('Counter'), self.progressBar.setValue)
         self.connect(self.threadclass, SIGNAL('FinalCounter'), self.setFinalCount)
+        self.connect(self.threadclass, SIGNAL('Error'), self.setErrorMessage)
         self.threadclass.finished.connect(self.downloadFinished)
     
     def cancelButtonClicked(self):
@@ -109,10 +110,15 @@ class PluginWindow(QDialog):
     
     def setFinalCount(self, counter):
         self.wordsFinalCount = counter
+        
+    def setErrorMessage(self, msg):
+        self.errorMessage = msg
     
     def downloadFinished(self): 
         if hasattr(self, 'wordsFinalCount'):
             showInfo("You have %d new words" % self.wordsFinalCount)
+        elif hasattr(self, 'errorMessage'):
+            showInfo(self.errorMessage)
         mw.reset()
         self.close() 
         
@@ -125,32 +131,37 @@ class Download(QThread):
         self.unstudied = unstudied
 
     def run(self):
-        collection = mw.col        
-        lingualeo = connect.Lingualeo(self.login, self.password)
-        lingualeo.get_all_words()
-        words = lingualeo.userdict
-        # Check if we need only unstudied words
-        if self.unstudied:
-            words = [word for word in words if word.get('progress_percent') < 100]
-        self.emit(SIGNAL('Length'), len(words))
-        model = prepare_model(collection, fields, model_css)
-        destination_folder = collection.media.dir()        
-        counter = 0
-        for word in words:
-            self.emit(SIGNAL('Word'), (word, model, destination_folder))            
-            # Divides downloading and filling note to different threads
-            # because you cannot create SQLite objects outside the main thread in Anki
-            # Also you cannot download files in the main thread because it will freeze GUI
-            try:
+        collection = mw.col    
+        try: 
+            lingualeo = connect.Lingualeo(self.login, self.password)
+            status = lingualeo.auth()        
+            words = lingualeo.get_all_words()
+            # Check if we need only unstudied words
+            if self.unstudied:
+                words = [word for word in words if word.get('progress_percent') < 100]
+            self.emit(SIGNAL('Length'), len(words))
+            model = prepare_model(collection, fields, model_css)
+            destination_folder = collection.media.dir()        
+            counter = 0
+            for word in words:
+                self.emit(SIGNAL('Word'), (word, model, destination_folder))            
+                # Divides downloading and filling note to different threads
+                # because you cannot create SQLite objects outside the main thread in Anki
+                # Also you cannot download files in the main thread because it will freeze GUI
                 send_to_download(word, destination_folder)           
-            except (urllib2.HTTPError, urllib2.URLError):
+                counter += 1    
+                self.emit(SIGNAL('Counter'), counter)      
+            self.emit(SIGNAL('FinalCounter'), counter)        
+        except (urllib2.HTTPError, urllib2.URLError):
                 # For rare cases of broken links for media files in LinguaLeo
                 # Does nothing but doesn't tolerate another type of exceptions
                 pass
-            counter += 1    
-            self.emit(SIGNAL('Counter'), counter)      
-        self.emit(SIGNAL('FinalCounter'), counter)
-
+        except ValueError:
+            if status.get('error_msg'):
+                self.emit(SIGNAL('Error'), status['error_msg'])
+            else:
+                msg = 'You have an unexpected error. Sorry about that!'
+                self.emit(SIGNAL('Error'), msg)
         
 def activate():
     window = PluginWindow()
