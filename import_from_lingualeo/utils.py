@@ -76,7 +76,7 @@ def fill_note(word, note, destination_folder):
     note['en'] = word['word_value']
     note['ru'] = word['user_translates'][0]['translate_value']   
     if word.get('transcription'):
-        note['transcription'] = '[' + word.get('transcription') + ']' # TEST IT
+        note['transcription'] = '[' + word.get('transcription') + ']'
     if word.get('context'):
         note['context'] = word.get('context')   
     picture_url = word.get('picture_url')
