@@ -11,7 +11,10 @@ model_css = '.card {font-family: arial; font-size: 20px; text-align: center; col
 # ru_answer = '{{FrontSide}}<hr id=answer><strong><font color="#0000ff"></font></strong><br>[{{transcription}}]<br>{{sound_name}}<br><em>{{context}}</em>'
 
 def create_templates(collection):
-    ''' Returns 2 templates (eng - ru and ru - eng) with 2 sides, front('qfmt') and back('afmt') '''    
+    """
+    Returns 2 templates (eng - ru and ru - eng) with 2 sides,
+    front('qfmt') and back('afmt')
+    """
     template_eng = collection.models.newTemplate('en -> ru')
     template_eng['qfmt'] = '''<strong>{{en}}</strong><br><br>{{transcription}}<br><br>{{picture_name}}<br><br>{{sound_name}}'''                        
     template_eng['afmt'] = '''{{FrontSide}}<hr id=answer><font color="#0000ff">{{ru}}</font><br><br><em>{{context}}</em>'''
@@ -21,12 +24,12 @@ def create_templates(collection):
     return (template_eng, template_ru)
 
 def create_new_model(collection, fields, model_css):
-    ''' Create a model for our notes, templates and cards '''
+    """ Create a model for our notes, templates and cards """
     model = collection.models.new("LinguaLeo_model")
     model['tags'].append("LinguaLeo")    
     model['css'] = model_css
     for field in fields:
-        collection.models.addField(model, collection.models.newField(field))       
+        collection.models.addField(model, collection.models.newField(field))
     template_eng, template_ru = create_templates(collection)
     collection.models.addTemplate(model, template_eng)
     collection.models.addTemplate(model, template_ru)    
@@ -43,7 +46,10 @@ def is_model_exist(collection, fields):
     return (name_exist and fields_ok)
     
 def prepare_model(collection, fields, model_css):
-    ''' Returns a model for our future notes. Creates a deck to keep them. '''
+    """
+    Returns a model for our future notes.
+    Creates a deck to keep them.
+    """
     if is_model_exist(collection, fields):
         model = collection.models.byName('LinguaLeo_model')
     else:    
