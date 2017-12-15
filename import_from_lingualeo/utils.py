@@ -13,11 +13,11 @@ model_css = '.card {font-family: arial; font-size: 20px; text-align: center; col
 def create_templates(collection):
     ''' Returns 2 templates (eng - ru and ru - eng) with 2 sides, front('qfmt') and back('afmt') '''    
     template_eng = collection.models.newTemplate('en -> ru')
-    template_eng['qfmt'] = '''<strong>{{en}}</strong><br><br>[{{transcription}}]<br><br>{{picture_name}}<br><br>{{sound_name}}'''                        
+    template_eng['qfmt'] = '''<strong>{{en}}</strong><br><br>{{transcription}}<br><br>{{picture_name}}<br><br>{{sound_name}}'''                        
     template_eng['afmt'] = '''{{FrontSide}}<hr id=answer><font color="#0000ff">{{ru}}</font><br><br><em>{{context}}</em>'''
     template_ru = collection.models.newTemplate('ru -> en')
     template_ru['qfmt'] = '''{{ru}}<br><br>{{picture_name}}<br><br>{{type:en}}'''
-    template_ru['afmt'] = '''{{FrontSide}}<hr id=answer><strong><font color="#0000ff"></font></strong><br>[{{transcription}}]<br>{{sound_name}}<br><em>{{context}}</em>'''
+    template_ru['afmt'] = '''{{FrontSide}}<hr id=answer><strong><font color="#0000ff"></font></strong><br>{{transcription}}<br>{{sound_name}}<br><em>{{context}}</em>'''
     return (template_eng, template_ru)
 
 def create_new_model(collection, fields, model_css):
@@ -76,7 +76,7 @@ def fill_note(word, note, destination_folder):
     note['en'] = word['word_value']
     note['ru'] = word['user_translates'][0]['translate_value']   
     if word.get('transcription'):
-        note['transcription'] = word.get('transcription')
+        note['transcription'] = '[' + word.get('transcription') + ']' # TEST IT
     if word.get('context'):
         note['context'] = word.get('context')   
     picture_url = word.get('picture_url')
