@@ -1,6 +1,6 @@
+import json
 import urllib
 import urllib2
-import json
 from cookielib import CookieJar
 
 
@@ -9,7 +9,6 @@ class Lingualeo:
         self.email = email
         self.password = password
         self.cj = CookieJar()
-        self.json_url = 'http://lingualeo.com/ru/userdict/json?&filter=all&page='
 
     def auth(self):
         url = "http://api.lingualeo.com/api/login"
@@ -25,15 +24,15 @@ class Lingualeo:
         data = urllib.urlencode(values)
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cj))
         req = opener.open(url, data)
-        return json.loads(req.read())  
+        return json.loads(req.read())
 
     def get_all_words(self):
-        '''
+        """
         The JSON consists of list "userdict3" on each page
         Inside of each userdict there is a list of periods with names
         such as "October 2015". And inside of them lay our words.
         Returns: type == list of dictionaries
-        '''
+        """
         words = []
         have_periods = True
         page_number = 1
@@ -41,7 +40,7 @@ class Lingualeo:
             periods = self.get_page(page_number)
             if len(periods) > 0:
                 for period in periods:
-                    words += period['words']                    
+                    words += period['words']
             else:
                 have_periods = False
             page_number += 1
