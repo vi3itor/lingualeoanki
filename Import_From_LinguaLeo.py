@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import locale
 import os
+import socket
 import urllib2
 from anki import notes
 from aqt import mw  
@@ -117,7 +118,7 @@ class PluginWindow(QDialog):
     def downloadFinished(self): 
         if hasattr(self, 'wordsFinalCount'):
             showInfo("You have %d new words" % self.wordsFinalCount)
-        elif hasattr(self, 'errorMessage'):
+        if hasattr(self, 'errorMessage'):
             showInfo(self.errorMessage)
         mw.reset()
         self.close() 
@@ -132,37 +133,54 @@ class Download(QThread):
 
     def run(self):
         collection = mw.col    
-        try: 
-            lingualeo = connect.Lingualeo(self.login, self.password)
+        lingualeo = connect.Lingualeo(self.login, self.password)
+        try:
             status = lingualeo.auth()        
             words = lingualeo.get_all_words()
-            # Check if we need only unstudied words
-            if self.unstudied:
-                words = [word for word in words if word.get('progress_percent') < 100]
-            self.emit(SIGNAL('Length'), len(words))
-            model = prepare_model(collection, fields, model_css)
-            destination_folder = collection.media.dir()        
-            counter = 0
-            for word in words:
-                self.emit(SIGNAL('Word'), (word, model, destination_folder))            
-                # Divides downloading and filling note to different threads
-                # because you cannot create SQLite objects outside the main thread in Anki
-                # Also you cannot download files in the main thread because it will freeze GUI
-                send_to_download(word, destination_folder)           
-                counter += 1    
-                self.emit(SIGNAL('Counter'), counter)      
-            self.emit(SIGNAL('FinalCounter'), counter)        
-        except (urllib2.HTTPError, urllib2.URLError):
-                # For rare cases of broken links for media files in LinguaLeo
-                # Does nothing but doesn't tolerate another type of exceptions
-                pass
+        except urllib2.URLError:
+            msg = "Can't download words. Check your internet connection."
+            self.emit(SIGNAL('Error'), msg)
+            return None
         except ValueError:
             if status.get('error_msg'):
                 self.emit(SIGNAL('Error'), status['error_msg'])
             else:
-                msg = 'You have an unexpected error. Sorry about that!'
+                msg = 'There is an unexpected error. Sorry about that!'
                 self.emit(SIGNAL('Error'), msg)
-        
+            return None
+        # Check if we need only unstudied words
+        if self.unstudied:
+            words = [word for word in words if word.get('progress_percent') < 100]
+        self.emit(SIGNAL('Length'), len(words))
+        counter = 0
+        model = prepare_model(collection, fields, model_css)
+        destination_folder = collection.media.dir()
+        problem_words = []
+        for word in words:
+            self.emit(SIGNAL('Word'), (word, model, destination_folder))
+            # Divides downloading and filling note to different threads
+            # because you cannot create SQLite objects outside the main
+            # thread in Anki. Also you cannot download files in the main
+            # thread because it will freeze GUI
+            try:
+                send_to_download(word, destination_folder)
+            except (urllib2.URLError, socket.error):
+                # For rare cases of broken links for media files in LinguaLeo
+                problem_word = problem_words.append(word.get('word_value'))
+            counter += 1
+            self.emit(SIGNAL('Counter'), counter)
+        self.emit(SIGNAL('FinalCounter'), counter)
+
+        if problem_words:
+            error_msg = "We weren't able to download media for these \
+words because of broken links in LinguaLeo or problems with \
+an internet connection: "
+            for problem_word in problem_words[:-1]:
+                error_msg += problem_word + ', '
+            error_msg += problem_words[-1] + '.'
+            self.emit(SIGNAL('Error'), error_msg)
+
+
 def activate():
     window = PluginWindow()
     window.exec_()        
