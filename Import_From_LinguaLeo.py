@@ -9,6 +9,7 @@ from aqt.qt import QAction
 from aqt.utils import showInfo
 from import_from_lingualeo import connect
 from import_from_lingualeo.utils import *
+from import_from_lingualeo.styles import model_css
 from PyQt4.QtGui import QDialog, QIcon, QPushButton, QHBoxLayout, QVBoxLayout, QLineEdit, QFormLayout, QLabel, QProgressBar, QCheckBox 
 from PyQt4.QtCore import QThread, SIGNAL
   
