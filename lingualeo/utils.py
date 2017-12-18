@@ -1,6 +1,10 @@
 import os
 from random import randint
 from urllib2 import urlopen
+
+from aqt import mw
+from anki import notes
+
 from lingualeo import styles
 
 
@@ -95,3 +99,16 @@ def fill_note(word, note, destination_folder):
         sound_name = sound_url.split('/')[-1]
         note['sound_name'] = '[sound:%s]' % sound_name
     return note
+
+
+def add_word(input):
+    """
+    Note is an SQLite object in Anki so you need
+    to fill it out inside the main thread
+    input: tuple from a worker's thread signal
+    """
+    word, model, destination_folder = input
+    collection = mw.col
+    note = notes.Note(collection, model)
+    note = fill_note(word, note, destination_folder)
+    collection.addNote(note)
