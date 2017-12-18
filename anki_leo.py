@@ -9,12 +9,12 @@ from aqt import mw
 from aqt.qt import QAction
 from aqt.utils import showInfo
 from PyQt4.QtGui import (QDialog, QIcon, QPushButton, QHBoxLayout,
-                            QVBoxLayout, QLineEdit, QFormLayout,
-                            QLabel, QProgressBar, QCheckBox)
+                         QVBoxLayout, QLineEdit, QFormLayout,
+                         QLabel, QProgressBar, QCheckBox)
 from PyQt4.QtCore import QThread, SIGNAL
 
 from lingualeo import connect
-from lingualeo import utils 
+from lingualeo import utils
 from lingualeo import styles
 
 
@@ -22,35 +22,35 @@ class PluginWindow(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.initUI()
-        
+
     def initUI(self):
-        self.setWindowTitle('Import From LinguaLeo')  
-        
+        self.setWindowTitle('Import From LinguaLeo')
+
         # Window Icon
         path = os.path.join(os.path.dirname(__file__), 'lingualeo', 'favicon.ico')
-        loc = locale.getdefaultlocale()[1] 
+        loc = locale.getdefaultlocale()[1]
         path = unicode(path, loc)
-        self.setWindowIcon(QIcon(path))               
-        
+        self.setWindowIcon(QIcon(path))
+
         # Buttons and fields
-        self.importButton = QPushButton("Import", self)  
+        self.importButton = QPushButton("Import", self)
         self.cancelButton = QPushButton("Cancel", self)
-        self.importButton.clicked.connect(self.importButtonClicked) 
-        self.cancelButton.clicked.connect(self.cancelButtonClicked)        
+        self.importButton.clicked.connect(self.importButtonClicked)
+        self.cancelButton.clicked.connect(self.cancelButtonClicked)
         loginLabel = QLabel('Your LinguaLeo Login:')
-        self.loginField = QLineEdit()        
+        self.loginField = QLineEdit()
         passLabel = QLabel('Your LinguaLeo Password:')
         self.passField = QLineEdit()
         self.passField.setEchoMode(QLineEdit.Password)
         self.progressLabel = QLabel('Downloading Progress:')
-        self.progressBar = QProgressBar()        
+        self.progressBar = QProgressBar()
         self.checkBox = QCheckBox()
         self.checkBoxLabel = QLabel('Unstudied only?')
-        
+
         # Main layout - vertical box
         vbox = QVBoxLayout()
- 
-        # Form layout        
+
+        # Form layout
         fbox = QFormLayout()
         fbox.setMargin(10)
         fbox.addRow(loginLabel, self.loginField)
@@ -59,38 +59,38 @@ class PluginWindow(QDialog):
         fbox.addRow(self.checkBoxLabel, self.checkBox)
         self.progressLabel.hide()
         self.progressBar.hide()
-        
+
         # Horizontal layout for buttons
         hbox = QHBoxLayout()
         hbox.setMargin(10)
         hbox.addStretch()
-        hbox.addWidget(self.importButton)        
+        hbox.addWidget(self.importButton)
         hbox.addWidget(self.cancelButton)
         hbox.addStretch()
-        
+
         # Add form layout, then stretch and then buttons in main layout
         vbox.addLayout(fbox)
         vbox.addStretch(2)
         vbox.addLayout(hbox)
-      
+
         # Set main layout
         self.setLayout(vbox)
         # Set focus for typing from the keyboard
         # You have to do it after creating all widgets
         self.loginField.setFocus()
-      
+
         self.show()
-        
+
     def importButtonClicked(self):
         self.importButton.setEnabled(False)
         self.progressLabel.show()
         self.progressBar.show()
         login = self.loginField.text()
-        password = self.passField.text()        
+        password = self.passField.text()
         unstudied = self.checkBox.checkState()
         self.checkBox.setEnabled(False)
         self.progressBar.setValue(0)
-        
+
         self.threadclass = Download(login, password, unstudied)
         self.threadclass.start()
         self.connect(self.threadclass, SIGNAL('Length'), self.progressBar.setMaximum)
@@ -99,37 +99,37 @@ class PluginWindow(QDialog):
         self.connect(self.threadclass, SIGNAL('FinalCounter'), self.setFinalCount)
         self.connect(self.threadclass, SIGNAL('Error'), self.setErrorMessage)
         self.threadclass.finished.connect(self.downloadFinished)
-    
+
     def cancelButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
             self.threadclass.quit()
-        mw.reset()    
+        mw.reset()
         self.close()
-        
+
     def addWord(self, input):
         word, model, destination_folder = input
         collection = mw.col
         note = notes.Note(collection, model)
-        # Note is an SQLite object in Anki so you need to fill it out
-        # inside the main thread
+        # Note is an SQLite object in Anki so you need
+        # to fill it out inside the main thread
         note = utils.fill_note(word, note, destination_folder)
         collection.addNote(note)
-    
+
     def setFinalCount(self, counter):
         self.wordsFinalCount = counter
-        
+
     def setErrorMessage(self, msg):
         self.errorMessage = msg
-    
-    def downloadFinished(self): 
+
+    def downloadFinished(self):
         if hasattr(self, 'wordsFinalCount'):
             showInfo("You have %d new words" % self.wordsFinalCount)
         if hasattr(self, 'errorMessage'):
             showInfo(self.errorMessage)
         mw.reset()
-        self.close() 
-        
-        
+        self.close()
+
+
 class Download(QThread):
     def __init__(self, login, password, unstudied, parent=None):
         QThread.__init__(self, parent)
@@ -138,10 +138,10 @@ class Download(QThread):
         self.unstudied = unstudied
 
     def run(self):
-        collection = mw.col    
+        collection = mw.col
         leo = connect.Lingualeo(self.login, self.password)
         try:
-            status = leo.auth()        
+            status = leo.auth()
             words = leo.get_all_words()
         except urllib2.URLError:
             msg = "Can't download words. Check your internet connection."
@@ -178,9 +178,9 @@ class Download(QThread):
         self.emit(SIGNAL('FinalCounter'), counter)
 
         if problem_words:
-            error_msg = "We weren't able to download media for these \
-words because of broken links in LinguaLeo or problems with \
-an internet connection: "
+            error_msg = ("We weren't able to download media for these "
+                         "words because of broken links in LinguaLeo "
+                         "or problems with an internet connection: ")
             for problem_word in problem_words[:-1]:
                 error_msg += problem_word + ', '
             error_msg += problem_words[-1] + '.'
@@ -189,7 +189,7 @@ an internet connection: "
 
 def activate():
     window = PluginWindow()
-    window.exec_()        
+    window.exec_()
 
 # create a new menu item
 action = QAction("Import From LinguaLeo", mw)
