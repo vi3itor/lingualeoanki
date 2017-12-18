@@ -1,7 +1,7 @@
 import os
-import styles
 from random import randint
 from urllib2 import urlopen
+from lingualeo import styles
 
 
 fields = ['en', 'transcription',

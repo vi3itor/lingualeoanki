@@ -3,16 +3,21 @@ import locale
 import os
 import socket
 import urllib2
+
 from anki import notes
-from aqt import mw  
+from aqt import mw
 from aqt.qt import QAction
 from aqt.utils import showInfo
-from import_from_lingualeo import connect
-from import_from_lingualeo.utils import *
-from import_from_lingualeo.styles import model_css
-from PyQt4.QtGui import QDialog, QIcon, QPushButton, QHBoxLayout, QVBoxLayout, QLineEdit, QFormLayout, QLabel, QProgressBar, QCheckBox 
+from PyQt4.QtGui import (QDialog, QIcon, QPushButton, QHBoxLayout,
+                            QVBoxLayout, QLineEdit, QFormLayout,
+                            QLabel, QProgressBar, QCheckBox)
 from PyQt4.QtCore import QThread, SIGNAL
-  
+
+from lingualeo import connect
+from lingualeo import utils 
+from lingualeo import styles
+
+
 class PluginWindow(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -22,7 +27,7 @@ class PluginWindow(QDialog):
         self.setWindowTitle('Import From LinguaLeo')  
         
         # Window Icon
-        path = os.path.join(os.path.dirname(__file__), 'import_from_lingualeo', 'favicon.ico')
+        path = os.path.join(os.path.dirname(__file__), 'lingualeo', 'favicon.ico')
         loc = locale.getdefaultlocale()[1] 
         path = unicode(path, loc)
         self.setWindowIcon(QIcon(path))               
@@ -107,7 +112,7 @@ class PluginWindow(QDialog):
         note = notes.Note(collection, model)
         # Note is an SQLite object in Anki so you need to fill it out
         # inside the main thread
-        note = fill_note(word, note, destination_folder)
+        note = utils.fill_note(word, note, destination_folder)
         collection.addNote(note)
     
     def setFinalCount(self, counter):
@@ -134,10 +139,10 @@ class Download(QThread):
 
     def run(self):
         collection = mw.col    
-        lingualeo = connect.Lingualeo(self.login, self.password)
+        leo = connect.Lingualeo(self.login, self.password)
         try:
-            status = lingualeo.auth()        
-            words = lingualeo.get_all_words()
+            status = leo.auth()        
+            words = leo.get_all_words()
         except urllib2.URLError:
             msg = "Can't download words. Check your internet connection."
             self.emit(SIGNAL('Error'), msg)
@@ -154,7 +159,7 @@ class Download(QThread):
             words = [word for word in words if word.get('progress_percent') < 100]
         self.emit(SIGNAL('Length'), len(words))
         counter = 0
-        model = prepare_model(collection, fields, model_css)
+        model = utils.prepare_model(collection, utils.fields, styles.model_css)
         destination_folder = collection.media.dir()
         problem_words = []
         for word in words:
@@ -164,7 +169,7 @@ class Download(QThread):
             # thread in Anki. Also you cannot download files in the main
             # thread because it will freeze GUI
             try:
-                send_to_download(word, destination_folder)
+                utils.send_to_download(word, destination_folder)
             except (urllib2.URLError, socket.error):
                 # For rare cases of broken links for media files in LinguaLeo
                 problem_word = problem_words.append(word.get('word_value'))
