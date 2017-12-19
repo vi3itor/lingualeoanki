@@ -63,7 +63,8 @@ def prepare_model(collection, fields, model_css):
     return model
 
 
-def download_media_file(destination_folder, url):
+def download_media_file(url):
+    destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
     abs_path = os.path.join(destination_folder, name)
     resp = urlopen(url)
@@ -73,17 +74,17 @@ def download_media_file(destination_folder, url):
     binfile.close()
 
 
-def send_to_download(word, destination_folder):
+def send_to_download(word):
     picture_url = word.get('picture_url')
     if picture_url:
         picture_url = 'http:' + picture_url
-        download_media_file(destination_folder, picture_url)
+        download_media_file(picture_url)
     sound_url = word.get('sound_url')
     if sound_url:
-        download_media_file(destination_folder, sound_url)
+        download_media_file(sound_url)
 
 
-def fill_note(word, note, destination_folder):
+def fill_note(word, note):
     note['en'] = word['word_value']
     note['ru'] = word['user_translates'][0]['translate_value']
     if word.get('transcription'):
@@ -101,14 +102,8 @@ def fill_note(word, note, destination_folder):
     return note
 
 
-def add_word(input):
-    """
-    Note is an SQLite object in Anki so you need
-    to fill it out inside the main thread
-    input: tuple from a worker's thread signal
-    """
-    word, model, destination_folder = input
+def add_word(word, model):
     collection = mw.col
     note = notes.Note(collection, model)
-    note = fill_note(word, note, destination_folder)
+    note = fill_note(word, note)
     collection.addNote(note)
