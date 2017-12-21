@@ -112,7 +112,7 @@ class PluginWindow(QDialog):
 
     def cancelButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
-            self.threadclass.quit()
+            self.threadclass.terminate()
         mw.reset()
         self.close()
 
