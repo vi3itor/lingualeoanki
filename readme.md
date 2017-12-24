@@ -1,5 +1,8 @@
 # Import Words From LinguaLeo to Anki
 
+[English](#en) / [Russian](#rus)
+
+##En <a name='en'></a>
 ### Description ###
 
 This is an add-on for [Anki](https://apps.ankiweb.net/) - powerful, intelligent flash cards, which makes remembering things easy.
@@ -35,4 +38,45 @@ This project is licensed under the GPL License - see the [LICENSE](https://bitbu
 ### Acknowledgments ###
 
 [Ilya Isaev](https://github.com/relaxart) for [inspiration](https://habrahabr.ru/post/276495/) and his project [LeoPort](https://github.com/relaxart/LeoPort).
+
+
+##Russian <a id='rus'></a>
+
+### Описание ###
+
+Дополнение для [Anki](https://apps.ankiweb.net/) - программы для облегчения запоминания слов, выражений и любой другой информации с помощью интервальных повторений.
+
+Дополнение позволяет в один клик скачать ваши сохранённые слова из [LinguaLeo](https://lingualeo.com/), другой замечательной образовательной платформы для изучения и практики английского, и создать для них карточки Anki. Карточки создаются как в варианте "русский - английский", так и "английский - русский" и включают в себя изображения, транскрипцию, аудио с произношением и предложение с контекстом с ЛингваЛео. 
+
+### Установка ###
+
+Для установки дополнения скачайте архив с исходным кодом, откройте Anki на вашем компьютере, выберите меню "Инструменты" (Tools) > "Дополнения" (Add-ons) > "Открыть папку с дополнениями" ("Open Add-ons Folder") и скопируйте в него содержимое архива.
+
+Гифка с наглядным изображением процесса установки:
+
+![how to install the plugin](https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif)
+
+### Как это работает? ###
+
+После установки, чтобы импортировать ваши слова из LinguaLeo в Anki откройте меню "Инструменты" (Tools) и выберите пункт Import from LinguaLeo. Введите ваш логин и пароль для сайта и нажмите "Импорт". Никаких моделей, шаблонов, колод создавать не нужно, дополнение сделает всю работу за вас. Проще некуда.
+
+Если вы хотите импортировать не все слова, а только неизученные, поставьте галочку в поле "Unstudied only?"
+
+Наберитесь терпения. Импорт 1000 слов может занять минут 10 и более в зависимости от веса аудио с произношением и картинок.
+
+
+### Совместимость ###
+
+Дополнение будет работать только с версией Anki 2.0.x ≥ 2.0.44.
+Бета-версия 2.1 ещё не поддерживается.
+
+### Кроме того ###
+
+По вопросам работы дополнения (и любым другим) пишите мне сюда на [bitbucket](https://bitbucket.org/alex-altay/) или [вконтакт](https://vk.com/trutanov.alex).
+
+Свободное копирование и использование. Лицензия [GPL](https://bitbucket.org/alex-altay/lingualeoanki/src/70f0add7da031166f3fbd50dfd8e634236488840/LICENSE?at=master&fileviewer=file-view-default). 
+
+### Благодарности ###
+
+[Илья Исаев](https://github.com/relaxart) за [вдохновение](https://habrahabr.ru/post/276495/) и проект [LeoPort](https://github.com/relaxart/LeoPort).
 
