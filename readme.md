@@ -2,7 +2,7 @@
 
 [English](#en) / [Russian](#rus)
 
-##En <a name='en'></a>
+##<a name='en'>En</a>
 ### Description ###
 
 This is an add-on for [Anki](https://apps.ankiweb.net/) - powerful, intelligent flash cards, which makes remembering things easy.
@@ -40,7 +40,7 @@ This project is licensed under the GPL License - see the [LICENSE](https://bitbu
 [Ilya Isaev](https://github.com/relaxart) for [inspiration](https://habrahabr.ru/post/276495/) and his project [LeoPort](https://github.com/relaxart/LeoPort).
 
 
-##Russian <a id='rus'></a>
+##<a id='rus'>Russian</a>
 
 ### Описание ###
 
