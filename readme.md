@@ -11,6 +11,7 @@ The add-on downloads your dictionary from [LinguaLeo](https://lingualeo.com/) - 
 To install this add-on, open Anki on your computer, go to the Tools menu and then Add-ons > Open Add-ons Folder and put the source code there. 
 
 Watch this gif for the details (with russian captures):
+
 ![how to install the plugin](https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif)
 
 ### Usage ###
