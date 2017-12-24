@@ -10,6 +10,9 @@ The add-on downloads your dictionary from [LinguaLeo](https://lingualeo.com/) - 
 
 To install this add-on, open Anki on your computer, go to the Tools menu and then Add-ons > Open Add-ons Folder and put the source code there. 
 
+Watch this gif for the details (with russian captures):
+![how to install the plugin](https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif)
+
 ### Usage ###
 
 To download your words simply go to the Tools menu > Import from LinguaLeo, enter your login and password for the site and that's all. You don't need to create decks, models, templates or anything else. The add-on will make it all for you. As simple as that. 
@@ -31,3 +34,4 @@ This project is licensed under the GPL License - see the [LICENSE](https://bitbu
 ### Acknowledgments ###
 
 [Ilya Isaev](https://github.com/relaxart) for [inspiration](https://habrahabr.ru/post/276495/) and his project [LeoPort](https://github.com/relaxart/LeoPort).
+
