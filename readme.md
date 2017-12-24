@@ -1,8 +1,8 @@
 # Import Words From LinguaLeo to Anki
 
-[English](#en) / [Russian](#rus)
+[English](#markdown-header-english) / [Russian](#markdown-header-russian)
 
-##<a name='en'>En</a>
+##English
 ### Description ###
 
 This is an add-on for [Anki](https://apps.ankiweb.net/) - powerful, intelligent flash cards, which makes remembering things easy.
@@ -40,7 +40,7 @@ This project is licensed under the GPL License - see the [LICENSE](https://bitbu
 [Ilya Isaev](https://github.com/relaxart) for [inspiration](https://habrahabr.ru/post/276495/) and his project [LeoPort](https://github.com/relaxart/LeoPort).
 
 
-##<a id='rus'>Russian</a>
+##Russian
 
 ### Описание ###
 
