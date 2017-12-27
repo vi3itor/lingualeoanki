@@ -79,4 +79,5 @@ This project is licensed under the GPL License - see the [LICENSE](https://bitbu
 ### Благодарности ###
 
 [Илья Исаев](https://github.com/relaxart) за [вдохновение](https://habrahabr.ru/post/276495/) и проект [LeoPort](https://github.com/relaxart/LeoPort).
+[Николай Байков](https://github.com/bikenik) и всем кто помогал с тестированием на MacOs.
 
