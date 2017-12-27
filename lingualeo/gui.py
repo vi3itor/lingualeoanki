@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import locale
 import os
+import platform
 import socket
 import urllib2
 
@@ -26,10 +27,11 @@ class PluginWindow(QDialog):
         self.setWindowTitle('Import From LinguaLeo')
 
         # Window Icon
-        path = os.path.join(os.path.dirname(__file__), 'favicon.ico')
-        loc = locale.getdefaultlocale()[1]
-        path = unicode(path, loc)
-        self.setWindowIcon(QIcon(path))
+        if platform.system() == 'Windows':
+            path = os.path.join(os.path.dirname(__file__), 'favicon.ico')
+            loc = locale.getdefaultlocale()[1]
+            path = unicode(path, loc)
+            self.setWindowIcon(QIcon(path))
 
         # Buttons and fields
         self.importButton = QPushButton("Import", self)
