@@ -154,9 +154,9 @@ class Download(QThread):
         except urllib2.URLError:
             self.msg = "Can't download words. Check your internet connection."
         except ValueError:
-            if status.get('error_msg'):
+            try:
                 self.msg = status['error_msg']
-            else:
+            except:
                 self.msg = "There's been an unexpected error. Sorry about that!"
         if hasattr(self, 'msg'):
             self.emit(SIGNAL('Error'), self.msg)
