@@ -17,6 +17,8 @@ Watch this gif for the details (with russian captures):
 
 ![how to install the plugin](https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif)
 
+But the easiest way to install the plugin is by using the Anki's built-in add-ons system. Check it out on the plugin page on [Anki add-ons forum](https://ankiweb.net/shared/info/1411073333).
+
 ### Usage ###
 
 To download your words simply go to the Tools menu > Import from LinguaLeo, enter your login and password for the site and that's all. You don't need to create decks, models, templates or anything else. The add-on will make it all for you. As simple as that. 
@@ -55,6 +57,8 @@ This project is licensed under the GPL License - see the [LICENSE](https://bitbu
 Гифка с наглядным изображением процесса установки:
 
 ![how to install the plugin](https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif)
+
+Альтернативный (и самый простой способ) установки это система управления дополнениями самой Анки. Для этого зайдите на [страницу плагина] (https://ankiweb.net/shared/info/1411073333) на форуме дополнений Анки. В разделе Download скопируйте код в синей рамке. Откройте программу на вашем компьютере. Выберите меню Инструменты (Tools) > Дополнения (Add-ons) > Обзор и установка (Browse & Install) и вставьте скопированный код. Перезапустите программу.
 
 ### Как это работает? ###
 
