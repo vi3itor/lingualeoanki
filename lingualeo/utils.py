@@ -1,6 +1,8 @@
 import os
 from random import randint
-from urllib2 import urlopen
+import socket
+import urllib2
+import time
 
 from aqt import mw
 from anki import notes
@@ -64,24 +66,48 @@ def prepare_model(collection, fields, model_css):
 
 
 def download_media_file(url):
+    DOWNLOAD_TIMEOUT = 20
     destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
     abs_path = os.path.join(destination_folder, name)
-    resp = urlopen(url)
+    resp = urllib2.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
     media_file = resp.read()
     binfile = open(abs_path, "wb")
     binfile.write(media_file)
     binfile.close()
 
 
-def send_to_download(word):
+def send_to_download(word, thread):
+    NUM_RETRIES = 5
+    SLEEP_SECONDS = 5
+    # try to download the picture and the sound the specified number of times,
+    # if not succeeded, raise the last error happened to be shown as a problem word
     picture_url = word.get('picture_url')
     if picture_url:
+        exc_happened = None
         picture_url = 'http:' + picture_url
-        download_media_file(picture_url)
+        for i in xrange(NUM_RETRIES):
+            exc_happened = None
+            try:
+                download_media_file(picture_url)
+                break
+            except (urllib2.URLError, socket.error) as e:
+                thread.sleep(SLEEP_SECONDS)
+        if exc_happened:
+            raise
     sound_url = word.get('sound_url')
     if sound_url:
-        download_media_file(sound_url)
+        exc_happened = None
+        for i in xrange(NUM_RETRIES):
+            exc_happened = None
+            try:
+                download_media_file(sound_url)
+                break
+            except (urllib2.URLError, socket.error) as e:
+                exc_happened = e
+                thread.sleep(SLEEP_SECONDS)
+        if exc_happened:
+            raise
 
 
 def fill_note(word, note):
@@ -106,4 +132,17 @@ def add_word(word, model):
     collection = mw.col
     note = notes.Note(collection, model)
     note = fill_note(word, note)
-    collection.addNote(note)
+    dupes = collection.findDupes("en", word['word_value'])
+    note_dupes = collection.findNotes("en:'%s'" % word['word_value'])
+    if not dupes and not note_dupes:
+        collection.addNote(note)
+    elif (note['picture_name'] or note['sound_name']) and note_dupes:
+        # update existing notes with new pictures and sounds in case
+        # they have been changed in LinguaLeo's UI
+        for nid in note_dupes:
+            note_in_db = notes.Note(collection, id=nid)
+            if note['picture_name']:
+                note_in_db['picture_name'] = note['picture_name']
+            if note['sound_name']:
+                note_in_db['sound_name'] = note['sound_name']
+            note_in_db.flush()

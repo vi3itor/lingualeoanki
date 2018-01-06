@@ -126,7 +126,7 @@ class PluginWindow(QDialog):
 
     def downloadFinished(self):
         if hasattr(self, 'wordsFinalCount'):
-            showInfo("You have %d new words" % self.wordsFinalCount)
+            showInfo("%d words from LinguaLeo have been processed" % self.wordsFinalCount)
         if hasattr(self, 'errorMessage'):
             showInfo(self.errorMessage)
         mw.reset()
@@ -177,8 +177,8 @@ class Download(QThread):
         for word in words:
             self.emit(SIGNAL('Word'), word)
             try:
-                utils.send_to_download(word)
-            except (urllib2.URLError, socket.error):
+                utils.send_to_download(word, self)
+            except (urllib2.URLError, socket.error) as e:
                 problem_words.append(word.get('word_value'))
             counter += 1
             self.emit(SIGNAL('Counter'), counter)
