@@ -133,7 +133,10 @@ def add_word(word, model):
     note = notes.Note(collection, model)
     note = fill_note(word, note)
     dupes = collection.findDupes("en", word['word_value'])
-    note_dupes = collection.findNotes("en:'%s'" % word['word_value'])
+    # a hack to support words with apostrophes
+    note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
+    note_dupes2 = collection.findNotes('en:"%s"' % word['word_value'])
+    note_dupes = note_dupes1 + note_dupes2
     if not dupes and not note_dupes:
         collection.addNote(note)
     elif (note['picture_name'] or note['sound_name']) and note_dupes:
@@ -141,8 +144,14 @@ def add_word(word, model):
         # they have been changed in LinguaLeo's UI
         for nid in note_dupes:
             note_in_db = notes.Note(collection, id=nid)
-            if note['picture_name']:
+            # a dirty hack below until a new field in the model is introduced
+            # put a space before or after a *sound* field of an existing note if you want it to be updated
+            # if a note has no picture or sound, it will be updated anyway
+            sound_name = note_in_db['sound_name']
+            sound_name = sound_name.replace("&nbsp;", " ")
+            note_needs_update = sound_name != sound_name.strip()
+            if note['picture_name'] and (note_needs_update or not note_in_db['picture_name'].strip()):
                 note_in_db['picture_name'] = note['picture_name']
-            if note['sound_name']:
+            if note['sound_name'] and (note_needs_update or not note_in_db['sound_name'].strip()):
                 note_in_db['sound_name'] = note['sound_name']
             note_in_db.flush()
