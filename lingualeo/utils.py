@@ -107,3 +107,16 @@ def add_word(word, model):
     note = notes.Note(collection, model)
     note = fill_note(word, note)
     collection.addNote(note)
+
+
+# my adds
+def get_the_last_word():
+    # mid - id deck
+    # one should determine mid after second and next uploading data
+    # to upload correctly to the deck
+    m = mw.col.models.byName("LinguaLeo_model")
+    mid = m['id']
+    last_word = mw.col.db.execute("SELECT sfld FROM notes WHERE mid = " + str(mid) + " ORDER BY id DESC LIMIT 1")
+    for row in last_word:
+        last = row
+    return last[0]
