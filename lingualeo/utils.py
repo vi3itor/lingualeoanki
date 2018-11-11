@@ -155,3 +155,16 @@ def add_word(word, model):
             if note['sound_name'] and (note_needs_update or not note_in_db['sound_name'].strip()):
                 note_in_db['sound_name'] = note['sound_name']
             note_in_db.flush()
+
+
+# my adds
+def get_the_last_word():
+    # mid - id deck
+    # one should determine mid after second and next uploading data
+    # to upload correctly to the deck
+    m = mw.col.models.byName("LinguaLeo_model")
+    mid = m['id']
+    last_word = mw.col.db.execute("SELECT sfld FROM notes WHERE mid = " + str(mid) + " ORDER BY id DESC LIMIT 1")
+    for row in last_word:
+        last = row
+    return last[0]
