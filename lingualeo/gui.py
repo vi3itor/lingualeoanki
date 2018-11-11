@@ -47,6 +47,8 @@ class PluginWindow(QDialog):
         self.progressBar = QProgressBar()
         self.checkBox = QCheckBox()
         self.checkBoxLabel = QLabel('Unstudied only?')
+        self.checkBoxMissed = QCheckBox()
+        self.checkBoxLabelMissed = QLabel('Missed words?')
 
         # Main layout - vertical box
         vbox = QVBoxLayout()
@@ -58,6 +60,7 @@ class PluginWindow(QDialog):
         fbox.addRow(passLabel, self.passField)
         fbox.addRow(self.progressLabel, self.progressBar)
         fbox.addRow(self.checkBoxLabel, self.checkBox)
+        fbox.addRow(self.checkBoxLabelMissed, self.checkBoxMissed)
         self.progressLabel.hide()
         self.progressBar.hide()
 
@@ -86,13 +89,18 @@ class PluginWindow(QDialog):
         login = self.loginField.text()
         password = self.passField.text()
         unstudied = self.checkBox.checkState()
+        missed = self.checkBoxMissed.checkState()
         self.importButton.setEnabled(False)
         self.checkBox.setEnabled(False)
+        self.checkBoxMissed.setEnabled(False)
         self.progressLabel.show()
         self.progressBar.show()
         self.progressBar.setValue(0)
 
-        self.threadclass = Download(login, password, unstudied)
+        # Find last word to work "missed function"
+        last_word = self.lastWord()
+
+        self.threadclass = Download(login, password, unstudied, missed, last_word)
         self.threadclass.start()
         self.connect(self.threadclass, SIGNAL('Length'), self.progressBar.setMaximum)
         self.setModel()
@@ -111,6 +119,10 @@ class PluginWindow(QDialog):
         to fill it out inside the main thread
         """
         utils.add_word(word, self.model)
+
+    def lastWord(self):
+        last_word = utils.get_the_last_word()
+        return last_word;
 
     def cancelButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
@@ -134,11 +146,13 @@ class PluginWindow(QDialog):
 
 
 class Download(QThread):
-    def __init__(self, login, password, unstudied, parent=None):
+    def __init__(self, login, password, unstudied, missed, last_word, parent=None):
         QThread.__init__(self, parent)
-        self.login = login
-        self.password = password
+        self.login     = login
+        self.password  = password
         self.unstudied = unstudied
+        self.missed    = missed
+        self.last_word = last_word
 
     def run(self):
         words = self.get_words_to_add()
@@ -150,7 +164,7 @@ class Download(QThread):
         leo = connect.Lingualeo(self.login, self.password)
         try:
             status = leo.auth()
-            words = leo.get_all_words()
+            words = leo.get_all_words(self.missed, self.last_word)
         except urllib2.URLError:
             self.msg = "Can't download words. Check your internet connection."
         except ValueError:
@@ -163,6 +177,7 @@ class Download(QThread):
             return None
         if self.unstudied:
             words = [word for word in words if word.get('progress_percent') < 100]
+
         return words
 
     def add_separately(self, words):
@@ -174,7 +189,7 @@ class Download(QThread):
         """
         counter = 0
         problem_words = []
-        for word in words:
+        for word in reversed(words):
             self.emit(SIGNAL('Word'), word)
             try:
                 utils.send_to_download(word, self)

@@ -3,7 +3,6 @@ import urllib
 import urllib2
 from cookielib import CookieJar
 
-
 class Lingualeo:
     def __init__(self, email, password):
         self.email = email
@@ -26,7 +25,8 @@ class Lingualeo:
         req = opener.open(url, data)
         return json.loads(req.read())
 
-    def get_all_words(self):
+
+    def get_all_words(self, missed, last_word):
         """
         The JSON consists of list "userdict3" on each page
         Inside of each userdict there is a list of periods with names
@@ -40,6 +40,14 @@ class Lingualeo:
             periods = self.get_page(page_number)
             if len(periods) > 0:
                 for period in periods:
+                    # if missed can be 2(True) or 0(False)
+                    # i have no idea why True doesn't output
+                    if missed == 2:
+                        if period['words']:
+                            for period_word in period['words']:
+                                if period_word['word_value'] == last_word:
+                                    return words
+
                     words += period['words']
             else:
                 have_periods = False
