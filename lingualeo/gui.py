@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 import locale
+#from PyQt5.QtWidgets import *
 import os
 import platform
 import socket
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
-from anki import notes
 from aqt import mw
 from aqt.utils import showInfo
-from PyQt4.QtGui import (QDialog, QIcon, QPushButton, QHBoxLayout,
-                         QVBoxLayout, QLineEdit, QFormLayout,
-                         QLabel, QProgressBar, QCheckBox)
-from PyQt4.QtCore import QThread, SIGNAL
+from aqt.qt import *
+#from PyQt5.QtCore import QThread, pyqtSignal
 
-from lingualeo import connect
-from lingualeo import utils
-from lingualeo import styles
+from . import connect
+from . import utils
+from . import styles
 
 
 class PluginWindow(QDialog):
@@ -30,7 +28,7 @@ class PluginWindow(QDialog):
         if platform.system() == 'Windows':
             path = os.path.join(os.path.dirname(__file__), 'favicon.ico')
             loc = locale.getdefaultlocale()[1]
-            path = unicode(path, loc)
+            path = str(path, loc)
             self.setWindowIcon(QIcon(path))
 
         # Buttons and fields
@@ -55,7 +53,6 @@ class PluginWindow(QDialog):
 
         # Form layout
         fbox = QFormLayout()
-        fbox.setMargin(10)
         fbox.addRow(loginLabel, self.loginField)
         fbox.addRow(passLabel, self.passField)
         fbox.addRow(self.progressLabel, self.progressBar)
@@ -66,7 +63,7 @@ class PluginWindow(QDialog):
 
         # Horizontal layout for buttons
         hbox = QHBoxLayout()
-        hbox.setMargin(10)
+        hbox.setContentsMargins(10, 10, 10, 10)
         hbox.addStretch()
         hbox.addWidget(self.importButton)
         hbox.addWidget(self.cancelButton)
@@ -102,12 +99,12 @@ class PluginWindow(QDialog):
 
         self.threadclass = Download(login, password, unstudied, missed, last_word)
         self.threadclass.start()
-        self.connect(self.threadclass, SIGNAL('Length'), self.progressBar.setMaximum)
+        self.threadclass.Length.connect(self.progressBar.setMaximum)
         self.setModel()
-        self.connect(self.threadclass, SIGNAL('Word'), self.addWord)
-        self.connect(self.threadclass, SIGNAL('Counter'), self.progressBar.setValue)
-        self.connect(self.threadclass, SIGNAL('FinalCounter'), self.setFinalCount)
-        self.connect(self.threadclass, SIGNAL('Error'), self.setErrorMessage)
+        self.threadclass.Word.connect(self.addWord)
+        self.threadclass.Counter.connect(self.progressBar.setValue)
+        self.threadclass.FinalCounter.connect(self.setFinalCount)
+        self.threadclass.Error.connect(self.setErrorMessage)
         self.threadclass.finished.connect(self.downloadFinished)
 
     def setModel(self):
@@ -146,6 +143,12 @@ class PluginWindow(QDialog):
 
 
 class Download(QThread):
+    Length = pyqtSignal()
+    Error = pyqtSignal()
+    Word = pyqtSignal()
+    Counter = pyqtSignal()
+    FinalCounter = pyqtSignal()
+
     def __init__(self, login, password, unstudied, missed, last_word, parent=None):
         QThread.__init__(self, parent)
         self.login     = login
@@ -157,7 +160,7 @@ class Download(QThread):
     def run(self):
         words = self.get_words_to_add()
         if words:
-            self.emit(SIGNAL('Length'), len(words))
+            self.Length.emit(len(words))
             self.add_separately(words)
 
     def get_words_to_add(self):
@@ -165,7 +168,7 @@ class Download(QThread):
         try:
             status = leo.auth()
             words = leo.get_all_words(self.missed, self.last_word)
-        except urllib2.URLError:
+        except urllib.error.URLError:
             self.msg = "Can't download words. Check your internet connection."
         except ValueError:
             try:
@@ -173,7 +176,7 @@ class Download(QThread):
             except:
                 self.msg = "There's been an unexpected error. Sorry about that!"
         if hasattr(self, 'msg'):
-            self.emit(SIGNAL('Error'), self.msg)
+            self.Error.emit(self.msg)
             return None
         if self.unstudied:
             words = [word for word in words if word.get('progress_percent') < 100]
@@ -190,14 +193,14 @@ class Download(QThread):
         counter = 0
         problem_words = []
         for word in reversed(words):
-            self.emit(SIGNAL('Word'), word)
+            self.Word.emit(word)
             try:
                 utils.send_to_download(word, self)
-            except (urllib2.URLError, socket.error) as e:
+            except (urllib.error.URLError, socket.error) as e:
                 problem_words.append(word.get('word_value'))
             counter += 1
-            self.emit(SIGNAL('Counter'), counter)
-        self.emit(SIGNAL('FinalCounter'), counter)
+            self.Counter.emit(counter)
+        self.FinalCounter.emit(counter)
         if problem_words:
             self.problem_words_msg(problem_words)
 
@@ -208,4 +211,4 @@ class Download(QThread):
         for problem_word in problem_words[:-1]:
             error_msg += problem_word + ', '
         error_msg += problem_words[-1] + '.'
-        self.emit(SIGNAL('Error'), error_msg)
+        self.Error.emit(error_msg)

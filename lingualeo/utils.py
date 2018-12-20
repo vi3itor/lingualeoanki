@@ -1,13 +1,13 @@
 import os
 from random import randint
 import socket
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import time
 
 from aqt import mw
 from anki import notes
 
-from lingualeo import styles
+from . import styles
 
 
 fields = ['en', 'transcription',
@@ -70,7 +70,7 @@ def download_media_file(url):
     destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
     abs_path = os.path.join(destination_folder, name)
-    resp = urllib2.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
+    resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
     media_file = resp.read()
     binfile = open(abs_path, "wb")
     binfile.write(media_file)
@@ -86,28 +86,28 @@ def send_to_download(word, thread):
     if picture_url:
         exc_happened = None
         picture_url = 'http:' + picture_url
-        for i in xrange(NUM_RETRIES):
+        for i in list(range(NUM_RETRIES)):
             exc_happened = None
             try:
                 download_media_file(picture_url)
                 break
-            except (urllib2.URLError, socket.error) as e:
+            except (urllib.error.URLError, socket.error) as e:
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
-            raise
+            raise e
     sound_url = word.get('sound_url')
     if sound_url:
         exc_happened = None
-        for i in xrange(NUM_RETRIES):
+        for i in list(range(NUM_RETRIES)):
             exc_happened = None
             try:
                 download_media_file(sound_url)
                 break
-            except (urllib2.URLError, socket.error) as e:
+            except (urllib.error.URLError, socket.error) as e:
                 exc_happened = e
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
-            raise
+            raise e
 
 
 def fill_note(word, note):

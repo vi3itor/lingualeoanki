@@ -1,7 +1,8 @@
 import json
-import urllib
-import urllib2
-from cookielib import CookieJar
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+from http.cookiejar import CookieJar
+
 
 class Lingualeo:
     def __init__(self, email, password):
@@ -20,11 +21,10 @@ class Lingualeo:
         return self.get_content(url, values)['userdict3']
 
     def get_content(self, url, values):
-        data = urllib.urlencode(values)
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cj))
+        data = urllib.parse.urlencode(values)
+        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
         req = opener.open(url, data)
         return json.loads(req.read())
-
 
     def get_all_words(self, missed, last_word):
         """

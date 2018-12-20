@@ -1,7 +1,8 @@
+# import the main window object (mw) from aqt
 from aqt import mw
 from aqt.qt import QAction
 
-from lingualeo import gui
+from .lingualeo import gui
 
 
 def activate():
