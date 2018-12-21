@@ -31,6 +31,9 @@ class PluginWindow(QDialog):
             path = str(path, loc)
             self.setWindowIcon(QIcon(path))
 
+        # Load config file
+        self.config = mw.addonManager.getConfig('lingualeoanki')
+
         # Buttons and fields
         self.importButton = QPushButton("Import", self)
         self.cancelButton = QPushButton("Cancel", self)
@@ -43,10 +46,12 @@ class PluginWindow(QDialog):
         self.passField.setEchoMode(QLineEdit.Password)
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
-        self.checkBox = QCheckBox()
-        self.checkBoxLabel = QLabel('Unstudied only?')
-        self.checkBoxMissed = QCheckBox()
-        self.checkBoxLabelMissed = QLabel('Missed words?')
+        self.checkBoxRememberPass = QCheckBox()
+        self.checkBoxRememberPassLabel = QLabel('Remember password')
+        self.checkBoxUnstudied = QCheckBox()
+        self.checkBoxUnstudiedLabel = QLabel('Unstudied only')
+        # self.checkBoxMissed = QCheckBox()
+        # self.checkBoxLabelMissed = QLabel('Missed words?')
 
         # Main layout - vertical box
         vbox = QVBoxLayout()
@@ -55,9 +60,10 @@ class PluginWindow(QDialog):
         fbox = QFormLayout()
         fbox.addRow(loginLabel, self.loginField)
         fbox.addRow(passLabel, self.passField)
+        fbox.addRow(self.checkBoxRememberPassLabel, self.checkBoxRememberPass)
         fbox.addRow(self.progressLabel, self.progressBar)
-        fbox.addRow(self.checkBoxLabel, self.checkBox)
-        fbox.addRow(self.checkBoxLabelMissed, self.checkBoxMissed)
+        fbox.addRow(self.checkBoxUnstudiedLabel, self.checkBoxUnstudied)
+        # fbox.addRow(self.checkBoxLabelMissed, self.checkBoxMissed)
         self.progressLabel.hide()
         self.progressBar.hide()
 
@@ -79,28 +85,39 @@ class PluginWindow(QDialog):
         # Set focus for typing from the keyboard
         # You have to do it after creating all widgets
         self.loginField.setFocus()
+        if self.config['rememberPassword'] == 1:
+            self.checkBoxRememberPass.setChecked(True)
+            self.loginField.setText(self.config['email'])
+            self.passField.setText(self.config['password'])
 
         self.show()
 
     def importButtonClicked(self):
         login = self.loginField.text()
         password = self.passField.text()
-        unstudied = self.checkBox.checkState()
-        missed = self.checkBoxMissed.checkState()
+        if self.checkBoxRememberPass.checkState():
+            self.config['email'] = login
+            self.config['password'] = password
+            self.config['rememberPassword'] = 1
+            mw.addonManager.writeConfig(__name__, self.config)
+
+        unstudied = self.checkBoxUnstudied.checkState()
+        # missed = self.checkBoxMissed.checkState()
         self.importButton.setEnabled(False)
-        self.checkBox.setEnabled(False)
-        self.checkBoxMissed.setEnabled(False)
+        self.checkBoxUnstudied.setEnabled(False)
+        # self.checkBoxMissed.setEnabled(False)
         self.progressLabel.show()
         self.progressBar.show()
         self.progressBar.setValue(0)
 
+        # Run before lastWord() to create a model if it doesn't exist
+        self.setModel()
         # Find last word to work "missed function"
-        last_word = self.lastWord()
+        # last_word = self.lastWord()
 
-        self.threadclass = Download(login, password, unstudied, missed, last_word)
+        self.threadclass = Download(login, password, unstudied)  # , missed, last_word)
         self.threadclass.start()
         self.threadclass.Length.connect(self.progressBar.setMaximum)
-        self.setModel()
         self.threadclass.Word.connect(self.addWord)
         self.threadclass.Counter.connect(self.progressBar.setValue)
         self.threadclass.FinalCounter.connect(self.setFinalCount)
@@ -117,9 +134,9 @@ class PluginWindow(QDialog):
         """
         utils.add_word(word, self.model)
 
-    def lastWord(self):
-        last_word = utils.get_the_last_word()
-        return last_word;
+    # def lastWord(self):
+    #     last_word = utils.get_the_last_word()
+    #     return last_word;
 
     def cancelButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
@@ -143,31 +160,31 @@ class PluginWindow(QDialog):
 
 
 class Download(QThread):
-    Length = pyqtSignal()
-    Error = pyqtSignal()
-    Word = pyqtSignal()
-    Counter = pyqtSignal()
-    FinalCounter = pyqtSignal()
+    Length = pyqtSignal(int)
+    Error = pyqtSignal(str)
+    Word = pyqtSignal(dict)
+    Counter = pyqtSignal(int)
+    FinalCounter = pyqtSignal(int)
 
-    def __init__(self, login, password, unstudied, missed, last_word, parent=None):
+    def __init__(self, login, password, unstudied, parent=None):  # , missed, last_word removed
         QThread.__init__(self, parent)
-        self.login     = login
-        self.password  = password
+        self.login = login
+        self.password = password
         self.unstudied = unstudied
-        self.missed    = missed
-        self.last_word = last_word
+        # self.missed = missed
+        # self.last_word = last_word
 
     def run(self):
         words = self.get_words_to_add()
         if words:
-            self.Length.emit(len(words))
+            self.Length.emit(len(words))  # removed argument len(words)
             self.add_separately(words)
 
     def get_words_to_add(self):
         leo = connect.Lingualeo(self.login, self.password)
         try:
             status = leo.auth()
-            words = leo.get_all_words(self.missed, self.last_word)
+            words = leo.get_all_words()  # self.missed, self.last_word)
         except urllib.error.URLError:
             self.msg = "Can't download words. Check your internet connection."
         except ValueError:

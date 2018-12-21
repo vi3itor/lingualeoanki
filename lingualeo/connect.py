@@ -21,12 +21,12 @@ class Lingualeo:
         return self.get_content(url, values)['userdict3']
 
     def get_content(self, url, values):
-        data = urllib.parse.urlencode(values)
+        data = urllib.parse.urlencode(values).encode("utf-8")
         opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
         req = opener.open(url, data)
         return json.loads(req.read())
 
-    def get_all_words(self, missed, last_word):
+    def get_all_words(self):  # , missed, last_word):
         """
         The JSON consists of list "userdict3" on each page
         Inside of each userdict there is a list of periods with names
@@ -42,12 +42,11 @@ class Lingualeo:
                 for period in periods:
                     # if missed can be 2(True) or 0(False)
                     # i have no idea why True doesn't output
-                    if missed == 2:
-                        if period['words']:
-                            for period_word in period['words']:
-                                if period_word['word_value'] == last_word:
-                                    return words
-
+                    # if missed == 2:
+                    #     if period['words']:
+                    #         for period_word in period['words']:
+                    #             if period_word['word_value'] == last_word:
+                    #                 return words
                     words += period['words']
             else:
                 have_periods = False
