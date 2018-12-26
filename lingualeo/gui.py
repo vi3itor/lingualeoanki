@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 import locale
-#from PyQt5.QtWidgets import *
-import os
+
 import platform
 import socket
-import urllib.request, urllib.error, urllib.parse
+import urllib.error
 
 from aqt import mw
 from aqt.utils import showInfo
 from aqt.qt import *
-#from PyQt5.QtCore import QThread, pyqtSignal
 
 from . import connect
 from . import utils
@@ -35,9 +33,12 @@ class PluginWindow(QDialog):
         self.config = mw.addonManager.getConfig('lingualeoanki')
 
         # Buttons and fields
-        self.importButton = QPushButton("Import", self)
+        self.importButton = QPushButton("Import all", self)
+        # TODO Rename buttons appropriately
+        self.wordsetButton = QPushButton("Wordsets", self)
         self.cancelButton = QPushButton("Cancel", self)
         self.importButton.clicked.connect(self.importButtonClicked)
+        self.wordsetButton.clicked.connect(self.wordsetButtonClicked)
         self.cancelButton.clicked.connect(self.cancelButtonClicked)
         loginLabel = QLabel('Your LinguaLeo Login:')
         self.loginField = QLineEdit()
@@ -72,6 +73,7 @@ class PluginWindow(QDialog):
         hbox.setContentsMargins(10, 10, 10, 10)
         hbox.addStretch()
         hbox.addWidget(self.importButton)
+        hbox.addWidget(self.wordsetButton)
         hbox.addWidget(self.cancelButton)
         hbox.addStretch()
 
@@ -95,6 +97,8 @@ class PluginWindow(QDialog):
     def importButtonClicked(self):
         login = self.loginField.text()
         password = self.passField.text()
+
+        # Save email and password to config
         if self.checkBoxRememberPass.checkState():
             self.config['email'] = login
             self.config['password'] = password
@@ -123,6 +127,18 @@ class PluginWindow(QDialog):
         self.threadclass.FinalCounter.connect(self.setFinalCount)
         self.threadclass.Error.connect(self.setErrorMessage)
         self.threadclass.finished.connect(self.downloadFinished)
+
+    def wordsetButtonClicked(self):
+        login = self.loginField.text()
+        password = self.passField.text()
+        unstudied = self.checkBoxUnstudied.checkState()
+
+        self.importButton.setEnabled(False)
+        self.wordsetButton.setEnabled(False)
+
+        wordset_window = WordsetsWindow(login, password, unstudied)
+        wordset_window.exec_()
+        self.importButton.setEnabled(True)
 
     def setModel(self):
         self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
@@ -159,6 +175,62 @@ class PluginWindow(QDialog):
         self.close()
 
 
+class WordsetsWindow(QDialog):
+    def __init__(self, login, password, unstudied, parent=None):
+        QDialog.__init__(self, parent)
+        self.initUI(login, password, unstudied)
+
+    def initUI(self, login, password, unstudied):
+        self.setWindowTitle('Choose wordsets to import')
+
+        # Buttons and fields
+        self.selectButton = QPushButton("Select", self)
+        self.cancelButton = QPushButton("Cancel", self)
+        self.selectButton.clicked.connect(self.selectButtonClicked)
+        self.cancelButton.clicked.connect(self.cancelButtonClicked)
+        self.listWidget = QListWidget()
+        self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        # TODO: check if setGeometry is needed
+        # self.listWidget.setGeometry(QRect(10, 10, 211, 291))
+
+        self.layout = QVBoxLayout()
+
+        download = Download(login, password, unstudied)  # , missed, last_word)
+        wordsets = download.get_wordsets()
+
+        if not wordsets:
+            self.showErrorMessage("No wordsets found")
+
+        for wordset in wordsets:
+            item = QListWidgetItem(wordset['name'])
+            self.listWidget.addItem(item)
+
+        self.layout.addWidget(self.listWidget)
+        self.layout.addWidget(self.selectButton)
+        self.layout.addWidget(self.cancelButton)
+        self.setLayout(self.layout)
+        self.show()
+
+    def selectButtonClicked(self):
+        items = self.listWidget.selectedItems()
+        x = []
+        for i in range(len(items)):
+            x.append(str(self.listWidget.selectedItems()[i].text()))
+
+        print(x)
+        mw.reset()
+        self.close()
+
+    def cancelButtonClicked(self):
+        mw.reset()
+        self.close()
+
+    def showErrorMessage(self, msg):
+        showInfo(msg)
+        mw.reset()
+        self.close()
+
+
 class Download(QThread):
     Length = pyqtSignal(int)
     Error = pyqtSignal(str)
@@ -174,24 +246,40 @@ class Download(QThread):
         # self.missed = missed
         # self.last_word = last_word
 
+    # TODO: Consider the order of buttons clicked and reimplement run method
     def run(self):
+        self.get_connection(self.login, self.password)
         words = self.get_words_to_add()
         if words:
-            self.Length.emit(len(words))  # removed argument len(words)
+            self.Length.emit(len(words))
             self.add_separately(words)
 
-    def get_words_to_add(self):
-        leo = connect.Lingualeo(self.login, self.password)
+    def get_connection(self, login, password):
+        self.leo = connect.Lingualeo(login, password)
         try:
-            status = leo.auth()
-            words = leo.get_all_words()  # self.missed, self.last_word)
+            status = self.leo.auth()
         except urllib.error.URLError:
-            self.msg = "Can't download words. Check your internet connection."
+            self.msg = "Can't authorize. Check your internet connection."
         except ValueError:
             try:
                 self.msg = status['error_msg']
             except:
                 self.msg = "There's been an unexpected error. Sorry about that!"
+        if hasattr(self, 'msg'):
+            self.Error.emit(self.msg)
+
+    def get_wordsets(self):
+        self.get_connection(self.login, self.password)
+        return self.leo.get_wordsets()
+
+    def get_words_to_add(self):
+        try:
+            words = self.leo.get_all_words()  # self.missed, self.last_word)
+        except urllib.error.URLError:
+            self.msg = "Can't download words. Check your internet connection."
+        except ValueError:
+            self.msg = "There's been an unexpected error. Sorry about that!"
+
         if hasattr(self, 'msg'):
             self.Error.emit(self.msg)
             return None

@@ -155,10 +155,9 @@ def add_word(word, model):
             if note['sound_name'] and (note_needs_update or not note_in_db['sound_name'].strip()):
                 note_in_db['sound_name'] = note['sound_name']
             note_in_db.flush()
-    collection.addNote(note)
 
 
-# my adds
+# TODO: Decide to keep or remove
 def get_the_last_word():
     # mid - id deck
     # one should determine mid after second and next uploading data
