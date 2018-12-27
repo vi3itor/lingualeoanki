@@ -23,6 +23,12 @@ class Lingualeo:
         values = {'filter': 'all', 'page': page_number}
         return self.get_content(url, values)['userdict3']
 
+    # Get the words of a particular wordset
+    def get_page_by_group_id(self, group_id, page_number):
+        url = 'http://lingualeo.com/ru/userdict/json'
+        values = {'filter': 'all', 'page': page_number, 'groupId': group_id}
+        return self.get_content(url, values)['userdict3']
+
     def get_content(self, url, values):
         data = urllib.parse.urlencode(values).encode("utf-8") if values else None
         opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
@@ -56,15 +62,28 @@ class Lingualeo:
             page_number += 1
         return words
 
+    def get_words_by_wordsets(self, wordsets):
+        words = []
+        # TODO: Consider not adding words that are included in multiple wordsets
+        for wordset in wordsets:
+            page_number = 1
+            group_id = wordset['id']
+            periods = self.get_page_by_group_id(group_id, page_number)
+            while len(periods) > 0:
+                for period in periods:
+                    words += period['words']
+                page_number += 1
+                periods = self.get_page_by_group_id(group_id, page_number)
+        return words
+
     def get_wordsets(self):
         """
-        Get user's wordsets,
-        including default ones
+        Get user's wordsets, including default ones,
+        and return non empty
         """
         url = "https://lingualeo.com/ru/userdict3/getWordSets"
         # get all wordsets (including empty ones)
-        content = self.get_content(url, None)
-        all_wordsets = content["result"]
+        all_wordsets = self.get_content(url, None)["result"]
         wordsets = []
 
         for wordset in all_wordsets:
