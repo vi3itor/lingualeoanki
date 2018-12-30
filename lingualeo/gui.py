@@ -29,44 +29,55 @@ class PluginWindow(QDialog):
             path = str(path, loc)
             self.setWindowIcon(QIcon(path))
 
-        # Load config file
-        self.config = mw.addonManager.getConfig('lingualeoanki')
-
-        # Buttons and fields
-        # TODO: Add tooltip with explanation, that it will add
-        self.importAllButton = QPushButton("Import all words", self)
-        # TODO Rename buttons appropriately
-        self.wordsetButton = QPushButton("Import from dictionaries", self)
-        self.cancelButton = QPushButton("Cancel", self)
-        self.importAllButton.clicked.connect(self.importAllButtonClicked)
-        self.wordsetButton.clicked.connect(self.wordsetButtonClicked)
-        self.cancelButton.clicked.connect(self.cancelButtonClicked)
+        # Login section
         loginLabel = QLabel('Your LinguaLeo Login:')
         self.loginField = QLineEdit()
         passLabel = QLabel('Your LinguaLeo Password:')
         self.passField = QLineEdit()
         self.passField.setEchoMode(QLineEdit.Password)
+        self.loginButton = QPushButton("Log In")
+        self.logoutButton = QPushButton("Log Out")
+
+        # Buttons and fields
+        # TODO: Add tooltip with explanation: it will not replace already existing words
+        self.importAllButton = QPushButton("Import all words", self)
+        # TODO Rename buttons appropriately
+        self.wordsetButton = QPushButton("Import from dictionaries", self)
+        self.cancelButton = QPushButton("Close", self)
+        self.importAllButton.clicked.connect(self.importAllButtonClicked)
+        self.wordsetButton.clicked.connect(self.wordsetButtonClicked)
+        self.cancelButton.clicked.connect(self.cancelButtonClicked)
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
         self.checkBoxRememberPass = QCheckBox()
         self.checkBoxRememberPassLabel = QLabel('Remember password')
+
+        # TODO Replace checkbox with radiobutton (Unstudied or Studied or All)
         self.checkBoxUnstudied = QCheckBox()
         self.checkBoxUnstudiedLabel = QLabel('Unstudied only')
 
         # Main layout - vertical box
         vbox = QVBoxLayout()
 
-        # Form layout
+        # Form layouts
+        login_form = QFormLayout()
+        login_form.addRow(loginLabel, self.loginField)
+        login_form.addRow(passLabel, self.passField)
+        login_form.addRow(self.checkBoxRememberPassLabel, self.checkBoxRememberPass)
+
         fbox = QFormLayout()
-        fbox.addRow(loginLabel, self.loginField)
-        fbox.addRow(passLabel, self.passField)
-        fbox.addRow(self.checkBoxRememberPassLabel, self.checkBoxRememberPass)
         fbox.addRow(self.checkBoxUnstudiedLabel, self.checkBoxUnstudied)
         fbox.addRow(self.progressLabel, self.progressBar)
         self.progressLabel.hide()
         self.progressBar.hide()
 
-        # Horizontal layout for buttons
+        # Horizontal layout for login buttons
+        login_buttons = QHBoxLayout()
+        login_buttons.setContentsMargins(10, 10, 10, 10)
+        login_buttons.addWidget(self.loginButton)
+        login_buttons.addWidget(self.logoutButton)
+
+        # Horizontal layout for import buttons
         hbox = QHBoxLayout()
         hbox.setContentsMargins(10, 10, 10, 10)
         hbox.addStretch()
@@ -75,9 +86,13 @@ class PluginWindow(QDialog):
         hbox.addWidget(self.cancelButton)
         hbox.addStretch()
 
-        # Add form layout, then stretch and then buttons on main layout
-        vbox.addLayout(fbox)
+        # Add layouts to main layout
+        vbox.addLayout(login_form)
+        vbox.addStretch()
+        vbox.addLayout(login_buttons)
         vbox.addStretch(2)
+        vbox.addLayout(fbox)
+        vbox.addStretch(1)
         vbox.addLayout(hbox)
 
         # Set main layout
@@ -85,6 +100,9 @@ class PluginWindow(QDialog):
         # Set focus for typing from the keyboard
         # You have to do it after creating all widgets
         self.loginField.setFocus()
+
+        # Load config file
+        self.config = mw.addonManager.getConfig('lingualeoanki')
         if self.config['rememberPassword'] == 1:
             self.checkBoxRememberPass.setChecked(True)
             self.loginField.setText(self.config['email'])
