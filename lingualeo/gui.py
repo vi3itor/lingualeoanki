@@ -29,7 +29,7 @@ class PluginWindow(QDialog):
             path = str(path, loc)
             self.setWindowIcon(QIcon(path))
 
-        # Login section
+        # Login section widgets
         loginLabel = QLabel('Your LinguaLeo Login:')
         self.loginField = QLineEdit()
         passLabel = QLabel('Your LinguaLeo Password:')
@@ -37,20 +37,21 @@ class PluginWindow(QDialog):
         self.passField.setEchoMode(QLineEdit.Password)
         self.loginButton = QPushButton("Log In")
         self.logoutButton = QPushButton("Log Out")
+        self.loginButton.clicked.connect(self.loginButtonClicked)
+        self.logoutButton.clicked.connect(self.logoutButtonClicked)
+        self.checkBoxRememberPass = QCheckBox()
+        self.checkBoxRememberPassLabel = QLabel('Remember password')
 
-        # Buttons and fields
+        # Import section widgets
         # TODO: Add tooltip with explanation: it will not replace already existing words
-        self.importAllButton = QPushButton("Import all words", self)
-        # TODO Rename buttons appropriately
-        self.wordsetButton = QPushButton("Import from dictionaries", self)
-        self.cancelButton = QPushButton("Close", self)
+        self.importAllButton = QPushButton("Import all words")
+        self.importByDictionaryButton = QPushButton("Import from dictionaries")
+        self.cancelButton = QPushButton("Cancel")
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
-        self.wordsetButton.clicked.connect(self.wordsetButtonClicked)
+        self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
         self.cancelButton.clicked.connect(self.cancelButtonClicked)
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
-        self.checkBoxRememberPass = QCheckBox()
-        self.checkBoxRememberPassLabel = QLabel('Remember password')
 
         # TODO Replace checkbox with radiobutton (Unstudied or Studied or All)
         self.checkBoxUnstudied = QCheckBox()
@@ -73,7 +74,7 @@ class PluginWindow(QDialog):
 
         # Horizontal layout for login buttons
         login_buttons = QHBoxLayout()
-        login_buttons.setContentsMargins(10, 10, 10, 10)
+        # login_buttons.setContentsMargins(10, 10, 10, 10)
         login_buttons.addWidget(self.loginButton)
         login_buttons.addWidget(self.logoutButton)
 
@@ -82,17 +83,20 @@ class PluginWindow(QDialog):
         hbox.setContentsMargins(10, 10, 10, 10)
         hbox.addStretch()
         hbox.addWidget(self.importAllButton)
-        hbox.addWidget(self.wordsetButton)
+        hbox.addWidget(self.importByDictionaryButton)
         hbox.addWidget(self.cancelButton)
         hbox.addStretch()
 
+        self.importAllButton.setEnabled(False)
+        self.importByDictionaryButton.setEnabled(False)
+        self.checkBoxUnstudied.setEnabled(False)
+
         # Add layouts to main layout
         vbox.addLayout(login_form)
-        vbox.addStretch()
         vbox.addLayout(login_buttons)
-        vbox.addStretch(2)
+        vbox.addStretch()
         vbox.addLayout(fbox)
-        vbox.addStretch(1)
+        vbox.addStretch()
         vbox.addLayout(hbox)
 
         # Set main layout
@@ -110,32 +114,55 @@ class PluginWindow(QDialog):
 
         self.show()
 
-    def importAllButtonClicked(self):
-        login = self.loginField.text()
-        password = self.passField.text()
+    def loginButtonClicked(self):
+        # Save login and password
+        self.login = self.loginField.text()
+        self.password = self.passField.text()
 
         # Save email and password to config
         if self.checkBoxRememberPass.checkState():
-            self.config['email'] = login
-            self.config['password'] = password
+            self.config['email'] = self.login
+            self.config['password'] = self.password
             self.config['rememberPassword'] = 1
             mw.addonManager.writeConfig(__name__, self.config)
+
+        # Disable login button and fields
+        self.loginButton.setEnabled(False)
+        self.loginField.setEnabled(False)
+        self.passField.setEnabled(False)
+        self.checkBoxRememberPass.setEnabled(False)
+
+        # Enable all other buttons
+        self.logoutButton.setEnabled(True)
+        self.importAllButton.setEnabled(True)
+        self.importByDictionaryButton.setEnabled(True)
+        self.checkBoxUnstudied.setEnabled(True)
+
+    def logoutButtonClicked(self):
+        # Disable logout and other buttons
+        self.logoutButton.setEnabled(False)
+        self.importAllButton.setEnabled(False)
+        self.importByDictionaryButton.setEnabled(False)
+        self.checkBoxUnstudied.setEnabled(False)
+        # Enable Login button
+        self.loginButton.setEnabled(True)
+
+    def importAllButtonClicked(self):
 
         unstudied = self.checkBoxUnstudied.checkState()
         self.importAllButton.setEnabled(False)
         self.checkBoxUnstudied.setEnabled(False)
 
-        self.start_download_thread(login, password, unstudied)
+        self.start_download_thread(self.login, self.password, unstudied)
 
     def wordsetButtonClicked(self):
-        login = self.loginField.text()
-        password = self.passField.text()
         unstudied = self.checkBoxUnstudied.checkState()
 
         self.importAllButton.setEnabled(False)
-        self.wordsetButton.setEnabled(False)
+        self.importByDictionaryButton.setEnabled(False)
 
-        wordset_window = WordsetsWindow(login, password, unstudied)
+        № ЕЩВЩЖ Зкщсуыы учсузешщт ща вщцтдщфвюпуе_цщквыуеы()
+        wordset_window = WordsetsWindow(self.login, self.password, unstudied)
         wordset_window.Wordsets.connect(self.import_wordset_words)
         wordset_window.exec_()
 
@@ -173,10 +200,6 @@ class PluginWindow(QDialog):
         to fill it out inside the main thread
         """
         utils.add_word(word, self.model)
-
-    # def lastWord(self):
-    #     last_word = utils.get_the_last_word()
-    #     return last_word;
 
     def cancelButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
@@ -324,6 +347,7 @@ class Download(QThread):
         try:
             if wordsets:
                 words = self.leo.get_words_by_wordsets(wordsets)
+            # Import all words
             else:
                 words = self.leo.get_all_words()
         except urllib.error.URLError:
