@@ -20,7 +20,7 @@ class PluginWindow(QDialog):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('Import From LinguaLeo')
+        self.setWindowTitle('Import from LinguaLeo')
 
         # Window Icon
         if platform.system() == 'Windows':
@@ -33,11 +33,12 @@ class PluginWindow(QDialog):
         self.config = mw.addonManager.getConfig('lingualeoanki')
 
         # Buttons and fields
-        self.importButton = QPushButton("Import all", self)
+        # TODO: Add tooltip with explanation, that it will add
+        self.importAllButton = QPushButton("Import all words", self)
         # TODO Rename buttons appropriately
-        self.wordsetButton = QPushButton("Wordsets", self)
+        self.wordsetButton = QPushButton("Import from dictionaries", self)
         self.cancelButton = QPushButton("Cancel", self)
-        self.importButton.clicked.connect(self.importButtonClicked)
+        self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.wordsetButton.clicked.connect(self.wordsetButtonClicked)
         self.cancelButton.clicked.connect(self.cancelButtonClicked)
         loginLabel = QLabel('Your LinguaLeo Login:')
@@ -51,8 +52,6 @@ class PluginWindow(QDialog):
         self.checkBoxRememberPassLabel = QLabel('Remember password')
         self.checkBoxUnstudied = QCheckBox()
         self.checkBoxUnstudiedLabel = QLabel('Unstudied only')
-        # self.checkBoxMissed = QCheckBox()
-        # self.checkBoxLabelMissed = QLabel('Missed words?')
 
         # Main layout - vertical box
         vbox = QVBoxLayout()
@@ -64,7 +63,6 @@ class PluginWindow(QDialog):
         fbox.addRow(self.checkBoxRememberPassLabel, self.checkBoxRememberPass)
         fbox.addRow(self.checkBoxUnstudiedLabel, self.checkBoxUnstudied)
         fbox.addRow(self.progressLabel, self.progressBar)
-        # fbox.addRow(self.checkBoxLabelMissed, self.checkBoxMissed)
         self.progressLabel.hide()
         self.progressBar.hide()
 
@@ -72,12 +70,12 @@ class PluginWindow(QDialog):
         hbox = QHBoxLayout()
         hbox.setContentsMargins(10, 10, 10, 10)
         hbox.addStretch()
-        hbox.addWidget(self.importButton)
+        hbox.addWidget(self.importAllButton)
         hbox.addWidget(self.wordsetButton)
         hbox.addWidget(self.cancelButton)
         hbox.addStretch()
 
-        # Add form layout, then stretch and then buttons in main layout
+        # Add form layout, then stretch and then buttons on main layout
         vbox.addLayout(fbox)
         vbox.addStretch(2)
         vbox.addLayout(hbox)
@@ -94,7 +92,7 @@ class PluginWindow(QDialog):
 
         self.show()
 
-    def importButtonClicked(self):
+    def importAllButtonClicked(self):
         login = self.loginField.text()
         password = self.passField.text()
 
@@ -106,13 +104,8 @@ class PluginWindow(QDialog):
             mw.addonManager.writeConfig(__name__, self.config)
 
         unstudied = self.checkBoxUnstudied.checkState()
-        # missed = self.checkBoxMissed.checkState()
-        self.importButton.setEnabled(False)
+        self.importAllButton.setEnabled(False)
         self.checkBoxUnstudied.setEnabled(False)
-        # self.checkBoxMissed.setEnabled(False)
-
-        # Find last word to work "missed function"
-        # last_word = self.lastWord()
 
         self.start_download_thread(login, password, unstudied)
 
@@ -121,7 +114,7 @@ class PluginWindow(QDialog):
         password = self.passField.text()
         unstudied = self.checkBoxUnstudied.checkState()
 
-        self.importButton.setEnabled(False)
+        self.importAllButton.setEnabled(False)
         self.wordsetButton.setEnabled(False)
 
         wordset_window = WordsetsWindow(login, password, unstudied)
@@ -141,10 +134,10 @@ class PluginWindow(QDialog):
         self.progressBar.setValue(0)
 
         # Set Anki Model
-        self.setModel()
+        self.set_model()
 
         # Start downloading
-        self.threadclass = Download(login, password, unstudied, wordsets)  # , missed, last_word)
+        self.threadclass = Download(login, password, unstudied, wordsets)
         self.threadclass.start()
         self.threadclass.Length.connect(self.progressBar.setMaximum)
         self.threadclass.Word.connect(self.addWord)
@@ -153,7 +146,7 @@ class PluginWindow(QDialog):
         self.threadclass.Error.connect(self.setErrorMessage)
         self.threadclass.finished.connect(self.downloadFinished)
 
-    def setModel(self):
+    def set_model(self):
         self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
 
     def addWord(self, word):
@@ -200,9 +193,9 @@ class WordsetsWindow(QDialog):
         self.setWindowTitle('Choose dictionaries to import')
 
         # Buttons and fields
-        self.selectButton = QPushButton("Select", self)
+        self.importButton = QPushButton("Import", self)
         self.cancelButton = QPushButton("Cancel", self)
-        self.selectButton.clicked.connect(self.selectButtonClicked)
+        self.importButton.clicked.connect(self.importButtonClicked)
         self.cancelButton.clicked.connect(self.cancelButtonClicked)
         label = QLabel("Hold Ctrl (Cmd) to pick several dictionaries")
         self.listWidget = QListWidget()
@@ -212,11 +205,14 @@ class WordsetsWindow(QDialog):
 
         self.layout = QVBoxLayout()
 
-        download = Download(login, password, unstudied, wordsets=None)  # , missed, last_word)
+        self.layout.addWidget(self.listWidget)
+
+        download = Download(login, password, unstudied, wordsets=None)
+        download.Error.connect(self.show_error_message)
         self.wordsets = download.get_wordsets()
 
         if not self.wordsets:
-            self.showErrorMessage("No wordsets found")
+            self.show_error_message("No dictionaries found")
 
         for wordset in self.wordsets:
             item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words)'
@@ -224,13 +220,19 @@ class WordsetsWindow(QDialog):
             self.listWidget.addItem(item)
 
         self.layout.addWidget(label)
-        self.layout.addWidget(self.listWidget)
-        self.layout.addWidget(self.selectButton)
-        self.layout.addWidget(self.cancelButton)
+
+        # Horizontal layout for buttons
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(10, 10, 10, 10)
+        hbox.addStretch()
+
+        hbox.addWidget(self.importButton)
+        hbox.addWidget(self.cancelButton)
+        self.layout.addLayout(hbox)
         self.setLayout(self.layout)
         self.show()
 
-    def selectButtonClicked(self):
+    def importButtonClicked(self):
         items = self.listWidget.selectedItems()
         selected_names = []
         for i in range(len(items)):
@@ -250,7 +252,7 @@ class WordsetsWindow(QDialog):
         mw.reset()
         self.close()
 
-    def showErrorMessage(self, msg):
+    def show_error_message(self, msg):
         showInfo(msg)
         mw.reset()
         self.close()
@@ -263,15 +265,13 @@ class Download(QThread):
     Counter = pyqtSignal(int)
     FinalCounter = pyqtSignal(int)
 
-    def __init__(self, login, password, unstudied, wordsets, parent=None):  # , missed, last_word removed
+    def __init__(self, login, password, unstudied, wordsets, parent=None):
         QThread.__init__(self, parent)
         self.login = login
         self.password = password
         self.unstudied = unstudied
         if wordsets:
             self.wordsets = wordsets
-        # self.missed = missed
-        # self.last_word = last_word
 
     # TODO: Consider the order of buttons clicked and reimplement run method
     def run(self):
@@ -296,6 +296,7 @@ class Download(QThread):
                 self.msg = "There's been an unexpected error. Sorry about that!"
         if hasattr(self, 'msg'):
             self.Error.emit(self.msg)
+            return None
 
     def get_wordsets(self):
         self.get_connection(self.login, self.password)
@@ -306,7 +307,7 @@ class Download(QThread):
             if wordsets:
                 words = self.leo.get_words_by_wordsets(wordsets)
             else:
-                words = self.leo.get_all_words()  # self.missed, self.last_word)
+                words = self.leo.get_all_words()
         except urllib.error.URLError:
             self.msg = "Can't download words. Check your internet connection."
         except ValueError:
@@ -329,6 +330,9 @@ class Download(QThread):
         """
         counter = 0
         problem_words = []
+
+        # TODO: utils have to prepare a list of not duplicates first and then send to download
+
         for word in reversed(words):
             self.Word.emit(word)
             try:
@@ -338,6 +342,10 @@ class Download(QThread):
             counter += 1
             self.Counter.emit(counter)
         self.FinalCounter.emit(counter)
+
+        # TODO: save problem words in json format to user_files folder
+        # TODO: ask user to retry downloading problem words
+
         if problem_words:
             self.problem_words_msg(problem_words)
 
