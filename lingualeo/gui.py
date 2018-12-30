@@ -196,13 +196,15 @@ class WordsetsWindow(QDialog):
         self.initUI(login, password, unstudied)
 
     def initUI(self, login, password, unstudied):
-        self.setWindowTitle('Choose wordsets to import')
+
+        self.setWindowTitle('Choose dictionaries to import')
 
         # Buttons and fields
         self.selectButton = QPushButton("Select", self)
         self.cancelButton = QPushButton("Cancel", self)
         self.selectButton.clicked.connect(self.selectButtonClicked)
         self.cancelButton.clicked.connect(self.cancelButtonClicked)
+        label = QLabel("Hold Ctrl (Cmd) to pick several dictionaries")
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         # TODO: check if setGeometry is needed
@@ -217,9 +219,11 @@ class WordsetsWindow(QDialog):
             self.showErrorMessage("No wordsets found")
 
         for wordset in self.wordsets:
-            item = QListWidgetItem(wordset['name'])
+            item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words)'
+            item = QListWidgetItem(item_name)
             self.listWidget.addItem(item)
 
+        self.layout.addWidget(label)
         self.layout.addWidget(self.listWidget)
         self.layout.addWidget(self.selectButton)
         self.layout.addWidget(self.cancelButton)
