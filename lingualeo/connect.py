@@ -15,8 +15,13 @@ class Lingualeo:
     def auth(self):
         url = "http://api.lingualeo.com/api/login"
         values = {"email": self.email, "password": self.password}
-        # TODO: Save and load cookies to user_files folder. Use API call "isauthorized"
+        # TODO: Save and load cookies to user_files folder. Use is_authorized
         return self.get_content(url, values)
+
+    def is_authorized(self):
+        url = 'http://api.lingualeo.com/api/isauthorized'
+        status = self.get_content(url, None)
+        return status['is_authorized']
 
     def get_page(self, page_number):
         url = 'http://lingualeo.com/ru/userdict/json'

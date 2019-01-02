@@ -87,6 +87,8 @@ class PluginWindow(QDialog):
         hbox.addWidget(self.cancelButton)
         hbox.addStretch()
 
+        # Disable buttons
+        self.logoutButton.setEnabled(False)
         self.importAllButton.setEnabled(False)
         self.importByDictionaryButton.setEnabled(False)
         self.checkBoxUnstudied.setEnabled(False)
@@ -119,16 +121,25 @@ class PluginWindow(QDialog):
         self.login = self.loginField.text()
         self.password = self.passField.text()
 
-        # Save email and password to config
-        if self.checkBoxRememberPass.checkState():
-            self.config['email'] = self.login
-            self.config['password'] = self.password
-            self.config['rememberPassword'] = 1
+        # Save email and password to config if they differ
+        if (self.config['email'] != self.login or
+            self.config['password'] != self.password):
+            # Write config only if it is different
+            if self.checkBoxRememberPass.checkState():
+                self.config['email'] = self.login
+                self.config['password'] = self.password
+                self.config['rememberPassword'] = 1
+            else:
+                self.config['email'] = ''
+                self.config['password'] = ''
+                self.config['rememberPassword'] = 0
+
             mw.addonManager.writeConfig(__name__, self.config)
 
         authorization = Download(self.login, self.password, unstudied=None, wordsets=None)
         # TODO Process incorrect login or password
-        # authorization.Error.connect()
+        authorization.Error.connect(self.showErrorMessage)
+        # TODO Don't close window if there's no connection to the internet
         authorization.get_connection()
 
         # Disable login button and fields
@@ -155,6 +166,8 @@ class PluginWindow(QDialog):
         self.passField.setEnabled(True)
         self.checkBoxRememberPass.setEnabled(True)
 
+        # TODO: a) Find if there is logout method in API; b) Delete cookies
+
     def importAllButtonClicked(self):
 
         unstudied = self.checkBoxUnstudied.checkState()
@@ -173,6 +186,8 @@ class PluginWindow(QDialog):
         wordset_window = WordsetsWindow(self.login, self.password, unstudied)
         wordset_window.Wordsets.connect(self.import_wordset_words)
         wordset_window.exec_()
+        self.importAllButton.setEnabled(True)
+        self.importByDictionaryButton.setEnabled(True)
 
     def import_wordset_words(self, wordsets):
         login = self.loginField.text()
@@ -221,6 +236,11 @@ class PluginWindow(QDialog):
     def setErrorMessage(self, msg):
         self.errorMessage = msg
 
+    def showErrorMessage(self, msg):
+        showInfo(msg)
+        mw.reset()
+        self.close()
+
     def downloadFinished(self):
         if hasattr(self, 'wordsFinalCount'):
             showInfo("%d words from LinguaLeo have been processed" % self.wordsFinalCount)
@@ -235,10 +255,12 @@ class WordsetsWindow(QDialog):
 
     def __init__(self, login, password, unstudied, parent=None):
         QDialog.__init__(self, parent)
-        self.initUI(login, password, unstudied)
+        self.login = login
+        self.password = password
+        self.unstudied = unstudied
+        self.initUI()
 
-    def initUI(self, login, password, unstudied):
-
+    def initUI(self):
         self.setWindowTitle('Choose dictionaries to import')
 
         # Buttons and fields
@@ -256,7 +278,7 @@ class WordsetsWindow(QDialog):
 
         self.layout.addWidget(self.listWidget)
 
-        download = Download(login, password, unstudied, wordsets=None)
+        download = Download(self.login, self.password, self.unstudied, wordsets=None)
         download.Error.connect(self.show_error_message)
         self.wordsets = download.get_wordsets()
 
@@ -266,6 +288,7 @@ class WordsetsWindow(QDialog):
         for wordset in self.wordsets:
             item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words)'
             item = QListWidgetItem(item_name)
+            item.wordset_id = wordset['id']
             self.listWidget.addItem(item)
 
         self.layout.addWidget(label)
@@ -283,14 +306,14 @@ class WordsetsWindow(QDialog):
 
     def importButtonClicked(self):
         items = self.listWidget.selectedItems()
-        selected_names = []
+        selected_ids = []
         for i in range(len(items)):
-            selected_names.append(str(self.listWidget.selectedItems()[i].text()))
+            selected_ids.append(str(items[i].wordset_id))
 
         selected_wordsets = []
 
         for wordset in self.wordsets:
-            if wordset['name'] in selected_names:
+            if str(wordset['id']) in selected_ids:
                 selected_wordsets.append(wordset.copy())
 
         self.Wordsets.emit(selected_wordsets)
@@ -324,7 +347,6 @@ class Download(QThread):
 
     # TODO: Consider the order of buttons clicked and reimplement run method
     def run(self):
-        self.get_connection()
         # Check if wordsets attribute exists
         wordsets = getattr(self, 'wordsets', None)
         words = self.get_words_to_add(wordsets)
@@ -335,24 +357,28 @@ class Download(QThread):
     def get_connection(self):
         self.leo = connect.Lingualeo(self.login, self.password)
         try:
-            status = self.leo.auth()
+            if not self.leo.is_authorized():
+                status = self.leo.auth()
+                if status['error_msg']:
+                    self.msg = status['error_msg']
         except urllib.error.URLError:
             self.msg = "Can't authorize. Check your internet connection."
         except ValueError:
-            try:
-                self.msg = status['error_msg']
-            except:
-                self.msg = "There's been an unexpected error. Sorry about that!"
+            # TODO improve exception handling
+            self.msg = "Value error"
+        except:
+            self.msg = "There's been an unexpected error. Sorry about that!"
         if hasattr(self, 'msg'):
             self.Error.emit(self.msg)
             return None
 
     def get_wordsets(self):
-        self.get_connection(self.login, self.password)
+        self.get_connection()
         return self.leo.get_wordsets()
 
     def get_words_to_add(self, wordsets=None):
         try:
+            self.get_connection()
             if wordsets:
                 words = self.leo.get_words_by_wordsets(wordsets)
             # Import all words
