@@ -126,6 +126,11 @@ class PluginWindow(QDialog):
             self.config['rememberPassword'] = 1
             mw.addonManager.writeConfig(__name__, self.config)
 
+        authorization = Download(self.login, self.password, unstudied=None, wordsets=None)
+        # TODO Process incorrect login or password
+        # authorization.Error.connect()
+        authorization.get_connection()
+
         # Disable login button and fields
         self.loginButton.setEnabled(False)
         self.loginField.setEnabled(False)
@@ -146,6 +151,9 @@ class PluginWindow(QDialog):
         self.checkBoxUnstudied.setEnabled(False)
         # Enable Login button
         self.loginButton.setEnabled(True)
+        self.loginField.setEnabled(True)
+        self.passField.setEnabled(True)
+        self.checkBoxRememberPass.setEnabled(True)
 
     def importAllButtonClicked(self):
 
@@ -161,7 +169,7 @@ class PluginWindow(QDialog):
         self.importAllButton.setEnabled(False)
         self.importByDictionaryButton.setEnabled(False)
 
-        № ЕЩВЩЖ Зкщсуыы учсузешщт ща вщцтдщфвюпуе_цщквыуеы()
+        # TODO: Process exception of download.get_wordsets()
         wordset_window = WordsetsWindow(self.login, self.password, unstudied)
         wordset_window.Wordsets.connect(self.import_wordset_words)
         wordset_window.exec_()
@@ -316,7 +324,7 @@ class Download(QThread):
 
     # TODO: Consider the order of buttons clicked and reimplement run method
     def run(self):
-        self.get_connection(self.login, self.password)
+        self.get_connection()
         # Check if wordsets attribute exists
         wordsets = getattr(self, 'wordsets', None)
         words = self.get_words_to_add(wordsets)
@@ -324,8 +332,8 @@ class Download(QThread):
             self.Length.emit(len(words))
             self.add_separately(words)
 
-    def get_connection(self, login, password):
-        self.leo = connect.Lingualeo(login, password)
+    def get_connection(self):
+        self.leo = connect.Lingualeo(self.login, self.password)
         try:
             status = self.leo.auth()
         except urllib.error.URLError:
