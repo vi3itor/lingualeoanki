@@ -109,6 +109,7 @@ class PluginWindow(QDialog):
         # You have to do it after creating all widgets
         self.loginField.setFocus()
 
+        # TODO: Support Anki 2.0 by manually reading config from json
         # Load config file
         self.config = mw.addonManager.getConfig('lingualeoanki')
         if self.config['rememberPassword'] == 1:
@@ -123,6 +124,7 @@ class PluginWindow(QDialog):
         self.login = self.loginField.text()
         self.password = self.passField.text()
 
+        # TODO: Support Anki 2.0 by manually writing json to config
         # Save email and password to config if they differ
         if (self.config['email'] != self.login or
             self.config['password'] != self.password):
@@ -135,7 +137,6 @@ class PluginWindow(QDialog):
                 self.config['email'] = ''
                 self.config['password'] = ''
                 self.config['rememberPassword'] = 0
-
             mw.addonManager.writeConfig(__name__, self.config)
 
         self.authorization = Download(self.login, self.password, None, None)
@@ -257,12 +258,12 @@ class PluginWindow(QDialog):
 class WordsetsWindow(QDialog):
     Wordsets = pyqtSignal(list)
 
-    def __init__(self, login, password, unstudied, download, parent=None):
+    def __init__(self, login, password, unstudied, authorization, parent=None):
         QDialog.__init__(self, parent)
         self.login = login
         self.password = password
         self.unstudied = unstudied
-        self.download = download
+        self.authorization = authorization
         self.initUI()
 
     def initUI(self):
@@ -276,13 +277,14 @@ class WordsetsWindow(QDialog):
         label = QLabel("Hold Ctrl (Cmd) to pick several dictionaries")
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        # TODO: Activate Import button only when some dictionary is selected
 
         self.layout = QVBoxLayout()
 
         self.layout.addWidget(self.listWidget)
 
-        self.download.Error.connect(self.show_error_message)
-        self.wordsets = self.download.get_wordsets()
+        self.authorization.Error.connect(self.show_error_message)
+        self.wordsets = self.authorization.get_wordsets()
 
         if not self.wordsets:
             self.show_error_message("No dictionaries found")
