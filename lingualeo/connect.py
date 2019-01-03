@@ -40,6 +40,20 @@ class Lingualeo:
         req = opener.open(url, data)
         return json.loads(req.read())
 
+    def get_wordsets(self):
+        """
+        Get user's dictionaries, including default ones,
+        and return non empty
+        """
+        url = "https://lingualeo.com/ru/userdict3/getWordSets"
+        # get all (including empty ones)
+        all_wordsets = self.get_content(url, None)["result"]
+        wordsets = []
+        for wordset in all_wordsets:
+            if wordset['countWords'] != 0:
+                wordsets.append(wordset.copy())
+        return wordsets
+
     def get_all_words(self):
         """
         The JSON consists of list "userdict3" on each page
@@ -58,31 +72,23 @@ class Lingualeo:
         return words
 
     def get_words_by_wordsets(self, wordsets):
-        # TODO: Use Set, not list, for words (eliminate words, included in multiple wordsets)
-        words = []
+        unique_words = []
         for wordset in wordsets:
             page_number = 1
             group_id = wordset['id']
             periods = self.get_page_by_group_id(group_id, page_number)
             while len(periods) > 0:
                 for period in periods:
-                    words += period['words']
+                    words = period['words']
+                    for word in words:
+                        if not self.is_word_exist(word, unique_words):
+                            unique_words.append(word)
                 page_number += 1
                 periods = self.get_page_by_group_id(group_id, page_number)
-        return words
+        return unique_words
 
-    def get_wordsets(self):
-        """
-        Get user's dictionaries, including default ones,
-        and return non empty
-        """
-        url = "https://lingualeo.com/ru/userdict3/getWordSets"
-        # get all (including empty ones)
-        all_wordsets = self.get_content(url, None)["result"]
-        wordsets = []
-
-        for wordset in all_wordsets:
-            if wordset['countWords'] != 0:
-                wordsets.append(wordset.copy())
-
-        return wordsets
+    def is_word_exist(self, check_word, words):
+        for word in words:
+            if word['word_id'] == check_word['word_id']:
+                return True
+        return False

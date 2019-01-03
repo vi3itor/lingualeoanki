@@ -1,8 +1,8 @@
 import os
 from random import randint
 import socket
-import urllib.request, urllib.error, urllib.parse
-import time
+import urllib.request
+import urllib.error
 
 from aqt import mw
 from anki import notes
@@ -129,6 +129,9 @@ def fill_note(word, note):
 
 
 def add_word(word, model):
+    # TODO: Introduce new fields to the model (pic_url and sound_url)
+    #  for testing if update is needed and implement a function
+    #  to update existing models (to introduce new fields) for compatibility
     collection = mw.col
     note = notes.Note(collection, model)
     note = fill_note(word, note)

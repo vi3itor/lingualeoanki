@@ -53,7 +53,10 @@ class PluginWindow(QDialog):
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
 
-        # TODO Replace checkbox with radiobutton (Unstudied or Studied or All)
+        # TODO: Implement GUI element to ask what style cards to create:
+        #  with typing correct answer or without
+
+        # TODO Replace checkbox with radiobutton (Studied or Unstudied or All)
         self.checkBoxUnstudied = QCheckBox()
         self.checkBoxUnstudiedLabel = QLabel('Unstudied only')
 
@@ -74,13 +77,12 @@ class PluginWindow(QDialog):
 
         # Horizontal layout for login buttons
         login_buttons = QHBoxLayout()
-        # login_buttons.setContentsMargins(10, 10, 10, 10)
+        # TODO: make buttons smaller
         login_buttons.addWidget(self.loginButton)
         login_buttons.addWidget(self.logoutButton)
 
         # Horizontal layout for import buttons
         hbox = QHBoxLayout()
-        hbox.setContentsMargins(10, 10, 10, 10)
         hbox.addStretch()
         hbox.addWidget(self.importAllButton)
         hbox.addWidget(self.importByDictionaryButton)
@@ -136,11 +138,11 @@ class PluginWindow(QDialog):
 
             mw.addonManager.writeConfig(__name__, self.config)
 
-        authorization = Download(self.login, self.password, unstudied=None, wordsets=None)
-        # TODO Process incorrect login or password
-        authorization.Error.connect(self.showErrorMessage)
-        # TODO Don't close window if there's no connection to the internet
-        authorization.get_connection()
+        self.authorization = Download(self.login, self.password, None, None)
+        # TODO Process incorrect login or password and don't close window
+        #  if login or pass doesn't match or there is no internet connection
+        self.authorization.Error.connect(self.showErrorMessage)
+        self.authorization.get_connection()
 
         # Disable login button and fields
         self.loginButton.setEnabled(False)
@@ -160,13 +162,15 @@ class PluginWindow(QDialog):
         self.importAllButton.setEnabled(False)
         self.importByDictionaryButton.setEnabled(False)
         self.checkBoxUnstudied.setEnabled(False)
-        # Enable Login button
+
+        self.authorization = None
+        # Enable Login button and fields
         self.loginButton.setEnabled(True)
         self.loginField.setEnabled(True)
         self.passField.setEnabled(True)
         self.checkBoxRememberPass.setEnabled(True)
 
-        # TODO: a) Find if there is logout method in API; b) Delete cookies
+        # TODO: Delete cookies here when they are implemented
 
     def importAllButtonClicked(self):
 
@@ -182,8 +186,8 @@ class PluginWindow(QDialog):
         self.importAllButton.setEnabled(False)
         self.importByDictionaryButton.setEnabled(False)
 
-        # TODO: Process exception of download.get_wordsets()
-        wordset_window = WordsetsWindow(self.login, self.password, unstudied)
+        # TODO: Process exceptions of get_wordsets()
+        wordset_window = WordsetsWindow(self.login, self.password, unstudied, self.authorization)
         wordset_window.Wordsets.connect(self.import_wordset_words)
         wordset_window.exec_()
         self.importAllButton.setEnabled(True)
@@ -253,11 +257,12 @@ class PluginWindow(QDialog):
 class WordsetsWindow(QDialog):
     Wordsets = pyqtSignal(list)
 
-    def __init__(self, login, password, unstudied, parent=None):
+    def __init__(self, login, password, unstudied, download, parent=None):
         QDialog.__init__(self, parent)
         self.login = login
         self.password = password
         self.unstudied = unstudied
+        self.download = download
         self.initUI()
 
     def initUI(self):
@@ -271,16 +276,13 @@ class WordsetsWindow(QDialog):
         label = QLabel("Hold Ctrl (Cmd) to pick several dictionaries")
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        # TODO: check if setGeometry is needed
-        # self.listWidget.setGeometry(QRect(10, 10, 211, 291))
 
         self.layout = QVBoxLayout()
 
         self.layout.addWidget(self.listWidget)
 
-        download = Download(self.login, self.password, self.unstudied, wordsets=None)
-        download.Error.connect(self.show_error_message)
-        self.wordsets = download.get_wordsets()
+        self.download.Error.connect(self.show_error_message)
+        self.wordsets = self.download.get_wordsets()
 
         if not self.wordsets:
             self.show_error_message("No dictionaries found")
@@ -345,7 +347,6 @@ class Download(QThread):
         if wordsets:
             self.wordsets = wordsets
 
-    # TODO: Consider the order of buttons clicked and reimplement run method
     def run(self):
         # Check if wordsets attribute exists
         wordsets = getattr(self, 'wordsets', None)
@@ -407,20 +408,22 @@ class Download(QThread):
         counter = 0
         problem_words = []
 
-        # TODO: utils have to prepare a list of not duplicates first and then send to download
+        # TODO: in utils prepare a list of not duplicates first and then send to download
 
+        # TODO: check if reversed is needed
         for word in reversed(words):
             self.Word.emit(word)
             try:
                 utils.send_to_download(word, self)
-            except (urllib.error.URLError, socket.error) as e:
+            except (urllib.error.URLError, socket.error):
                 problem_words.append(word.get('word_value'))
             counter += 1
+            # TODO Show numbers in progress bar
             self.Counter.emit(counter)
         self.FinalCounter.emit(counter)
 
         # TODO: save problem words in json format to user_files folder
-        # TODO: ask user to retry downloading problem words
+        #  and ask user to retry downloading problem words
 
         if problem_words:
             self.problem_words_msg(problem_words)
