@@ -13,6 +13,8 @@ from . import connect
 from . import utils
 from . import styles
 
+# TODO: Make Russian localization
+#  (since beginners are more comfortable with native language)
 
 class PluginWindow(QDialog):
     def __init__(self, parent=None):
@@ -56,9 +58,14 @@ class PluginWindow(QDialog):
         # TODO: Implement GUI element to ask what style cards to create:
         #  with typing correct answer or without
 
-        # TODO Replace checkbox with radiobutton (Studied or Unstudied or All)
-        self.checkBoxUnstudied = QCheckBox()
-        self.checkBoxUnstudiedLabel = QLabel('Unstudied only')
+        radio_buttons = QHBoxLayout()
+        self.rbutton_all = QRadioButton("All")
+        self.rbutton_studied = QRadioButton("Studied")
+        self.rbutton_unstudied = QRadioButton("Unstudied")
+        self.rbutton_all.setChecked(True)
+        radio_buttons.addWidget(self.rbutton_all)
+        radio_buttons.addWidget(self.rbutton_studied)
+        radio_buttons.addWidget(self.rbutton_unstudied)
 
         # Main layout - vertical box
         vbox = QVBoxLayout()
@@ -70,7 +77,7 @@ class PluginWindow(QDialog):
         login_form.addRow(self.checkBoxRememberPassLabel, self.checkBoxRememberPass)
 
         fbox = QFormLayout()
-        fbox.addRow(self.checkBoxUnstudiedLabel, self.checkBoxUnstudied)
+        fbox.addRow(radio_buttons)
         fbox.addRow(self.progressLabel, self.progressBar)
         self.progressLabel.hide()
         self.progressBar.hide()
@@ -93,7 +100,9 @@ class PluginWindow(QDialog):
         self.logoutButton.setEnabled(False)
         self.importAllButton.setEnabled(False)
         self.importByDictionaryButton.setEnabled(False)
-        self.checkBoxUnstudied.setEnabled(False)
+        self.rbutton_all.setEnabled(False)
+        self.rbutton_studied.setEnabled(False)
+        self.rbutton_unstudied.setEnabled(False)
 
         # Add layouts to main layout
         vbox.addLayout(login_form)
@@ -140,8 +149,8 @@ class PluginWindow(QDialog):
             mw.addonManager.writeConfig(__name__, self.config)
 
         self.authorization = Download(self.login, self.password, None, None)
-        # TODO Process incorrect login or password and don't close window
-        #  if login or pass doesn't match or there is no internet connection
+        # TODO if login or pass doesn't match or there is no internet connection
+        #  don't enable other buttons
         self.authorization.Error.connect(self.showErrorMessage)
         self.authorization.get_connection()
 
@@ -153,64 +162,50 @@ class PluginWindow(QDialog):
 
         # Enable all other buttons
         self.logoutButton.setEnabled(True)
-        self.importAllButton.setEnabled(True)
-        self.importByDictionaryButton.setEnabled(True)
-        self.checkBoxUnstudied.setEnabled(True)
+        self.set_download_form_enabled(True)
 
     def logoutButtonClicked(self):
         # Disable logout and other buttons
         self.logoutButton.setEnabled(False)
-        self.importAllButton.setEnabled(False)
-        self.importByDictionaryButton.setEnabled(False)
-        self.checkBoxUnstudied.setEnabled(False)
+        self.set_download_form_enabled(False)
 
         self.authorization = None
+        # TODO: Delete cookies here when they are implemented
+
         # Enable Login button and fields
         self.loginButton.setEnabled(True)
         self.loginField.setEnabled(True)
         self.passField.setEnabled(True)
         self.checkBoxRememberPass.setEnabled(True)
 
-        # TODO: Delete cookies here when they are implemented
-
     def importAllButtonClicked(self):
-
-        unstudied = self.checkBoxUnstudied.checkState()
-        self.importAllButton.setEnabled(False)
-        self.checkBoxUnstudied.setEnabled(False)
-
-        self.start_download_thread(self.login, self.password, unstudied)
+        # Disable buttons
+        self.set_download_form_enabled(False)
+        self.start_download_thread()
 
     def wordsetButtonClicked(self):
-        unstudied = self.checkBoxUnstudied.checkState()
-
-        self.importAllButton.setEnabled(False)
-        self.importByDictionaryButton.setEnabled(False)
+        self.set_download_form_enabled(False)
 
         # TODO: Process exceptions of get_wordsets()
-        wordset_window = WordsetsWindow(self.login, self.password, unstudied, self.authorization)
-        wordset_window.Wordsets.connect(self.import_wordset_words)
+        wordset_window = WordsetsWindow(self.authorization)
+        wordset_window.Wordsets.connect(self.start_download_thread)
+        wordset_window.Error.connect(self.showErrorMessage)
         wordset_window.exec_()
-        self.importAllButton.setEnabled(True)
-        self.importByDictionaryButton.setEnabled(True)
 
-    def import_wordset_words(self, wordsets):
-        login = self.loginField.text()
-        password = self.passField.text()
-        unstudied = self.checkBoxUnstudied.checkState()
-        self.start_download_thread(login, password, unstudied, wordsets)
-
-    def start_download_thread(self, login, password, unstudied, wordsets=None):
+    def start_download_thread(self, wordsets=None):
         # Activate progress bar
-        self.progressLabel.show()
-        self.progressBar.show()
         self.progressBar.setValue(0)
+        self.progressBar.show()
+        self.progressLabel.show()
 
         # Set Anki Model
         self.set_model()
 
+        # Get user's choice of words: {'Studied', 'Unstudied', 'All'}
+        progress = self.get_progress_type()
+
         # Start downloading
-        self.threadclass = Download(login, password, unstudied, wordsets)
+        self.threadclass = Download(self.login, self.password, progress, wordsets)
         self.threadclass.start()
         self.threadclass.Length.connect(self.progressBar.setMaximum)
         self.threadclass.Word.connect(self.addWord)
@@ -221,6 +216,25 @@ class PluginWindow(QDialog):
 
     def set_model(self):
         self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
+
+    def get_progress_type(self):
+        progress = 'All'
+        if self.rbutton_studied.isChecked():
+            progress = 'Studied'
+        elif self.rbutton_unstudied.isChecked():
+            progress = 'Unstudied'
+        return progress
+
+    def set_download_form_enabled(self, mode):
+        """
+        Set buttons either enabled or disabled
+        :param mode: True or False
+        """
+        self.importAllButton.setEnabled(mode)
+        self.importByDictionaryButton.setEnabled(mode)
+        self.rbutton_all.setEnabled(mode)
+        self.rbutton_studied.setEnabled(mode)
+        self.rbutton_unstudied.setEnabled(mode)
 
     def addWord(self, word):
         """
@@ -244,25 +258,26 @@ class PluginWindow(QDialog):
     def showErrorMessage(self, msg):
         showInfo(msg)
         mw.reset()
-        self.close()
 
     def downloadFinished(self):
         if hasattr(self, 'wordsFinalCount'):
             showInfo("%d words from LinguaLeo have been processed" % self.wordsFinalCount)
         if hasattr(self, 'errorMessage'):
-            showInfo(self.errorMessage)
+            self.showErrorMessage(self.errorMessage)
+
+        self.set_download_form_enabled(True)
+
+        self.progressLabel.hide()
+        self.progressBar.hide()
         mw.reset()
-        self.close()
 
 
 class WordsetsWindow(QDialog):
     Wordsets = pyqtSignal(list)
+    Error = pyqtSignal(str)
 
-    def __init__(self, login, password, unstudied, authorization, parent=None):
+    def __init__(self, authorization, parent=None):
         QDialog.__init__(self, parent)
-        self.login = login
-        self.password = password
-        self.unstudied = unstudied
         self.authorization = authorization
         self.initUI()
 
@@ -283,11 +298,11 @@ class WordsetsWindow(QDialog):
 
         self.layout.addWidget(self.listWidget)
 
-        self.authorization.Error.connect(self.show_error_message)
+        self.authorization.Error.connect(self.emit_error_message)
         self.wordsets = self.authorization.get_wordsets()
 
         if not self.wordsets:
-            self.show_error_message("No dictionaries found")
+            self.emit_error_message("No user dictionaries found")
 
         for wordset in self.wordsets:
             item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words)'
@@ -315,7 +330,6 @@ class WordsetsWindow(QDialog):
             selected_ids.append(str(items[i].wordset_id))
 
         selected_wordsets = []
-
         for wordset in self.wordsets:
             if str(wordset['id']) in selected_ids:
                 selected_wordsets.append(wordset.copy())
@@ -328,8 +342,8 @@ class WordsetsWindow(QDialog):
         mw.reset()
         self.close()
 
-    def show_error_message(self, msg):
-        showInfo(msg)
+    def emit_error_message(self, msg):
+        self.Error.emit(msg)
         mw.reset()
         self.close()
 
@@ -341,11 +355,11 @@ class Download(QThread):
     Counter = pyqtSignal(int)
     FinalCounter = pyqtSignal(int)
 
-    def __init__(self, login, password, unstudied, wordsets, parent=None):
+    def __init__(self, login, password, progress, wordsets, parent=None):
         QThread.__init__(self, parent)
         self.login = login
         self.password = password
-        self.unstudied = unstudied
+        self.progress = progress
         if wordsets:
             self.wordsets = wordsets
 
@@ -356,14 +370,19 @@ class Download(QThread):
         if words:
             self.Length.emit(len(words))
             self.add_separately(words)
+        else:
+            msg = "No words to download"
+            if not self.progress == 'All':
+                msg = "No " + self.progress + " words to download"
+            self.Error.emit(msg)
 
     def get_connection(self):
         self.leo = connect.Lingualeo(self.login, self.password)
         try:
-            if not self.leo.is_authorized():
-                status = self.leo.auth()
-                if status['error_msg']:
-                    self.msg = status['error_msg']
+            # TODO: for cookies: if not self.leo.is_authorized():
+            status = self.leo.auth()
+            if status['error_msg']:
+                self.msg = status['error_msg']
         except urllib.error.URLError:
             self.msg = "Can't authorize. Check your internet connection."
         except ValueError:
@@ -373,6 +392,7 @@ class Download(QThread):
             self.msg = "There's been an unexpected error. Sorry about that!"
         if hasattr(self, 'msg'):
             self.Error.emit(self.msg)
+            self.msg = ''
             return None
 
     def get_wordsets(self):
@@ -380,8 +400,8 @@ class Download(QThread):
         return self.leo.get_wordsets()
 
     def get_words_to_add(self, wordsets=None):
+        self.get_connection()
         try:
-            self.get_connection()
             if wordsets:
                 words = self.leo.get_words_by_wordsets(wordsets)
             # Import all words
@@ -394,9 +414,12 @@ class Download(QThread):
 
         if hasattr(self, 'msg'):
             self.Error.emit(self.msg)
+            self.msg = ''
             return None
-        if self.unstudied:
+        if self.progress == 'Unstudied':
             words = [word for word in words if word.get('progress_percent') < 100]
+        elif self.progress == 'Studied':
+            words = [word for word in words if word.get('progress_percent') == 100]
 
         return words
 
