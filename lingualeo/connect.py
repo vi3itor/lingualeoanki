@@ -42,12 +42,11 @@ class Lingualeo:
                 for period in periods:
                     # if missed can be 2(True) or 0(False)
                     # i have no idea why True doesn't output
-                    if missed == 2:
+                    if missed == 2 and last_word:
                         if period['words']:
                             for period_word in period['words']:
                                 if period_word['word_value'] == last_word:
                                     return words
-
                     words += period['words']
             else:
                 have_periods = False

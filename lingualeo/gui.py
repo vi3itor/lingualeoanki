@@ -122,7 +122,7 @@ class PluginWindow(QDialog):
 
     def lastWord(self):
         last_word = utils.get_the_last_word()
-        return last_word;
+        return last_word
 
     def cancelButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
