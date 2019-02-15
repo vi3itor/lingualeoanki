@@ -6,7 +6,7 @@ import urllib.error
 from http.cookiejar import CookieJar
 
 # TODO: Measure http vs https speed and consider doing https-only requests,
-#  or ask user what protocol to use
+#  or ask user what protocol to use (or use config for that purpose)
 
 class Lingualeo:
     def __init__(self, email, password):
@@ -44,8 +44,8 @@ class Lingualeo:
 
     def get_wordsets(self):
         """
-        Get user's dictionaries, including default ones,
-        and return non empty
+        Get user's dictionaries (wordsets), including default ones,
+        and return those, that are not empty
         """
         url = "http://lingualeo.com/ru/userdict3/getWordSets"
         # get all (including empty ones)

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 import locale
+import sys
 
 import platform
 import socket
@@ -27,8 +27,10 @@ class PluginWindow(QDialog):
         # Window Icon
         if platform.system() == 'Windows':
             path = os.path.join(os.path.dirname(__file__), 'favicon.ico')
-            loc = locale.getdefaultlocale()[1]
-            path = str(path, loc)
+            # Check Python version for Anki 2.0 support (in the future)
+            if sys.version_info[0] < 3:
+                loc = locale.getdefaultlocale()[1]
+                path = path.decode(loc)
             self.setWindowIcon(QIcon(path))
 
         # Login section widgets
@@ -56,7 +58,7 @@ class PluginWindow(QDialog):
         self.progressBar = QProgressBar()
 
         # TODO: Implement GUI element to ask what style cards to create:
-        #  with typing correct answer or without
+        #  with typing correct answer or without (or use config for that purpose)
 
         radio_buttons = QHBoxLayout()
         self.rbutton_all = QRadioButton("All")
@@ -120,7 +122,7 @@ class PluginWindow(QDialog):
 
         # TODO: Support Anki 2.0 by manually reading config from json
         # Load config file
-        self.config = mw.addonManager.getConfig('lingualeoanki')
+        self.config = mw.addonManager.getConfig(__name__)
         if self.config['rememberPassword'] == 1:
             self.checkBoxRememberPass.setChecked(True)
             self.loginField.setText(self.config['email'])
@@ -136,7 +138,7 @@ class PluginWindow(QDialog):
         # TODO: Support Anki 2.0 by manually writing json to config
         # Save email and password to config if they differ
         if (self.config['email'] != self.login or
-            self.config['password'] != self.password):
+                self.config['password'] != self.password):
             # Write config only if it is different
             if self.checkBoxRememberPass.checkState():
                 self.config['email'] = self.login
@@ -289,7 +291,10 @@ class WordsetsWindow(QDialog):
         self.cancelButton = QPushButton("Cancel", self)
         self.importButton.clicked.connect(self.importButtonClicked)
         self.cancelButton.clicked.connect(self.cancelButtonClicked)
-        label = QLabel("Hold Ctrl (Cmd) to pick several dictionaries")
+        key_name = 'Cmd'
+        if platform.system() == 'Windows' or platform.system() == 'Linux':
+            key_name = 'Ctrl'
+        label = QLabel('Hold ' + key_name + ' to select several dictionaries')
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         # TODO: Activate Import button only when some dictionary is selected
