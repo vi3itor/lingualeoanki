@@ -34,9 +34,9 @@ class PluginWindow(QDialog):
             self.setWindowIcon(QIcon(path))
 
         # Login section widgets
-        loginLabel = QLabel('Your LinguaLeo Login:')
+        loginLabel = QLabel('Your LinguaLeo login:')
         self.loginField = QLineEdit()
-        passLabel = QLabel('Your LinguaLeo Password:')
+        passLabel = QLabel('Your LinguaLeo password:')
         self.passField = QLineEdit()
         self.passField.setEchoMode(QLineEdit.Password)
         self.loginButton = QPushButton("Log In")
@@ -203,8 +203,8 @@ class PluginWindow(QDialog):
         # Set Anki Model
         self.set_model()
 
-        # Get user's choice of words: {'Studied', 'Unstudied', 'All'}
         progress = self.get_progress_type()
+        # Get user's choice of words: {'All', 'Studied', 'Unstudied'}
 
         # Start downloading
         self.threadclass = Download(self.login, self.password, progress, wordsets)
@@ -296,7 +296,7 @@ class WordsetsWindow(QDialog):
         key_name = 'Cmd'
         if platform.system() == 'Windows' or platform.system() == 'Linux':
             key_name = 'Ctrl'
-        label = QLabel('Hold ' + key_name + ' to select several dictionaries')
+        label = QLabel('Hold %s to select several dictionaries' % key_name)
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         # TODO: Activate Import button only when some dictionary is selected
@@ -312,7 +312,7 @@ class WordsetsWindow(QDialog):
             self.emit_error_message("No user dictionaries found")
 
         for wordset in self.wordsets:
-            item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words)'
+            item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words total)'
             item = QListWidgetItem(item_name)
             item.wordset_id = wordset['id']
             self.listWidget.addItem(item)
@@ -442,8 +442,7 @@ class Download(QThread):
 
         # TODO: in utils prepare a list of not duplicates first and then send to download
 
-        # TODO: check if reversed is needed
-        for word in reversed(words):
+        for word in words:
             self.Word.emit(word)
             try:
                 utils.send_to_download(word, self)

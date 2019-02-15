@@ -8,6 +8,7 @@ from http.cookiejar import CookieJar
 # TODO: Measure http vs https speed and consider doing https-only requests,
 #  or ask user what protocol to use (or use config for that purpose)
 
+
 class Lingualeo:
     def __init__(self, email, password):
         self.email = email
@@ -74,6 +75,10 @@ class Lingualeo:
         return words
 
     def get_words_by_wordsets(self, wordsets):
+        """
+        Since each word can belong to multiple dictionaries (wordsets),
+        we return a list of unique words only.
+        """
         unique_words = []
         for wordset in wordsets:
             page_number = 1
@@ -83,14 +88,15 @@ class Lingualeo:
                 for period in periods:
                     words = period['words']
                     for word in words:
-                        if not self.is_word_exist(word, unique_words):
+                        if not is_word_exist(word, unique_words):
                             unique_words.append(word)
                 page_number += 1
                 periods = self.get_page_by_group_id(group_id, page_number)
         return unique_words
 
-    def is_word_exist(self, check_word, words):
-        for word in words:
-            if word['word_id'] == check_word['word_id']:
-                return True
-        return False
+
+def is_word_exist(check_word, words):
+    for word in words:
+        if word['word_id'] == check_word['word_id']:
+            return True
+    return False
