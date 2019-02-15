@@ -6,8 +6,15 @@ from .lingualeo import gui
 
 
 def activate():
-    window = gui.PluginWindow()
-    window.exec_()
+    # Not to run multiple copies of a plugin window,
+    # we create an attribute in the mw object
+    if hasattr(mw, 'lingualeoanki'):
+        mw.lingualeoanki.activateWindow()
+        mw.lingualeoanki.raise_()
+    else:
+        window = gui.PluginWindow()
+        setattr(mw, 'lingualeoanki', window)
+        window.exec_()
 
 
 # create a new menu item

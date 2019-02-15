@@ -248,6 +248,8 @@ class PluginWindow(QDialog):
     def cancelButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
             self.threadclass.terminate()
+        # Delete attribute before closing to allow running the plugin again
+        delattr(mw, 'lingualeoanki')
         mw.reset()
         self.close()
 
