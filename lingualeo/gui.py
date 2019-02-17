@@ -4,6 +4,7 @@ import sys
 import platform
 import socket
 import urllib.error
+import requests.exceptions
 
 from aqt import mw
 from aqt.utils import showInfo
@@ -393,7 +394,7 @@ class Download(QThread):
             wordsets = self.leo.get_wordsets()
             if not wordsets:
                 self.msg = 'No user dictionaries found'
-        except (urllib.error.URLError, socket.error):
+        except (requests.exceptions.RequestException, socket.error):
             self.msg = "Can't get dictionaries. Check your internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
@@ -422,7 +423,7 @@ class Download(QThread):
                 self.msg = 'No words to download'
                 if not self.word_progress == 'All':
                     self.msg = 'No %s words to download' % self.word_progress.lower()
-        except urllib.error.URLError:
+        except requests.exceptions.RequestException:
             self.msg = "Can't download words. Check your internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"

@@ -1,58 +1,73 @@
-import json
-import urllib.request
-import urllib.parse
-import urllib.error
-
-from http.cookiejar import CookieJar
-
-# TODO: Measure http vs https speed and consider doing https-only requests,
-#  or ask user what protocol to use (or use config for that purpose)
+import requests
+import pickle
 
 
 class Lingualeo:
-    def __init__(self, email, password):
+    def __init__(self, email, password, cookies_path=None):
         self.email = email
         self.password = password
-        self.cj = CookieJar()
+        self.cookies_path = cookies_path
+        self.cj = requests.cookies.RequestsCookieJar()
+        try:
+            with open(cookies_path, 'rb') as f:
+                cookies = pickle.load(f)
+                self.cj.update(cookies)
+        except:
+            # TODO: narrow exception clause (FileNotFound, pickle.UnpicklingError, etc)
+            self.cj = requests.cookies.RequestsCookieJar()
 
     def auth(self):
-        url = "http://api.lingualeo.com/api/login"
-        values = {"email": self.email, "password": self.password}
-        # TODO: Save and load cookies to user_files folder. Use is_authorized
-        return self.get_content(url, values)
+        url = 'https://api.lingualeo.com/api/login'
+        values = {'email': self.email, 'password': self.password}
+        content = self.get_content(url, values)
+        if hasattr(self, 'cookies_path'):
+            with open(self.cookies_path, 'wb+') as f:
+                pickle.dump(self.cj, f)
+
+        return content
 
     def is_authorized(self):
-        url = 'http://api.lingualeo.com/api/isauthorized'
-        status = self.get_content(url, None)
-        return status['is_authorized']
+        url = 'https://api.lingualeo.com/api/isauthorized'
+        status = self.get_content(url, None)['is_authorized']
+        return status
 
     def get_page(self, page_number):
-        url = 'http://lingualeo.com/ru/userdict/json'
+        url = 'https://lingualeo.com/ru/userdict/json'
         values = {'filter': 'all', 'page': page_number}
         return self.get_content(url, values)['userdict3']
 
-    # Get the words of a particular dictionary (wordset)
     def get_page_by_group_id(self, group_id, page_number):
-        url = 'http://lingualeo.com/ru/userdict/json'
+        """
+        Get the words of a particular user dictionary (wordset)
+        """
+        url = 'https://lingualeo.com/ru/userdict/json'
         values = {'filter': 'all', 'page': page_number, 'groupId': group_id}
         return self.get_content(url, values)['userdict3']
 
     def get_content(self, url, values):
-        data = urllib.parse.urlencode(values).encode("utf-8") if values else None
-        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
-        req = opener.open(url, data)
-        return json.loads(req.read())
+        r = requests.get(url, params=values, cookies=self.cj)
+        self.cj.update(r.cookies)
+        return r.json()
+
+    # TODO: Measure http vs https speed and
+    #  consider adding 'http' option to config
+
+    # TODO: should we update cookies file with every request?
+    #  Or only in auth() and get_wordsets, get_all_words...
+
+    # TODO: Add processing of http status codes and raise an exception,
+    #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
 
     def get_wordsets(self):
         """
         Get user's dictionaries (wordsets), including default ones,
         and return those, that are not empty
         """
-        url = "http://lingualeo.com/ru/userdict3/getWordSets"
-        # get all (including empty ones)
+        url = 'https://lingualeo.com/ru/userdict3/getWordSets'
         all_wordsets = self.get_content(url, None)["result"]
         wordsets = []
         for wordset in all_wordsets:
+            # Add only non-empty dictionaries
             if wordset['countWords'] != 0:
                 wordsets.append(wordset.copy())
         return wordsets

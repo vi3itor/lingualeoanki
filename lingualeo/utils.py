@@ -70,6 +70,7 @@ def download_media_file(url):
     destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
     abs_path = os.path.join(destination_folder, name)
+    # TODO: change to Requests library
     resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
     media_file = resp.read()
     binfile = open(abs_path, "wb")
@@ -78,6 +79,7 @@ def download_media_file(url):
 
 
 def send_to_download(word, thread):
+    # TODO: Move to config following settings
     NUM_RETRIES = 5
     SLEEP_SECONDS = 5
     # try to download the picture and the sound the specified number of times,
@@ -92,9 +94,11 @@ def send_to_download(word, thread):
                 download_media_file(picture_url)
                 break
             except (urllib.error.URLError, socket.error) as e:
+                exc_happened = e
                 thread.sleep(SLEEP_SECONDS)
+            # TODO: Handle possible exceptions
         if exc_happened:
-            raise e
+            raise exc_happened
     sound_url = word.get('sound_url')
     if sound_url:
         exc_happened = None
@@ -107,7 +111,7 @@ def send_to_download(word, thread):
                 exc_happened = e
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
-            raise e
+            raise exc_happened
 
 
 def fill_note(word, note):
@@ -159,3 +163,29 @@ def add_word(word, model):
                 note_in_db['sound_name'] = note['sound_name']
             note_in_db.flush()
 
+
+def get_cookies_path():
+    """
+    Returns a full path to cookies.dat in the user_files folder
+    :return:
+    """
+    root = mw.pm.addonFolder()
+    # user_files folder in the current addon's dir
+    # TODO: check if it possible to get addon's name
+    uf_dir = os.path.join(root, 'lingualeoanki', 'user_files')
+    # Create a folder if doesn't exist
+    if not os.path.exists(uf_dir):
+        try:
+            os.makedirs(uf_dir)
+        except:
+            # TODO: Improve error handling
+            return None
+    return os.path.join(uf_dir, 'cookies.dat')
+
+
+def clean_cookies():
+    # TODO: Better handle file removal (check if exists or if in use)
+    try:
+        os.remove(get_cookies_path())
+    except:
+        pass
