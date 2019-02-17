@@ -90,7 +90,7 @@ class PluginWindow(QDialog):
 
         # Horizontal layout for login buttons
         login_buttons = QHBoxLayout()
-        # TODO: make buttons smaller
+        # TODO: make login and logout buttons smaller?
         login_buttons.addWidget(self.loginButton)
         login_buttons.addWidget(self.logoutButton)
 
@@ -130,10 +130,12 @@ class PluginWindow(QDialog):
             self.loginField.setText(self.config['email'])
             self.passField.setText(self.config['password'])
 
+        self.allow_to_close(True)
         self.show()
 
     def loginButtonClicked(self):
-        # Save login and password
+        self.allow_to_close(False)
+        # Read login and password
         self.login = self.loginField.text()
         self.password = self.passField.text()
 
@@ -164,19 +166,22 @@ class PluginWindow(QDialog):
             self.logoutButton.setEnabled(True)
             self.set_download_form_enabled(True)
 
+        self.allow_to_close(True)
+
     def logoutButtonClicked(self):
         # Disable logout and other buttons
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
 
         self.authorization = None
-        # TODO: Delete cookies here when they are implemented
+        utils.clean_cookies()
 
         # Enable Login button and fields
         self.loginButton.setEnabled(True)
         self.loginField.setEnabled(True)
         self.passField.setEnabled(True)
         self.checkBoxRememberPass.setEnabled(True)
+        self.allow_to_close(True)
 
     def importAllButtonClicked(self):
         # Disable buttons
@@ -184,6 +189,7 @@ class PluginWindow(QDialog):
         self.start_download_thread()
 
     def wordsetButtonClicked(self):
+        self.allow_to_close(False)
         wordsets = self.authorization.get_wordsets()
         if wordsets:
             self.set_download_form_enabled(False)
@@ -193,10 +199,12 @@ class PluginWindow(QDialog):
             wordset_window.exec_()
 
     def start_download_thread(self, wordsets=None):
+        self.allow_to_close(False)
         # Activate progress bar
         self.progressBar.setValue(0)
         self.progressBar.show()
         self.progressLabel.show()
+        self.logoutButton.setEnabled(False)
 
         # Set Anki Model
         self.set_model()
@@ -258,15 +266,28 @@ class PluginWindow(QDialog):
         showInfo(msg)
         mw.reset()
 
+    def allow_to_close(self, flag):
+        '''
+        Sets attribute 'silentlyClose' to allow Anki's main window
+        to automatically close plugin windows on exit
+        :param flag: bool
+        '''
+        if flag:
+            # Set attribute to allow Anki to close the plugin window
+            setattr(self, 'silentlyClose', 1)
+        elif hasattr(self, 'silentlyClose'):
+            delattr(self, 'silentlyClose')
+
     def downloadFinished(self):
         if hasattr(self, 'wordsFinalCount'):
             showInfo("%d words from LinguaLeo have been processed" % self.wordsFinalCount)
             del self.wordsFinalCount
 
         self.set_download_form_enabled(True)
-
+        self.logoutButton.setEnabled(True)
         self.progressLabel.hide()
         self.progressBar.hide()
+        self.allow_to_close(True)
         mw.reset()
 
 
@@ -316,6 +337,8 @@ class WordsetsWindow(QDialog):
         hbox.addWidget(self.cancelButton)
         self.layout.addLayout(hbox)
         self.setLayout(self.layout)
+        # Set attribute to allow Anki to close the plugin window
+        setattr(self, 'silentlyClose', 1)
         self.show()
 
     def importButtonClicked(self):
