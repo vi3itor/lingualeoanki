@@ -147,12 +147,12 @@ class PluginWindow(QDialog):
         # Update email or password in config only if they differ
         elif (self.config['email'] != self.login or
                 self.config['password'] != self.password):
-
-        self.authorization = Download(self.login, self.password, None, None)
             self.config['email'] = self.login
             self.config['password'] = self.password
             self.config['rememberPassword'] = 1
             utils.update_config(self.config)
+
+        self.authorization = Authorization(self.login, self.password)
         self.authorization.Error.connect(self.showErrorMessage)
 
         if self.authorization.get_connection():
@@ -213,7 +213,7 @@ class PluginWindow(QDialog):
         word_progress = self.get_progress_type()
 
         # Start downloading
-        self.threadclass = Download(self.login, self.password, word_progress, wordsets)
+        self.threadclass = Download(self.authorization, word_progress, wordsets)
         self.threadclass.start()
         self.threadclass.Length.connect(self.progressBar.setMaximum)
         self.threadclass.Word.connect(self.addWord)
@@ -361,45 +361,34 @@ class WordsetsWindow(QDialog):
         self.close()
 
 
-class Download(QThread):
-    Length = pyqtSignal(int)
-    Counter = pyqtSignal(int)
-    FinalCounter = pyqtSignal(int)
-    Word = pyqtSignal(dict)
+# TODO: Move Authorization and Download classes into a different module?
+
+# TODO: check if it is necessary (and makes sense) to run it asynchronously
+class Authorization(QThread):
     Error = pyqtSignal(str)
 
-    def __init__(self, login, password, word_progress, wordsets, parent=None):
+    def __init__(self, login, password, parent=None):
         QThread.__init__(self, parent)
         self.login = login
         self.password = password
-        self.word_progress = word_progress
-        if wordsets:
-            self.wordsets = wordsets
-        # Error message
         self.msg = ''
 
-    def run(self):
-        # Check if wordsets attribute exists
-        wordsets = getattr(self, 'wordsets', None)
-        words = self.get_words_to_add(wordsets)
-        if words:
-            self.Length.emit(len(words))
-            self.add_separately(words)
-
     def get_connection(self):
-        self.leo = connect.Lingualeo(self.login, self.password)
+        if not hasattr(self, 'leo'):
+            cookies_path = utils.get_cookies_path()
+            self.leo = connect.Lingualeo(self.login, self.password, cookies_path)
         try:
-            # TODO: for cookies: if not self.leo.is_authorized():
-            status = self.leo.auth()
-            if status['error_msg']:
-                self.msg = status['error_msg']
-        except urllib.error.URLError:
+            if not self.leo.is_authorized():
+                status = self.leo.auth()
+                if status['error_msg']:
+                    self.msg = status['error_msg']
+        except requests.exceptions.RequestException:
             self.msg = "Can't authorize. Check your internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
-        except:
+        except Exception as e:
             # TODO improve exception handling
-            self.msg = "There's been an unexpected error. Sorry about that!"
+            self.msg = "There's been an unexpected error. Sorry about that! " + str(e.args)
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
@@ -423,15 +412,38 @@ class Download(QThread):
             return None
         return wordsets
 
+    def get_words(self, wordsets):
+        return self.leo.get_words_by_wordsets(wordsets) if wordsets else self.leo.get_all_words()
+
+
+class Download(QThread):
+    Length = pyqtSignal(int)
+    Counter = pyqtSignal(int)
+    FinalCounter = pyqtSignal(int)
+    Word = pyqtSignal(dict)
+    Error = pyqtSignal(str)
+
+    def __init__(self, auth, word_progress, wordsets, parent=None):
+        QThread.__init__(self, parent)
+        self.auth = auth
+        self.word_progress = word_progress
+        if wordsets:
+            self.wordsets = wordsets
+        # Error message
+        self.msg = ''
+
+    def run(self):
+        wordsets = getattr(self, 'wordsets', None)
+        words = self.get_words_to_add(wordsets)
+        if words:
+            self.Length.emit(len(words))
+            self.add_separately(words)
+
     def get_words_to_add(self, wordsets=None):
-        if not self.get_connection():
+        if not self.auth.get_connection():
             return None
         try:
-            if wordsets:
-                words = self.leo.get_words_by_wordsets(wordsets)
-            # Import all words
-            else:
-                words = self.leo.get_all_words()
+            words = self.auth.get_words(wordsets)
 
             if self.word_progress == 'Unstudied':
                 words = [word for word in words if word.get('progress_percent') < 100]
@@ -464,7 +476,8 @@ class Download(QThread):
         counter = 0
         problem_words = []
 
-        # TODO: in utils prepare a list of not duplicates first and then send to download
+        # TODO: in utils prepare a list of not duplicates first and then
+        #  send to download, and do full notes update only if user decided to do so
 
         for word in words:
             self.Word.emit(word)
@@ -473,7 +486,7 @@ class Download(QThread):
             except (urllib.error.URLError, socket.error):
                 problem_words.append(word.get('word_value'))
             counter += 1
-            # TODO Show numbers in progress bar
+            # TODO: Show numbers in progress bar
             self.Counter.emit(counter)
         self.FinalCounter.emit(counter)
 
