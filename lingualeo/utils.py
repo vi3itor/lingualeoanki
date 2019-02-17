@@ -189,3 +189,12 @@ def clean_cookies():
         os.remove(get_cookies_path())
     except:
         pass
+
+def get_config():
+    # TODO: Support Anki 2.0 by manually reading config from json
+    # Load config from config.json file
+    return mw.addonManager.getConfig(__name__)
+
+
+def update_config(config):
+    mw.addonManager.writeConfig(__name__, config)

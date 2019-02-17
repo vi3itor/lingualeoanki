@@ -124,9 +124,7 @@ class PluginWindow(QDialog):
         # You have to do it after creating all widgets
         self.loginField.setFocus()
 
-        # TODO: Support Anki 2.0 by manually reading config from json
-        # Load config file
-        self.config = mw.addonManager.getConfig(__name__)
+        self.config = utils.get_config()
         if self.config['rememberPassword'] == 1:
             self.checkBoxRememberPass.setChecked(True)
             self.loginField.setText(self.config['email'])
@@ -139,22 +137,20 @@ class PluginWindow(QDialog):
         self.login = self.loginField.text()
         self.password = self.passField.text()
 
-        # TODO: Support Anki 2.0 by manually writing json to config
-        # Save email and password to config if they differ
-        if (self.config['email'] != self.login or
+        if not self.checkBoxRememberPass.checkState():
+            self.config['email'] = ''
+            self.config['password'] = ''
+            self.config['rememberPassword'] = 0
+            utils.update_config(self.config)
+        # Update email or password in config only if they differ
+        elif (self.config['email'] != self.login or
                 self.config['password'] != self.password):
-            # Write config only if it is different
-            if self.checkBoxRememberPass.checkState():
-                self.config['email'] = self.login
-                self.config['password'] = self.password
-                self.config['rememberPassword'] = 1
-            else:
-                self.config['email'] = ''
-                self.config['password'] = ''
-                self.config['rememberPassword'] = 0
-            mw.addonManager.writeConfig(__name__, self.config)
 
         self.authorization = Download(self.login, self.password, None, None)
+            self.config['email'] = self.login
+            self.config['password'] = self.password
+            self.config['rememberPassword'] = 1
+            utils.update_config(self.config)
         self.authorization.Error.connect(self.showErrorMessage)
 
         if self.authorization.get_connection():
