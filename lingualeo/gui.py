@@ -186,7 +186,7 @@ class PluginWindow(QDialog):
     def importAllButtonClicked(self):
         # Disable buttons
         self.set_download_form_enabled(False)
-        self.start_download_thread()
+        self.download_words()
 
     def wordsetButtonClicked(self):
         self.allow_to_close(False)
@@ -194,12 +194,12 @@ class PluginWindow(QDialog):
         if wordsets:
             self.set_download_form_enabled(False)
             wordset_window = WordsetsWindow(wordsets)
-            wordset_window.Wordsets.connect(self.start_download_thread)
+            wordset_window.Wordsets.connect(self.download_words)
             wordset_window.Cancel.connect(self.set_download_form_enabled)
             wordset_window.exec_()
 
-    def start_download_thread(self, wordsets=None):
         self.allow_to_close(False)
+    def start_download_thread(self, words):
         # Activate progress bar
         self.progressBar.setValue(0)
         self.progressBar.show()
@@ -209,11 +209,8 @@ class PluginWindow(QDialog):
         # Set Anki Model
         self.set_model()
 
-        # Get user's choice of words: {'All', 'Studied', 'Unstudied'}
-        word_progress = self.get_progress_type()
-
         # Start downloading
-        self.threadclass = Download(self.authorization, word_progress, wordsets)
+        self.threadclass = Download(words)
         self.threadclass.start()
         self.threadclass.Length.connect(self.progressBar.setMaximum)
         self.threadclass.Word.connect(self.addWord)
@@ -363,12 +360,11 @@ class WordsetsWindow(QDialog):
 
 # TODO: Move Authorization and Download classes into a different module?
 
-# TODO: check if it is necessary (and makes sense) to run it asynchronously
-class Authorization(QThread):
+class Authorization(QObject):
     Error = pyqtSignal(str)
 
     def __init__(self, login, password, parent=None):
-        QThread.__init__(self, parent)
+        QObject.__init__(self, parent)
         self.login = login
         self.password = password
         self.msg = ''
@@ -412,48 +408,11 @@ class Authorization(QThread):
             return None
         return wordsets
 
-    def get_words(self, wordsets):
-        return self.leo.get_words_by_wordsets(wordsets) if wordsets else self.leo.get_all_words()
-
-
-class Download(QThread):
-    Length = pyqtSignal(int)
-    Counter = pyqtSignal(int)
-    FinalCounter = pyqtSignal(int)
-    Word = pyqtSignal(dict)
-    Error = pyqtSignal(str)
-
-    def __init__(self, auth, word_progress, wordsets, parent=None):
-        QThread.__init__(self, parent)
-        self.auth = auth
-        self.word_progress = word_progress
-        if wordsets:
-            self.wordsets = wordsets
-        # Error message
-        self.msg = ''
-
-    def run(self):
-        wordsets = getattr(self, 'wordsets', None)
-        words = self.get_words_to_add(wordsets)
-        if words:
-            self.Length.emit(len(words))
-            self.add_separately(words)
-
     def get_words_to_add(self, wordsets=None):
-        if not self.auth.get_connection():
+        if not self.get_connection():
             return None
         try:
-            words = self.auth.get_words(wordsets)
-
-            if self.word_progress == 'Unstudied':
-                words = [word for word in words if word.get('progress_percent') < 100]
-            elif self.word_progress == 'Studied':
-                words = [word for word in words if word.get('progress_percent') == 100]
-
-            if not words:
-                self.msg = 'No words to download'
-                if not self.word_progress == 'All':
-                    self.msg = 'No %s words to download' % self.word_progress.lower()
+            words = self.leo.get_words(wordsets)
         except requests.exceptions.RequestException:
             self.msg = "Can't download words. Check your internet connection."
         except ValueError:
@@ -466,7 +425,25 @@ class Download(QThread):
 
         return words
 
-    def add_separately(self, words):
+
+class Download(QThread):
+    Length = pyqtSignal(int)
+    Counter = pyqtSignal(int)
+    FinalCounter = pyqtSignal(int)
+    Word = pyqtSignal(dict)
+    Error = pyqtSignal(str)
+
+    def __init__(self, words, parent=None):
+        QThread.__init__(self, parent)
+        self.words = words
+        # Error message
+        self.msg = ''
+
+    def run(self):
+        self.Length.emit(len(self.words))
+        self.add_separately()
+
+    def add_separately(self):
         """
         Divides downloading and filling note to different threads
         because you cannot create SQLite objects outside the main
@@ -476,10 +453,7 @@ class Download(QThread):
         counter = 0
         problem_words = []
 
-        # TODO: in utils prepare a list of not duplicates first and then
-        #  send to download, and do full notes update only if user decided to do so
-
-        for word in words:
+        for word in self.words:
             self.Word.emit(word)
             try:
                 utils.send_to_download(word, self)
