@@ -72,6 +72,12 @@ class Lingualeo:
                 wordsets.append(wordset.copy())
         return wordsets
 
+    def get_words(self, wordsets=None):
+        if wordsets:
+            return self.get_words_by_wordsets(wordsets)
+        else:
+            return self.get_all_words()
+
     def get_all_words(self):
         """
         The JSON consists of list "userdict3" on each page
