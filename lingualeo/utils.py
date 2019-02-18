@@ -139,9 +139,9 @@ def add_word(word, model):
     collection = mw.col
     note = notes.Note(collection, model)
     note = fill_note(word, note)
+    # TODO: Rewrite and use is_duplicate()
     dupes = collection.findDupes("en", word['word_value'])
     # a hack to support words with apostrophes
-    # TODO: Debug to find out if it is still required
     note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
     note_dupes2 = collection.findNotes('en:"%s"' % word['word_value'])
     note_dupes = note_dupes1 + note_dupes2
@@ -164,6 +164,22 @@ def add_word(word, model):
                 note_in_db['sound_name'] = note['sound_name']
             note_in_db.flush()
     # TODO: Check if it is possible to update Anki's media collection to remove old (unused) media
+
+
+def is_duplicate(word):
+    """
+    Check if the word exists in collection
+    :param word: dictionary
+    :return: bool
+    """
+    collection = mw.col
+    dupes = collection.findDupes("en", word['word_value'])
+    # a hack to support words with apostrophes
+    # TODO: Debug to find out if it is still required
+    note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
+    note_dupes2 = collection.findNotes('en:"%s"' % word['word_value'])
+    note_dupes = note_dupes1 + note_dupes2
+    return True if dupes or note_dupes else False
 
 
 def get_cookies_path():
