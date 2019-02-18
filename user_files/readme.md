@@ -1,0 +1,1 @@
+A directory to store user files, such as cookies and list of words that were not successfully downloaded. 
