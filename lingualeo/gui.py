@@ -48,7 +48,6 @@ class PluginWindow(QDialog):
         self.checkBoxRememberPassLabel = QLabel('Remember password')
 
         # Import section widgets
-        # TODO: Add tooltip with explanation: it will not replace already existing words
         self.importAllButton = QPushButton("Import all words")
         self.importByDictionaryButton = QPushButton("Import from dictionaries")
         self.cancelButton = QPushButton("Cancel")
@@ -198,7 +197,20 @@ class PluginWindow(QDialog):
             wordset_window.Cancel.connect(self.set_download_form_enabled)
             wordset_window.exec_()
 
+    def download_words(self, wordsets=None):
+        # TODO: Test on big dictionaries and check if async run needed
         self.allow_to_close(False)
+        words = self.authorization.get_words_to_add(wordsets)
+        filtered = self.filter_words(words)
+        if filtered:
+            self.start_download_thread(filtered)
+        else:
+            progress = self.get_progress_type()
+            msg = 'No %s words to download' % progress if progress != 'All' else 'No words to download'
+            self.showErrorMessage(msg)
+            self.set_download_form_enabled(True)
+            self.allow_to_close(True)
+
     def start_download_thread(self, words):
         # Activate progress bar
         self.progressBar.setValue(0)
@@ -240,6 +252,21 @@ class PluginWindow(QDialog):
         self.rbutton_all.setEnabled(mode)
         self.rbutton_studied.setEnabled(mode)
         self.rbutton_unstudied.setEnabled(mode)
+
+    def filter_words(self, words, update=False):
+        """
+        Eliminates unnecessary to download words.
+        We need to do it in main thread by using signals and slots
+        """
+        word_progress = self.get_progress_type()
+        if word_progress == 'Unstudied':
+            words = [word for word in words if word.get('progress_percent') < 100]
+        elif word_progress == 'Studied':
+            words = [word for word in words if word.get('progress_percent') == 100]
+        # Exlude duplicates, if full update is not required
+        if not update:
+            words = [word for word in words if not utils.is_duplicate(word)]
+        return words
 
     def addWord(self, word):
         """
