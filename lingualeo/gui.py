@@ -318,7 +318,7 @@ class WordsetsWindow(QDialog):
         self.layout.addWidget(self.listWidget)
 
         for wordset in self.wordsets:
-            item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words total)'
+            item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words in total)'
             item = QListWidgetItem(item_name)
             item.wordset_id = wordset['id']
             self.listWidget.addItem(item)
@@ -341,16 +341,14 @@ class WordsetsWindow(QDialog):
     def importButtonClicked(self):
         items = self.listWidget.selectedItems()
         selected_ids = []
-        for i in range(len(items)):
-            selected_ids.append(str(items[i].wordset_id))
-
+        for item in items:
+            selected_ids.append(str(item.wordset_id))
         selected_wordsets = []
         for wordset in self.wordsets:
             if str(wordset['id']) in selected_ids:
                 selected_wordsets.append(wordset.copy())
-
-        self.Wordsets.emit(selected_wordsets)
         self.close()
+        self.Wordsets.emit(selected_wordsets)
 
     def cancelButtonClicked(self):
         # Send signal to activate buttons and radio buttons on the main plugin window
