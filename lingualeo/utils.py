@@ -141,6 +141,7 @@ def add_word(word, model):
     note = fill_note(word, note)
     dupes = collection.findDupes("en", word['word_value'])
     # a hack to support words with apostrophes
+    # TODO: Debug to find out if it is still required
     note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
     note_dupes2 = collection.findNotes('en:"%s"' % word['word_value'])
     note_dupes = note_dupes1 + note_dupes2
@@ -162,6 +163,7 @@ def add_word(word, model):
             if note['sound_name'] and (note_needs_update or not note_in_db['sound_name'].strip()):
                 note_in_db['sound_name'] = note['sound_name']
             note_in_db.flush()
+    # TODO: Check if it is possible to update Anki's media collection to remove old (unused) media
 
 
 def get_cookies_path():
@@ -189,6 +191,7 @@ def clean_cookies():
         os.remove(get_cookies_path())
     except:
         pass
+
 
 def get_config():
     # TODO: Support Anki 2.0 by manually reading config from json
