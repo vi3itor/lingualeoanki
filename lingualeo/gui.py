@@ -76,25 +76,31 @@ class PluginWindow(QDialog):
         login_checkboxes.addWidget(self.checkBoxSavePass)
         # Horizontal layout for login buttons
         login_buttons = QHBoxLayout()
-        # TODO: make login and logout buttons smaller?
+        # Add stretch to make buttons smaller
+        login_buttons.addStretch()
         login_buttons.addWidget(self.loginButton)
         login_buttons.addWidget(self.logoutButton)
+        login_buttons.addStretch()
         # Horizontal layout for radio buttons and update checkbox
         options_layout = QHBoxLayout()
+        options_layout.addStretch()
         options_layout.addWidget(self.rbutton_all)
         options_layout.addWidget(self.rbutton_studied)
         options_layout.addWidget(self.rbutton_unstudied)
         options_layout.addSpacing(15)
         options_layout.addWidget(self.checkBoxUpdateNotes)
+        options_layout.addStretch()
         # Form layout for option buttons and progress bar
         progress_layout = QFormLayout()
         progress_layout.addRow(options_layout)
         progress_layout.addRow(self.progressLabel, self.progressBar)
         # Horizontal layout for import and exit buttons
         imp_btn_layout = QHBoxLayout()
+        imp_btn_layout.addStretch()
         imp_btn_layout.addWidget(self.importAllButton)
         imp_btn_layout.addWidget(self.importByDictionaryButton)
         imp_btn_layout.addWidget(self.cancelButton)
+        imp_btn_layout.addStretch()
         # Main layout
         main_layout = QVBoxLayout()
         # Add layouts to main layout
