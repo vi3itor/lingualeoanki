@@ -54,67 +54,63 @@ class PluginWindow(QDialog):
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
         self.cancelButton.clicked.connect(self.cancelButtonClicked)
-        self.progressLabel = QLabel('Downloading Progress:')
-        self.progressBar = QProgressBar()
-
-        radio_buttons = QHBoxLayout()
         self.rbutton_all = QRadioButton("All")
         self.rbutton_all.setChecked(True)
         self.rbutton_studied = QRadioButton("Studied")
         self.rbutton_unstudied = QRadioButton("Unstudied")
         self.checkBoxUpdateNotes = QCheckBox('Update existing notes')
-        radio_buttons.addWidget(self.rbutton_all)
-        radio_buttons.addWidget(self.rbutton_studied)
-        radio_buttons.addWidget(self.rbutton_unstudied)
-        radio_buttons.addSpacing(15)
-        radio_buttons.addWidget(self.checkBoxUpdateNotes)
+        self.progressLabel = QLabel('Downloading Progress:')
+        self.progressBar = QProgressBar()
 
         # TODO: Implement GUI element to ask what style cards to create:
         #  with typing correct answer or without (or use config for that purpose)
 
-        # TODO: Add checkbox "Update words" and reimplement existing functions
-        #  for duplicate finding (no need to download media, check duplicates by names)
-
-        # Form layouts
+        # Login form layout
         login_form = QFormLayout()
         login_form.addRow(loginLabel, self.loginField)
         login_form.addRow(passLabel, self.passField)
-        login_form.addRow(self.checkBoxStayLoggedIn)
-        login_form.addRow(self.checkBoxSavePass)
-
-        fbox = QFormLayout()
-        fbox.addRow(radio_buttons)
-        fbox.addRow(self.progressLabel, self.progressBar)
-        self.progressLabel.hide()
-        self.progressBar.hide()
-
+        # Vertical layout for checkboxes
+        login_checkboxes = QVBoxLayout()
+        login_checkboxes.setAlignment(Qt.AlignCenter)
+        login_checkboxes.addWidget(self.checkBoxStayLoggedIn)
+        login_checkboxes.addWidget(self.checkBoxSavePass)
         # Horizontal layout for login buttons
         login_buttons = QHBoxLayout()
         # TODO: make login and logout buttons smaller?
         login_buttons.addWidget(self.loginButton)
         login_buttons.addWidget(self.logoutButton)
+        # Horizontal layout for radio buttons and update checkbox
+        options_layout = QHBoxLayout()
+        options_layout.addWidget(self.rbutton_all)
+        options_layout.addWidget(self.rbutton_studied)
+        options_layout.addWidget(self.rbutton_unstudied)
+        options_layout.addSpacing(15)
+        options_layout.addWidget(self.checkBoxUpdateNotes)
+        # Form layout for option buttons and progress bar
+        progress_layout = QFormLayout()
+        progress_layout.addRow(options_layout)
+        progress_layout.addRow(self.progressLabel, self.progressBar)
+        # Horizontal layout for import and exit buttons
+        imp_btn_layout = QHBoxLayout()
+        imp_btn_layout.addWidget(self.importAllButton)
+        imp_btn_layout.addWidget(self.importByDictionaryButton)
+        imp_btn_layout.addWidget(self.cancelButton)
+        # Main layout
+        main_layout = QVBoxLayout()
+        # Add layouts to main layout
+        main_layout.addLayout(login_form)
+        main_layout.addLayout(login_checkboxes)
+        main_layout.addLayout(login_buttons)
+        main_layout.addLayout(progress_layout)
+        main_layout.addLayout(imp_btn_layout)
+        # Set main layout
+        self.setLayout(main_layout)
 
-        # Horizontal layout for import buttons
-        hbox = QHBoxLayout()
-        hbox.addStretch()
-        hbox.addWidget(self.importAllButton)
-        hbox.addWidget(self.importByDictionaryButton)
-        hbox.addWidget(self.cancelButton)
-        # Disable buttons
+        # Disable buttons and hide progress bar
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
-
-        # Main layout - vertical box
-        vbox = QVBoxLayout()
-        # Add layouts to main layout
-        vbox.addLayout(login_form)
-        vbox.addLayout(login_buttons)
-        vbox.addStretch()
-        vbox.addLayout(fbox)
-        vbox.addStretch()
-        vbox.addLayout(hbox)
-        # Set main layout
-        self.setLayout(vbox)
+        self.progressLabel.hide()
+        self.progressBar.hide()
 
         self.config = utils.get_config()
         self.loginField.setText(self.config['email'])
