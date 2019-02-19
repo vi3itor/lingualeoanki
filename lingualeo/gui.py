@@ -44,8 +44,8 @@ class PluginWindow(QDialog):
         self.logoutButton = QPushButton("Log Out")
         self.loginButton.clicked.connect(self.loginButtonClicked)
         self.logoutButton.clicked.connect(self.logoutButtonClicked)
-        self.checkBoxRememberPass = QCheckBox()
-        self.checkBoxRememberPassLabel = QLabel('Remember password')
+        self.checkBoxSavePass = QCheckBox()
+        self.checkBoxSavePassLabel = QLabel('Save password')
 
         # Import section widgets
         self.importAllButton = QPushButton("Import all words")
@@ -79,7 +79,7 @@ class PluginWindow(QDialog):
         login_form = QFormLayout()
         login_form.addRow(loginLabel, self.loginField)
         login_form.addRow(passLabel, self.passField)
-        login_form.addRow(self.checkBoxRememberPassLabel, self.checkBoxRememberPass)
+        login_form.addRow(self.checkBoxSavePassLabel, self.checkBoxSavePass)
 
         fbox = QFormLayout()
         fbox.addRow(radio_buttons)
@@ -103,11 +103,7 @@ class PluginWindow(QDialog):
 
         # Disable buttons
         self.logoutButton.setEnabled(False)
-        self.importAllButton.setEnabled(False)
-        self.importByDictionaryButton.setEnabled(False)
-        self.rbutton_all.setEnabled(False)
-        self.rbutton_studied.setEnabled(False)
-        self.rbutton_unstudied.setEnabled(False)
+        self.set_download_form_enabled(False)
 
         # Add layouts to main layout
         vbox.addLayout(login_form)
@@ -124,9 +120,9 @@ class PluginWindow(QDialog):
         self.loginField.setFocus()
 
         self.config = utils.get_config()
+        self.loginField.setText(self.config['email'])
         if self.config['rememberPassword'] == 1:
-            self.checkBoxRememberPass.setChecked(True)
-            self.loginField.setText(self.config['email'])
+            self.checkBoxSavePass.setChecked(True)
             self.passField.setText(self.config['password'])
 
         self.allow_to_close(True)
@@ -138,8 +134,7 @@ class PluginWindow(QDialog):
         self.login = self.loginField.text()
         self.password = self.passField.text()
 
-        if not self.checkBoxRememberPass.checkState():
-            self.config['email'] = ''
+        if not self.checkBoxSavePass.checkState():
             self.config['password'] = ''
             self.config['rememberPassword'] = 0
             utils.update_config(self.config)
@@ -156,11 +151,7 @@ class PluginWindow(QDialog):
 
         if self.authorization.get_connection():
             # Disable login button and fields
-            self.loginButton.setEnabled(False)
-            self.loginField.setEnabled(False)
-            self.passField.setEnabled(False)
-            self.checkBoxRememberPass.setEnabled(False)
-
+            self.set_login_form_enabled(False)
             # Enable all other buttons
             self.logoutButton.setEnabled(True)
             self.set_download_form_enabled(True)
@@ -176,10 +167,7 @@ class PluginWindow(QDialog):
         utils.clean_cookies()
 
         # Enable Login button and fields
-        self.loginButton.setEnabled(True)
-        self.loginField.setEnabled(True)
-        self.passField.setEnabled(True)
-        self.checkBoxRememberPass.setEnabled(True)
+        self.set_login_form_enabled(True)
         self.allow_to_close(True)
 
     def importAllButtonClicked(self):
@@ -245,7 +233,7 @@ class PluginWindow(QDialog):
     def set_download_form_enabled(self, mode):
         """
         Set buttons either enabled or disabled
-        :param mode: True or False
+        :param mode: bool
         """
         self.importAllButton.setEnabled(mode)
         self.importByDictionaryButton.setEnabled(mode)
@@ -254,6 +242,17 @@ class PluginWindow(QDialog):
         self.rbutton_unstudied.setEnabled(mode)
 
     def filter_words(self, words, update=False):
+    def set_login_form_enabled(self, mode):
+        """
+        Set login elements either enabled or disabled
+        :param mode: bool
+        """
+        self.loginButton.setEnabled(mode)
+        self.loginField.setEnabled(mode)
+        self.passField.setEnabled(mode)
+        self.checkBoxStayLoggedIn.setEnabled(mode)
+        self.checkBoxSavePass.setEnabled(mode)
+
         """
         Eliminates unnecessary to download words.
         We need to do it in main thread by using signals and slots
