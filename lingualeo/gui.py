@@ -44,10 +44,8 @@ class PluginWindow(QDialog):
         self.logoutButton = QPushButton("Log Out")
         self.loginButton.clicked.connect(self.loginButtonClicked)
         self.logoutButton.clicked.connect(self.logoutButtonClicked)
-        self.checkBoxStayLoggedIn = QCheckBox()
-        self.checkBoxStayLoggedInLabel = QLabel('Stay logged in')
-        self.checkBoxSavePass = QCheckBox()
-        self.checkBoxSavePassLabel = QLabel('Save password')
+        self.checkBoxStayLoggedIn = QCheckBox('Stay logged in')
+        self.checkBoxSavePass = QCheckBox('Save password')
 
         # Import section widgets
         self.importAllButton = QPushButton("Import all words")
@@ -61,15 +59,15 @@ class PluginWindow(QDialog):
 
         radio_buttons = QHBoxLayout()
         self.rbutton_all = QRadioButton("All")
+        self.rbutton_all.setChecked(True)
         self.rbutton_studied = QRadioButton("Studied")
         self.rbutton_unstudied = QRadioButton("Unstudied")
-        self.rbutton_all.setChecked(True)
+        self.checkBoxUpdateNotes = QCheckBox('Update existing notes')
         radio_buttons.addWidget(self.rbutton_all)
         radio_buttons.addWidget(self.rbutton_studied)
         radio_buttons.addWidget(self.rbutton_unstudied)
-
-        self.checkBoxUpdateNotes = QCheckBox()
-        self.checkBoxUpdateNotesLabel = QLabel('Update existing notes')
+        radio_buttons.addSpacing(15)
+        radio_buttons.addWidget(self.checkBoxUpdateNotes)
 
         # TODO: Implement GUI element to ask what style cards to create:
         #  with typing correct answer or without (or use config for that purpose)
@@ -77,19 +75,15 @@ class PluginWindow(QDialog):
         # TODO: Add checkbox "Update words" and reimplement existing functions
         #  for duplicate finding (no need to download media, check duplicates by names)
 
-        # Main layout - vertical box
-        vbox = QVBoxLayout()
-
         # Form layouts
         login_form = QFormLayout()
         login_form.addRow(loginLabel, self.loginField)
         login_form.addRow(passLabel, self.passField)
-        login_form.addRow(self.checkBoxStayLoggedInLabel, self.checkBoxStayLoggedIn)
-        login_form.addRow(self.checkBoxSavePassLabel, self.checkBoxSavePass)
+        login_form.addRow(self.checkBoxStayLoggedIn)
+        login_form.addRow(self.checkBoxSavePass)
 
         fbox = QFormLayout()
         fbox.addRow(radio_buttons)
-        fbox.addRow(self.checkBoxUpdateNotesLabel, self.checkBoxUpdateNotes)
         fbox.addRow(self.progressLabel, self.progressBar)
         self.progressLabel.hide()
         self.progressBar.hide()
@@ -106,12 +100,12 @@ class PluginWindow(QDialog):
         hbox.addWidget(self.importAllButton)
         hbox.addWidget(self.importByDictionaryButton)
         hbox.addWidget(self.cancelButton)
-        hbox.addStretch()
-
         # Disable buttons
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
 
+        # Main layout - vertical box
+        vbox = QVBoxLayout()
         # Add layouts to main layout
         vbox.addLayout(login_form)
         vbox.addLayout(login_buttons)
@@ -119,7 +113,6 @@ class PluginWindow(QDialog):
         vbox.addLayout(fbox)
         vbox.addStretch()
         vbox.addLayout(hbox)
-
         # Set main layout
         self.setLayout(vbox)
 
@@ -132,8 +125,6 @@ class PluginWindow(QDialog):
             # Set focus for typing from the keyboard
             # You have to do it after creating all widgets
             self.passField.setFocus()
-
-        # TODO: Save "Stay logged in" to config and delete cookies when pressed cancel (exit)
 
         self.allow_to_close(True)
         self.show()
@@ -165,6 +156,9 @@ class PluginWindow(QDialog):
             # Enable all other buttons
             self.logoutButton.setEnabled(True)
             self.set_download_form_enabled(True)
+
+
+        # TODO: Save "Stay logged in" to config and delete cookies when pressed cancel (exit)
 
         self.allow_to_close(True)
 
