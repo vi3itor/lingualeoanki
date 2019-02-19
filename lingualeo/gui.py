@@ -122,15 +122,18 @@ class PluginWindow(QDialog):
 
         # Set main layout
         self.setLayout(vbox)
-        # Set focus for typing from the keyboard
-        # You have to do it after creating all widgets
-        self.loginField.setFocus()
 
         self.config = utils.get_config()
         self.loginField.setText(self.config['email'])
         if self.config['rememberPassword'] == 1:
             self.checkBoxSavePass.setChecked(True)
             self.passField.setText(self.config['password'])
+        else:
+            # Set focus for typing from the keyboard
+            # You have to do it after creating all widgets
+            self.passField.setFocus()
+
+        # TODO: Save "Stay logged in" to config and delete cookies when pressed cancel (exit)
 
         self.allow_to_close(True)
         self.show()
