@@ -288,9 +288,15 @@ class PluginWindow(QDialog):
 
     def cancelButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
+            # TODO: Notify user that the downloading in progress and ask if they could wait
             self.threadclass.terminate()
         # Delete attribute before closing to allow running the plugin again
         delattr(mw, 'lingualeoanki')
+        # FIXME: Delete cookies if user don't want to be remembered,
+        #  and/or don't load cookies from file if config.remember is false
+
+        # TODO: Rename button to 'Exit', and change to 'Cancel' when download started,
+        #  and implement a function to safely stop downloading media
         mw.reset()
         self.close()
 
@@ -308,7 +314,6 @@ class PluginWindow(QDialog):
         :param flag: bool
         '''
         if flag:
-            # Set attribute to allow Anki to close the plugin window
             setattr(self, 'silentlyClose', 1)
         elif hasattr(self, 'silentlyClose'):
             delattr(self, 'silentlyClose')
