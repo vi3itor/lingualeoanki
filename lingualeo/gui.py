@@ -149,19 +149,8 @@ class PluginWindow(QDialog):
             self.config['rememberPassword'] = 1
             utils.update_config(self.config)
 
-        self.authorization = Authorization(self.login, self.password)
-        self.authorization.Error.connect(self.showErrorMessage)
-
-        if self.authorization.get_connection():
-            # Disable login button and fields
-            self.set_login_form_enabled(False)
-            # Enable all other buttons
-            self.logoutButton.setEnabled(True)
-            self.set_download_form_enabled(True)
-
-
         # TODO: Save "Stay logged in" to config and delete cookies when pressed cancel (exit)
-
+        self.authorize()
         self.allow_to_close(True)
 
     def logoutButtonClicked(self):
@@ -169,7 +158,7 @@ class PluginWindow(QDialog):
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
 
-        self.authorization = None
+        delattr(self, 'authorization')
         utils.clean_cookies()
 
         # Enable Login button and fields
@@ -190,6 +179,21 @@ class PluginWindow(QDialog):
             wordset_window.Wordsets.connect(self.download_words)
             wordset_window.Cancel.connect(self.set_download_form_enabled)
             wordset_window.exec_()
+
+    def authorize(self):
+        """
+        Creates authorization object and connects to lingualeo website
+        """
+        cookies_path = utils.get_cookies_path()
+        self.authorization = Authorization(self.login, self.password, cookies_path)
+        self.authorization.Error.connect(self.showErrorMessage)
+
+        if self.authorization.get_connection():
+            # Disable login button and fields
+            self.set_login_form_enabled(False)
+            # Enable all other buttons
+            self.logoutButton.setEnabled(True)
+            self.set_download_form_enabled(True)
 
     def download_words(self, wordsets=None):
         # TODO: Test on big dictionaries and check if async run needed
@@ -397,16 +401,17 @@ class WordsetsWindow(QDialog):
 class Authorization(QObject):
     Error = pyqtSignal(str)
 
-    def __init__(self, login, password, parent=None):
+    # TODO: Check if parent=None is needed
+    def __init__(self, login, password, cookies_path, parent=None):
         QObject.__init__(self, parent)
         self.login = login
         self.password = password
+        self.cookies_path = cookies_path
         self.msg = ''
 
     def get_connection(self):
         if not hasattr(self, 'leo'):
-            cookies_path = utils.get_cookies_path()
-            self.leo = connect.Lingualeo(self.login, self.password, cookies_path)
+            self.leo = connect.Lingualeo(self.login, self.password, self.cookies_path)
         try:
             if not self.leo.is_authorized():
                 status = self.leo.auth()
