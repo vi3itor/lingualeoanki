@@ -1,7 +1,7 @@
 import locale
 import sys
 
-import platform
+import platform as pm
 import socket
 import urllib.error
 import requests.exceptions
@@ -26,7 +26,7 @@ class PluginWindow(QDialog):
         self.setWindowTitle('Import from LinguaLeo')
 
         # Window Icon
-        if platform.system() == 'Windows':
+        if pm.system() == 'Windows':
             path = os.path.join(os.path.dirname(__file__), 'favicon.ico')
             # Check Python version for Anki 2.0 support (in the future)
             if sys.version_info[0] < 3:
@@ -332,15 +332,12 @@ class WordsetsWindow(QDialog):
 
     def initUI(self):
         self.setWindowTitle('Choose dictionaries to import')
-
         # Buttons and fields
         self.importButton = QPushButton("Import", self)
         self.cancelButton = QPushButton("Cancel", self)
         self.importButton.clicked.connect(self.importButtonClicked)
         self.cancelButton.clicked.connect(self.cancelButtonClicked)
-        key_name = 'Cmd'
-        if platform.system() == 'Windows' or platform.system() == 'Linux':
-            key_name = 'Ctrl'
+        key_name = 'Ctrl' if pm.system() == 'Windows' or pm.system() == 'Linux' else 'Cmd'
         label = QLabel('Hold %s to select several dictionaries' % key_name)
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
