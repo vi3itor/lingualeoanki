@@ -59,9 +59,6 @@ class PluginWindow(QDialog):
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
 
-        # TODO: Implement GUI element to ask what style cards to create:
-        #  with typing correct answer or without (or use config for that purpose)
-
         radio_buttons = QHBoxLayout()
         self.rbutton_all = QRadioButton("All")
         self.rbutton_studied = QRadioButton("Studied")
@@ -70,6 +67,12 @@ class PluginWindow(QDialog):
         radio_buttons.addWidget(self.rbutton_all)
         radio_buttons.addWidget(self.rbutton_studied)
         radio_buttons.addWidget(self.rbutton_unstudied)
+
+        self.checkBoxUpdateNotes = QCheckBox()
+        self.checkBoxUpdateNotesLabel = QLabel('Update existing notes')
+
+        # TODO: Implement GUI element to ask what style cards to create:
+        #  with typing correct answer or without (or use config for that purpose)
 
         # TODO: Add checkbox "Update words" and reimplement existing functions
         #  for duplicate finding (no need to download media, check duplicates by names)
@@ -86,6 +89,7 @@ class PluginWindow(QDialog):
 
         fbox = QFormLayout()
         fbox.addRow(radio_buttons)
+        fbox.addRow(self.checkBoxUpdateNotesLabel, self.checkBoxUpdateNotes)
         fbox.addRow(self.progressLabel, self.progressBar)
         self.progressLabel.hide()
         self.progressBar.hide()
@@ -243,8 +247,8 @@ class PluginWindow(QDialog):
         self.rbutton_all.setEnabled(mode)
         self.rbutton_studied.setEnabled(mode)
         self.rbutton_unstudied.setEnabled(mode)
+        self.checkBoxUpdateNotes.setEnabled(mode)
 
-    def filter_words(self, words, update=False):
     def set_login_form_enabled(self, mode):
         """
         Set login elements either enabled or disabled
@@ -256,6 +260,7 @@ class PluginWindow(QDialog):
         self.checkBoxStayLoggedIn.setEnabled(mode)
         self.checkBoxSavePass.setEnabled(mode)
 
+    def filter_words(self, words):
         """
         Eliminates unnecessary to download words.
         We need to do it in main thread by using signals and slots
@@ -265,8 +270,9 @@ class PluginWindow(QDialog):
             words = [word for word in words if word.get('progress_percent') < 100]
         elif word_progress == 'Studied':
             words = [word for word in words if word.get('progress_percent') == 100]
-        # Exlude duplicates, if full update is not required
+        update = self.checkBoxUpdateNotes.checkState()
         if not update:
+            # Exclude duplicates, if full update is not required
             words = [word for word in words if not utils.is_duplicate(word)]
         return words
 
