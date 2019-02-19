@@ -44,6 +44,8 @@ class PluginWindow(QDialog):
         self.logoutButton = QPushButton("Log Out")
         self.loginButton.clicked.connect(self.loginButtonClicked)
         self.logoutButton.clicked.connect(self.logoutButtonClicked)
+        self.checkBoxStayLoggedIn = QCheckBox()
+        self.checkBoxStayLoggedInLabel = QLabel('Stay logged in')
         self.checkBoxSavePass = QCheckBox()
         self.checkBoxSavePassLabel = QLabel('Save password')
 
@@ -79,6 +81,7 @@ class PluginWindow(QDialog):
         login_form = QFormLayout()
         login_form.addRow(loginLabel, self.loginField)
         login_form.addRow(passLabel, self.passField)
+        login_form.addRow(self.checkBoxStayLoggedInLabel, self.checkBoxStayLoggedIn)
         login_form.addRow(self.checkBoxSavePassLabel, self.checkBoxSavePass)
 
         fbox = QFormLayout()
