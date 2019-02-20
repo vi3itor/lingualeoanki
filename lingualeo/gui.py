@@ -20,6 +20,7 @@ from . import styles
 class PluginWindow(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
+        self.config = utils.get_config()
         self.initUI()
 
     def initUI(self):
@@ -45,6 +46,7 @@ class PluginWindow(QDialog):
         self.loginButton.clicked.connect(self.loginButtonClicked)
         self.logoutButton.clicked.connect(self.logoutButtonClicked)
         self.checkBoxStayLoggedIn = QCheckBox('Stay logged in')
+        self.checkBoxStayLoggedIn.setChecked(True)
         self.checkBoxSavePass = QCheckBox('Save password')
 
         # Import section widgets
@@ -118,15 +120,16 @@ class PluginWindow(QDialog):
         self.progressLabel.hide()
         self.progressBar.hide()
 
-        self.config = utils.get_config()
         self.loginField.setText(self.config['email'])
-        if self.config['rememberPassword'] == 1:
+        if self.config['rememberPassword']:
             self.checkBoxSavePass.setChecked(True)
             self.passField.setText(self.config['password'])
         else:
-            # Set focus for typing from the keyboard
-            # You have to do it after creating all widgets
+            # Have to set focus for typing after creating all widgets
             self.passField.setFocus()
+
+        if self.config['stayLoggedIn']:
+            self.authorize(self.loginField.text(), self.passField.text())
 
         self.allow_to_close(True)
         self.show()
@@ -134,23 +137,24 @@ class PluginWindow(QDialog):
     def loginButtonClicked(self):
         self.allow_to_close(False)
         # Read login and password
-        self.login = self.loginField.text()
-        self.password = self.passField.text()
+        login = self.loginField.text()
+        password = self.passField.text()
 
-        if not self.checkBoxSavePass.checkState():
+        self.config['email'] = login
+        if self.checkBoxSavePass.checkState():
+            self.config['password'] = password
+            self.config['rememberPassword'] = True
+        else:
             self.config['password'] = ''
-            self.config['rememberPassword'] = 0
-            utils.update_config(self.config)
-        # Update email or password in config only if they differ
-        elif (self.config['email'] != self.login or
-                self.config['password'] != self.password):
-            self.config['email'] = self.login
-            self.config['password'] = self.password
-            self.config['rememberPassword'] = 1
-            utils.update_config(self.config)
+            self.config['rememberPassword'] = False
 
-        # TODO: Save "Stay logged in" to config and delete cookies when pressed cancel (exit)
-        self.authorize()
+        if self.checkBoxStayLoggedIn.checkState():
+            self.config['stayLoggedIn'] = True
+        else:
+            self.config['stayLoggedIn'] = False
+        utils.update_config(self.config)
+
+        self.authorize(login, password)
         self.allow_to_close(True)
 
     def logoutButtonClicked(self):
@@ -160,6 +164,8 @@ class PluginWindow(QDialog):
 
         delattr(self, 'authorization')
         utils.clean_cookies()
+        self.config['stayLoggedIn'] = False
+        utils.update_config(self.config)
 
         # Enable Login button and fields
         self.set_login_form_enabled(True)
@@ -180,12 +186,14 @@ class PluginWindow(QDialog):
             wordset_window.Cancel.connect(self.set_download_form_enabled)
             wordset_window.exec_()
 
-    def authorize(self):
+    def authorize(self, login, password):
         """
         Creates authorization object and connects to lingualeo website
         """
         cookies_path = utils.get_cookies_path()
-        self.authorization = Authorization(self.login, self.password, cookies_path)
+        if not os.path.exists(cookies_path):
+            cookies_path = None
+        self.authorization = Authorization(login, password, cookies_path)
         self.authorization.Error.connect(self.showErrorMessage)
 
         if self.authorization.get_connection():
@@ -292,8 +300,8 @@ class PluginWindow(QDialog):
             self.threadclass.terminate()
         # Delete attribute before closing to allow running the plugin again
         delattr(mw, 'lingualeoanki')
-        # FIXME: Delete cookies if user don't want to be remembered,
-        #  and/or don't load cookies from file if config.remember is false
+        if not self.checkBoxStayLoggedIn.checkState():
+            utils.clean_cookies()
 
         # TODO: Rename button to 'Exit', and change to 'Cancel' when download started,
         #  and implement a function to safely stop downloading media
@@ -308,11 +316,11 @@ class PluginWindow(QDialog):
         mw.reset()
 
     def allow_to_close(self, flag):
-        '''
+        """
         Sets attribute 'silentlyClose' to allow Anki's main window
         to automatically close plugin windows on exit
         :param flag: bool
-        '''
+        """
         if flag:
             setattr(self, 'silentlyClose', 1)
         elif hasattr(self, 'silentlyClose'):

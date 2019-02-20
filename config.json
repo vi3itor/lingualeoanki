@@ -1,3 +1,4 @@
 {"email": "your@email.com",
-  "password": "yourpass",
-  "rememberPassword": 1}
+  "password": "password",
+  "rememberPassword": true,
+  "stayLoggedIn": false}
