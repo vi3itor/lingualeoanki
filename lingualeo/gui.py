@@ -56,8 +56,8 @@ class PluginWindow(QDialog):
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
         self.cancelButton.clicked.connect(self.cancelButtonClicked)
-        self.rbutton_all = QRadioButton("All")
-        self.rbutton_all.setChecked(True)
+        self.rbutton_any = QRadioButton("Any")
+        self.rbutton_any.setChecked(True)
         self.rbutton_studied = QRadioButton("Studied")
         self.rbutton_unstudied = QRadioButton("Unstudied")
         self.checkBoxUpdateNotes = QCheckBox('Update existing notes')
@@ -86,7 +86,7 @@ class PluginWindow(QDialog):
         # Horizontal layout for radio buttons and update checkbox
         options_layout = QHBoxLayout()
         options_layout.addStretch()
-        options_layout.addWidget(self.rbutton_all)
+        options_layout.addWidget(self.rbutton_any)
         options_layout.addWidget(self.rbutton_studied)
         options_layout.addWidget(self.rbutton_unstudied)
         options_layout.addSpacing(15)
@@ -212,7 +212,7 @@ class PluginWindow(QDialog):
             self.start_download_thread(filtered)
         else:
             progress = self.get_progress_type()
-            msg = 'No %s words to download' % progress if progress != 'All' else 'No words to download'
+            msg = 'No %s words to download' % progress if progress != 'Any' else 'No words to download'
             self.showErrorMessage(msg)
             self.set_download_form_enabled(True)
             self.allow_to_close(True)
@@ -241,7 +241,7 @@ class PluginWindow(QDialog):
         self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
 
     def get_progress_type(self):
-        progress = 'All'
+        progress = 'Any'
         if self.rbutton_studied.isChecked():
             progress = 'Studied'
         elif self.rbutton_unstudied.isChecked():
@@ -255,7 +255,7 @@ class PluginWindow(QDialog):
         """
         self.importAllButton.setEnabled(mode)
         self.importByDictionaryButton.setEnabled(mode)
-        self.rbutton_all.setEnabled(mode)
+        self.rbutton_any.setEnabled(mode)
         self.rbutton_studied.setEnabled(mode)
         self.rbutton_unstudied.setEnabled(mode)
         self.checkBoxUpdateNotes.setEnabled(mode)
