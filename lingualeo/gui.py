@@ -296,9 +296,12 @@ class PluginWindow(QDialog):
 
     def exitButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
-            # TODO: Notify user that the downloading in progress and ask if they could wait
-            #  and implement a function to safely stop downloading media
-            self.threadclass.terminate()
+            qm = QMessageBox()
+            answer = qm.question(self, '', "Are you sure you want to stop downloading?", qm.No | qm.Yes, qm.No)
+            if answer == qm.Yes and not self.threadclass.isFinished():
+                self.threadclass.terminate()
+            elif answer == qm.No:
+                return
         # Delete attribute before closing to allow running the plugin again
         delattr(mw, 'lingualeoanki')
         if not self.checkBoxStayLoggedIn.checkState():
@@ -481,8 +484,6 @@ class Download(QThread):
     def __init__(self, words, parent=None):
         QThread.__init__(self, parent)
         self.words = words
-        # Error message
-        self.msg = ''
 
     def run(self):
         self.Length.emit(len(self.words))

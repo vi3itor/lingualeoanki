@@ -73,9 +73,8 @@ def download_media_file(url):
     # TODO: change to Requests library
     resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
     media_file = resp.read()
-    binfile = open(abs_path, "wb")
-    binfile.write(media_file)
-    binfile.close()
+    with open(abs_path, "wb") as binfile:
+        binfile.write(media_file)
 
 
 def send_to_download(word, thread):
