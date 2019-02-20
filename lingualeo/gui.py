@@ -124,15 +124,17 @@ class PluginWindow(QDialog):
         if self.config['rememberPassword']:
             self.checkBoxSavePass.setChecked(True)
             self.passField.setText(self.config['password'])
-        else:
+
+        self.show()
+        if self.config['stayLoggedIn']:
+            self.passField.clearFocus()
+            cookies_path = utils.get_cookies_path()
+            self.authorize(self.loginField.text(), self.passField.text(), cookies_path)
+        elif not self.config['rememberPassword']:
             # Have to set focus for typing after creating all widgets
             self.passField.setFocus()
 
-        if self.config['stayLoggedIn']:
-            self.authorize(self.loginField.text(), self.passField.text())
-
         self.allow_to_close(True)
-        self.show()
 
     def loginButtonClicked(self):
         self.allow_to_close(False)
@@ -150,11 +152,13 @@ class PluginWindow(QDialog):
 
         if self.checkBoxStayLoggedIn.checkState():
             self.config['stayLoggedIn'] = True
+            cookies_path = utils.get_cookies_path()
+            self.authorize(login, password, cookies_path)
         else:
             self.config['stayLoggedIn'] = False
+            self.authorize(login, password)
         utils.update_config(self.config)
 
-        self.authorize(login, password)
         self.allow_to_close(True)
 
     def logoutButtonClicked(self):
@@ -186,16 +190,12 @@ class PluginWindow(QDialog):
             wordset_window.Cancel.connect(self.set_download_form_enabled)
             wordset_window.exec_()
 
-    def authorize(self, login, password):
+    def authorize(self, login, password, cookies_path=None):
         """
         Creates authorization object and connects to lingualeo website
         """
-        cookies_path = utils.get_cookies_path()
-        if not os.path.exists(cookies_path):
-            cookies_path = None
         self.authorization = Authorization(login, password, cookies_path)
         self.authorization.Error.connect(self.showErrorMessage)
-
         if self.authorization.get_connection():
             # Disable login button and fields
             self.set_login_form_enabled(False)

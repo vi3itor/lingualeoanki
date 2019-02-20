@@ -1,29 +1,31 @@
 import requests
 import pickle
+import os
 
 
 class Lingualeo:
     def __init__(self, email, password, cookies_path=None):
         self.email = email
         self.password = password
-        self.cookies_path = cookies_path
         self.cj = requests.cookies.RequestsCookieJar()
-        try:
-            with open(cookies_path, 'rb') as f:
-                cookies = pickle.load(f)
-                self.cj.update(cookies)
-        except:
-            # TODO: narrow exception clause (FileNotFound, pickle.UnpicklingError, etc)
-            self.cj = requests.cookies.RequestsCookieJar()
+        if cookies_path:
+            self.cookies_path = cookies_path
+            if not os.path.exists(cookies_path):
+                self.save_cookies()
+            else:
+                try:
+                    with open(cookies_path, 'rb') as f:
+                        cookies = pickle.load(f)
+                        self.cj.update(cookies)
+                except:
+                    # TODO: narrow exception clause (FileNotFound, pickle.UnpicklingError, etc)
+                    self.cj = requests.cookies.RequestsCookieJar()
 
     def auth(self):
         url = 'https://api.lingualeo.com/api/login'
         values = {'email': self.email, 'password': self.password}
         content = self.get_content(url, values)
-        if hasattr(self, 'cookies_path'):
-            with open(self.cookies_path, 'wb+') as f:
-                pickle.dump(self.cj, f)
-
+        self.save_cookies()
         return content
 
     def is_authorized(self):
@@ -52,11 +54,13 @@ class Lingualeo:
     # TODO: Measure http vs https speed and
     #  consider adding 'http' option to config
 
-    # TODO: should we update cookies file with every request?
-    #  Or only in auth() and get_wordsets, get_all_words...
-
     # TODO: Add processing of http status codes and raise an exception,
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
+
+    def save_cookies(self):
+        if hasattr(self, 'cookies_path'):
+            with open(self.cookies_path, 'wb+') as f:
+                pickle.dump(self.cj, f)
 
     def get_wordsets(self):
         """
@@ -70,13 +74,13 @@ class Lingualeo:
             # Add only non-empty dictionaries
             if wordset['countWords'] != 0:
                 wordsets.append(wordset.copy())
+        self.save_cookies()
         return wordsets
 
     def get_words(self, wordsets=None):
-        if wordsets:
-            return self.get_words_by_wordsets(wordsets)
-        else:
-            return self.get_all_words()
+        words = self.get_words_by_wordsets(wordsets) if wordsets else self.get_all_words()
+        self.save_cookies()
+        return words
 
     def get_all_words(self):
         """
@@ -117,6 +121,12 @@ class Lingualeo:
 
 
 def is_word_exist(check_word, words):
+    """
+    Helper function to test if check_word dictionary exists in the list of words
+    :param check_word: dict
+    :param words: list
+    :return: bool
+    """
     for word in words:
         if word['word_id'] == check_word['word_id']:
             return True
