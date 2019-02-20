@@ -56,7 +56,7 @@ class PluginWindow(QDialog):
         self.exitButton = QPushButton("Exit")
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
-        self.exitButton.clicked.connect(self.exitButtonClicked)
+        self.exitButton.clicked.connect(self.close)
         self.rbutton_any = QRadioButton("Any")
         self.rbutton_any.setChecked(True)
         self.rbutton_studied = QRadioButton("Studied")
@@ -295,21 +295,30 @@ class PluginWindow(QDialog):
         """
         utils.add_word(word, self.model)
 
-    def exitButtonClicked(self):
+    def reject(self):
+        """
+        Override reject event to handle Escape key press correctly
+        """
+        self.close()
+
+    def closeEvent(self, event):
+        """
+        Override close event to safely close plugin
+        """
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
             qm = QMessageBox()
-            answer = qm.question(self, '', "Are you sure you want to stop downloading?", qm.No | qm.Yes, qm.No)
+            answer = qm.question(self, '', "Are you sure you want to stop downloading?",
+                                 qm.Yes | qm.Cancel, qm.Cancel)
             if answer == qm.Yes and not self.threadclass.isFinished():
                 self.threadclass.terminate()
-            elif answer == qm.No:
+            elif answer == qm.Cancel:
+                event.ignore()
                 return
         # Delete attribute before closing to allow running the plugin again
         delattr(mw, 'lingualeoanki')
         if not self.checkBoxStayLoggedIn.checkState():
             utils.clean_cookies()
-
         mw.reset()
-        self.close()
 
     def setFinalCount(self, counter):
         self.wordsFinalCount = counter
