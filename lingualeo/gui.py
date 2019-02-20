@@ -52,10 +52,10 @@ class PluginWindow(QDialog):
         # Import section widgets
         self.importAllButton = QPushButton("Import all words")
         self.importByDictionaryButton = QPushButton("Import from dictionaries")
-        self.cancelButton = QPushButton("Cancel")
+        self.exitButton = QPushButton("Exit")
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
-        self.cancelButton.clicked.connect(self.cancelButtonClicked)
+        self.exitButton.clicked.connect(self.exitButtonClicked)
         self.rbutton_any = QRadioButton("Any")
         self.rbutton_any.setChecked(True)
         self.rbutton_studied = QRadioButton("Studied")
@@ -101,7 +101,7 @@ class PluginWindow(QDialog):
         imp_btn_layout.addStretch()
         imp_btn_layout.addWidget(self.importAllButton)
         imp_btn_layout.addWidget(self.importByDictionaryButton)
-        imp_btn_layout.addWidget(self.cancelButton)
+        imp_btn_layout.addWidget(self.exitButton)
         imp_btn_layout.addStretch()
         # Main layout
         main_layout = QVBoxLayout()
@@ -294,17 +294,16 @@ class PluginWindow(QDialog):
         """
         utils.add_word(word, self.model)
 
-    def cancelButtonClicked(self):
+    def exitButtonClicked(self):
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
             # TODO: Notify user that the downloading in progress and ask if they could wait
+            #  and implement a function to safely stop downloading media
             self.threadclass.terminate()
         # Delete attribute before closing to allow running the plugin again
         delattr(mw, 'lingualeoanki')
         if not self.checkBoxStayLoggedIn.checkState():
             utils.clean_cookies()
 
-        # TODO: Rename button to 'Exit', and change to 'Cancel' when download started,
-        #  and implement a function to safely stop downloading media
         mw.reset()
         self.close()
 
@@ -329,8 +328,7 @@ class PluginWindow(QDialog):
     def downloadFinished(self):
         if hasattr(self, 'wordsFinalCount'):
             showInfo("%d words from LinguaLeo have been processed" % self.wordsFinalCount)
-            del self.wordsFinalCount
-
+            delattr(self, 'wordsFinalCount')
         self.set_download_form_enabled(True)
         self.logoutButton.setEnabled(True)
         self.progressLabel.hide()
