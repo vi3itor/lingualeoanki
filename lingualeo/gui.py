@@ -14,6 +14,7 @@ from . import connect
 from . import utils
 from . import styles
 
+
 # TODO: Make Russian localization
 #  (since beginners are more comfortable with native language)
 
@@ -360,29 +361,24 @@ class WordsetsWindow(QDialog):
         label = QLabel('Hold %s to select several dictionaries' % key_name)
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        # TODO: Activate Import button only when some dictionary is selected
-
-        self.layout = QVBoxLayout()
-
-        self.layout.addWidget(self.listWidget)
-
         for wordset in self.wordsets:
             item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words in total)'
             item = QListWidgetItem(item_name)
             item.wordset_id = wordset['id']
             self.listWidget.addItem(item)
 
-        self.layout.addWidget(label)
-
         # Horizontal layout for buttons
         hbox = QHBoxLayout()
-        hbox.setContentsMargins(10, 10, 10, 10)
         hbox.addStretch()
-
         hbox.addWidget(self.importButton)
         hbox.addWidget(self.cancelButton)
-        self.layout.addLayout(hbox)
-        self.setLayout(self.layout)
+        hbox.addStretch()
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.listWidget)
+        main_layout.addWidget(label)
+        main_layout.addLayout(hbox)
+        self.setLayout(main_layout)
         # Set attribute to allow Anki to close the plugin window
         setattr(self, 'silentlyClose', 1)
         self.show()
