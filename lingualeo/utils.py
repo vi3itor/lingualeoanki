@@ -1,13 +1,12 @@
 import os
 from random import randint
-import socket
-import urllib2
-import time
+import requests
+import json
 
 from aqt import mw
 from anki import notes
 
-from lingualeo import styles
+from . import styles
 
 
 fields = ['en', 'transcription',
@@ -46,7 +45,7 @@ def is_model_exist(collection, fields):
                                                 'LinguaLeo_model')) == fields
     else:
         fields_ok = False
-    return (name_exist and fields_ok)
+    return name_exist and fields_ok
 
 
 def prepare_model(collection, fields, model_css):
@@ -70,14 +69,14 @@ def download_media_file(url):
     destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
     abs_path = os.path.join(destination_folder, name)
-    resp = urllib2.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
-    media_file = resp.read()
-    binfile = open(abs_path, "wb")
-    binfile.write(media_file)
-    binfile.close()
+    r = requests.get(url, timeout=DOWNLOAD_TIMEOUT)
+    media_file = r.content
+    with open(abs_path, "wb") as binfile:
+        binfile.write(media_file)
 
 
 def send_to_download(word, thread):
+    # TODO: Move to config following settings and DOWNLOAD_TIMEOUT
     NUM_RETRIES = 5
     SLEEP_SECONDS = 5
     # try to download the picture and the sound the specified number of times,
@@ -86,28 +85,29 @@ def send_to_download(word, thread):
     if picture_url:
         exc_happened = None
         picture_url = 'http:' + picture_url
-        for i in xrange(NUM_RETRIES):
+        for i in list(range(NUM_RETRIES)):
             exc_happened = None
             try:
                 download_media_file(picture_url)
                 break
-            except (urllib2.URLError, socket.error) as e:
+            except requests.exceptions.RequestException as e:
+                exc_happened = e
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
-            raise
+            raise exc_happened
     sound_url = word.get('sound_url')
     if sound_url:
         exc_happened = None
-        for i in xrange(NUM_RETRIES):
+        for i in list(range(NUM_RETRIES)):
             exc_happened = None
             try:
                 download_media_file(sound_url)
                 break
-            except (urllib2.URLError, socket.error) as e:
+            except requests.exceptions.RequestException as e:
                 exc_happened = e
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
-            raise
+            raise exc_happened
 
 
 def fill_note(word, note):
@@ -129,9 +129,13 @@ def fill_note(word, note):
 
 
 def add_word(word, model):
+    # TODO: Introduce new fields to the model (pic_url and sound_url)
+    #  for testing if update is needed and implement a function
+    #  to update existing models (to introduce new fields) for compatibility
     collection = mw.col
     note = notes.Note(collection, model)
     note = fill_note(word, note)
+    # TODO: Rewrite and use is_duplicate()
     dupes = collection.findDupes("en", word['word_value'])
     # a hack to support words with apostrophes
     note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
@@ -155,20 +159,83 @@ def add_word(word, model):
             if note['sound_name'] and (note_needs_update or not note_in_db['sound_name'].strip()):
                 note_in_db['sound_name'] = note['sound_name']
             note_in_db.flush()
-    collection.addNote(note)
+    # TODO: Check if it is possible to update Anki's media collection to remove old (unused) media
 
 
-# my adds
-def get_the_last_word():
-    # mid - id deck
-    # one should determine mid after second and next uploading data
-    # to upload correctly to the deck
+def is_duplicate(word):
+    """
+    Check if the word exists in collection
+    :param word: dictionary
+    :return: bool
+    """
+    collection = mw.col
+    dupes = collection.findDupes("en", word['word_value'])
+    # a hack to support words with apostrophes
+    # TODO: Debug to find out if it is still required
+    note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
+    note_dupes2 = collection.findNotes('en:"%s"' % word['word_value'])
+    note_dupes = note_dupes1 + note_dupes2
+    return True if dupes or note_dupes else False
+
+
+def get_addon_dir():
+    root = mw.pm.addonFolder()
+    # TODO: check if it possible to get addon's name
+    # TODO: Fix folders naming
+    addon_dir = os.path.join(root, 'lingualeo')
+    return addon_dir
+
+
+def get_cookies_path():
+    """
+    Returns a full path to cookies.dat in the user_files folder
+    :return:
+    """
+
+    # user_files folder in the current addon's dir
+    uf_dir = os.path.join(get_addon_dir(), 'user_files')
+    # Create a folder if doesn't exist
+    if not os.path.exists(uf_dir):
+        try:
+            os.makedirs(uf_dir)
+        except:
+            # TODO: Improve error handling
+            return None
+    return os.path.join(uf_dir, 'cookies.dat')
+
+
+def clean_cookies():
+    # TODO: Better handle file removal (check if exists or if in use)
     try:
-        m = mw.col.models.byName("LinguaLeo_model")
-        mid = m['id']
-        last_word = mw.col.db.execute("SELECT sfld FROM notes WHERE mid = " + str(mid) + " ORDER BY id DESC LIMIT 1")
-        for row in last_word:
-            last = row
-        return last[0]
-    except TypeError:
-        return None
+        os.remove(get_cookies_path())
+    except:
+        pass
+
+
+def get_config():
+    # Load config from config.json file
+    if getattr(getattr(mw, "addonManager", None), "getConfig", None):
+        config = mw.addonManager.getConfig(__name__)
+    else:
+        try:
+            config_file = os.path.join(get_addon_dir(), 'config.json')
+            with open(config_file, 'r') as f:
+                config = json.loads(f.read())
+        except IOError:
+            config = None
+
+    return config
+
+
+def update_config(config):
+    if getattr(getattr(mw, "addonManager", None), "writeConfig", None):
+        mw.addonManager.writeConfig(__name__, config)
+    else:
+        try:
+            config_file = os.path.join(get_addon_dir(), 'config.json')
+            with open(config_file, 'w') as f:
+                json.dump(config, f, sort_keys=True, indent=2)
+        except:
+            # TODO: Improve error handling
+            pass
+

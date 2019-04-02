@@ -1,0 +1,6 @@
+{
+  "email": "your@email.com",
+  "password": "yourPassword",
+  "rememberPassword": true, 
+  "stayLoggedIn": true
+}
