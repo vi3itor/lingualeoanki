@@ -202,7 +202,7 @@ def get_cookies_path():
         except:
             # TODO: Improve error handling
             return None
-    return os.path.join(uf_dir, 'cookies.dat')
+    return os.path.join(uf_dir, 'cookies.txt')
 
 
 def clean_cookies():

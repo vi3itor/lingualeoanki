@@ -1,6 +1,8 @@
-import requests
-import pickle
 import os
+from six.moves import http_cookiejar
+from six.moves import urllib
+import socket
+import json
 
 from aqt.qt import *
 from . import utils
@@ -13,7 +15,7 @@ class Lingualeo(QObject):
         QObject.__init__(self, parent)
         self.email = email
         self.password = password
-        self.cj = requests.cookies.RequestsCookieJar()
+        self.cj = http_cookiejar.MozillaCookieJar()
         self.msg = ''
         if cookies_path:
             self.cookies_path = cookies_path
@@ -21,12 +23,10 @@ class Lingualeo(QObject):
                 self.save_cookies()
             else:
                 try:
-                    with open(cookies_path, 'rb') as f:
-                        cookies = pickle.load(f)
-                        self.cj.update(cookies)
-                except:
-                    # TODO: narrow exception clause (FileNotFound, pickle.UnpicklingError, etc)
-                    self.cj = requests.cookies.RequestsCookieJar()
+                    self.cj.load(cookies_path)
+                except (IOError, TypeError):
+                    # TODO: process exceptions separately
+                    self.cj = http_cookiejar.MozillaCookieJar()
 
     def get_connection(self):
         try:
@@ -34,7 +34,7 @@ class Lingualeo(QObject):
                 status = self.auth()
                 if status['error_msg']:
                     self.msg = status['error_msg']
-        except requests.exceptions.RequestException:
+        except (urllib.error.URLError, socket.error):
             self.msg = "Can't authorize. Check your internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
@@ -56,7 +56,7 @@ class Lingualeo(QObject):
             return None
         try:
             url = 'https://lingualeo.com/ru/userdict3/getWordSets'
-            all_wordsets = self.get_content(url, None)["result"]
+            all_wordsets = self.get_content(url, values=None)["result"]
             wordsets = []
             for wordset in all_wordsets:
                 # Add only non-empty dictionaries
@@ -65,7 +65,7 @@ class Lingualeo(QObject):
             self.save_cookies()
             if not wordsets:
                 self.msg = 'No user dictionaries found'
-        except requests.exceptions.RequestException:
+        except (urllib.error.URLError, socket.error):
             self.msg = "Can't get dictionaries. Check your internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
@@ -81,7 +81,7 @@ class Lingualeo(QObject):
         try:
             words = self.get_words_by_wordsets(wordsets) if wordsets else self.get_all_words()
             self.save_cookies()
-        except requests.exceptions.RequestException:
+        except (urllib.error.URLError, socket.error):
             self.msg = "Can't download words. Check your internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
@@ -132,8 +132,7 @@ class Lingualeo(QObject):
 
     def save_cookies(self):
         if hasattr(self, 'cookies_path'):
-            with open(self.cookies_path, 'wb+') as f:
-                pickle.dump(self.cj, f)
+            self.cj.save(self.cookies_path)
 
     # Low level methods
     #########################
@@ -164,9 +163,13 @@ class Lingualeo(QObject):
         return self.get_content(url, values)['userdict3']
 
     def get_content(self, url, values):
-        r = requests.get(url, params=values, cookies=self.cj)
-        self.cj.update(r.cookies)
-        return r.json()
+        url_values = urllib.parse.urlencode(values) if values else None
+        if not getattr(self, 'opener', None):
+            self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+        # TODO: Check if it is needed to define an additional method for POST requests
+        full_url = url + '?' + url_values if url_values else url
+        req = self.opener.open(full_url)
+        return json.loads(req.read())
 
     # TODO: Measure http vs https speed and
     #  consider adding 'http' option to config
@@ -217,7 +220,7 @@ class Download(QThread):
             self.Word.emit(word)
             try:
                 utils.send_to_download(word, self)
-            except requests.exceptions.RequestException:
+            except (urllib.error.URLError, socket.error):
                 problem_words.append(word.get('word_value'))
             counter += 1
             self.Counter.emit(counter)
