@@ -1,7 +1,8 @@
 import os
 from random import randint
-import requests
 import json
+from six.moves import urllib
+import socket
 
 from aqt import mw
 from anki import notes
@@ -69,8 +70,8 @@ def download_media_file(url):
     destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
     abs_path = os.path.join(destination_folder, name)
-    r = requests.get(url, timeout=DOWNLOAD_TIMEOUT)
-    media_file = r.content
+    resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
+    media_file = resp.read()
     with open(abs_path, "wb") as binfile:
         binfile.write(media_file)
 
@@ -90,7 +91,7 @@ def send_to_download(word, thread):
             try:
                 download_media_file(picture_url)
                 break
-            except requests.exceptions.RequestException as e:
+            except (urllib.error.URLError, socket.error) as e:
                 exc_happened = e
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
@@ -103,7 +104,7 @@ def send_to_download(word, thread):
             try:
                 download_media_file(sound_url)
                 break
-            except requests.exceptions.RequestException as e:
+            except (urllib.error.URLError, socket.error) as e:
                 exc_happened = e
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
