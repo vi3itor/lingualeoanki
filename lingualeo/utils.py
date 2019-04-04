@@ -1,7 +1,7 @@
 import os
 from random import randint
 import json
-from six.moves import urllib
+from .six.moves import urllib
 import socket
 
 from aqt import mw
@@ -216,7 +216,8 @@ def clean_cookies():
 def get_config():
     # Load config from config.json file
     if getattr(getattr(mw, "addonManager", None), "getConfig", None):
-        config = mw.addonManager.getConfig(__name__)
+        # TODO: define an add-on name in one place
+        config = mw.addonManager.getConfig('lingualeo')
     else:
         try:
             config_file = os.path.join(get_addon_dir(), 'config.json')
@@ -230,7 +231,7 @@ def get_config():
 
 def update_config(config):
     if getattr(getattr(mw, "addonManager", None), "writeConfig", None):
-        mw.addonManager.writeConfig(__name__, config)
+        mw.addonManager.writeConfig('lingualeo', config)
     else:
         try:
             config_file = os.path.join(get_addon_dir(), 'config.json')

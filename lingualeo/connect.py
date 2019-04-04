@@ -1,6 +1,6 @@
 import os
-from six.moves import http_cookiejar
-from six.moves import urllib
+from .six.moves import http_cookiejar
+from .six.moves import urllib
 import socket
 import json
 
@@ -16,7 +16,6 @@ class Lingualeo(QObject):
         self.email = email
         self.password = password
         self.cj = http_cookiejar.MozillaCookieJar()
-        self.msg = ''
         if cookies_path:
             self.cookies_path = cookies_path
             if not os.path.exists(cookies_path):
@@ -24,9 +23,16 @@ class Lingualeo(QObject):
             else:
                 try:
                     self.cj.load(cookies_path)
-                except (IOError, TypeError):
+                except (IOError, TypeError, ValueError):
                     # TODO: process exceptions separately
                     self.cj = http_cookiejar.MozillaCookieJar()
+                except:
+                    # TODO: Handle corrupt cookies loading
+                    self.cj = http_cookiejar.MozillaCookieJar()
+        self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+        config = utils.get_config()
+        self.url_prefix = config['protocol']
+        self.msg = ''
 
     def get_connection(self):
         try:
@@ -34,12 +40,19 @@ class Lingualeo(QObject):
                 status = self.auth()
                 if status['error_msg']:
                     self.msg = status['error_msg']
-        except (urllib.error.URLError, socket.error):
-            self.msg = "Can't authorize. Check your internet connection."
+        except (urllib.error.URLError, socket.error) as e:
+            if 'SSL' in str(e.args) and self.url_prefix == 'https://':
+                self.msg = "Problem with https connection, switching to http. Please try again"
+                self.url_prefix = 'http://'
+                config = utils.get_config()
+                config['protocol'] = 'http://'
+                utils.update_config(config)
+            else:
+                self.msg = "Can't authorize. Check your internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
         except Exception as e:
-            # TODO improve exception handling
+            # TODO improve exception handling and suggest posting the error as an issue on GitHub
             self.msg = "There's been an unexpected error. Sorry about that! " + str(e.args)
         if self.msg:
             self.Error.emit(self.msg)
@@ -55,7 +68,7 @@ class Lingualeo(QObject):
         if not self.get_connection():
             return None
         try:
-            url = 'https://lingualeo.com/ru/userdict3/getWordSets'
+            url = 'lingualeo.com/ru/userdict3/getWordSets'
             all_wordsets = self.get_content(url, values=None)["result"]
             wordsets = []
             for wordset in all_wordsets:
@@ -138,19 +151,19 @@ class Lingualeo(QObject):
     #########################
 
     def auth(self):
-        url = 'https://api.lingualeo.com/api/login'
+        url = 'api.lingualeo.com/api/login'
         values = {'email': self.email, 'password': self.password}
         content = self.get_content(url, values)
         self.save_cookies()
         return content
 
     def is_authorized(self):
-        url = 'https://api.lingualeo.com/api/isauthorized'
+        url = 'api.lingualeo.com/api/isauthorized'
         status = self.get_content(url, None)['is_authorized']
         return status
 
     def get_page(self, page_number):
-        url = 'https://lingualeo.com/ru/userdict/json'
+        url = 'lingualeo.com/ru/userdict/json'
         values = {'filter': 'all', 'page': page_number}
         return self.get_content(url, values)['userdict3']
 
@@ -158,29 +171,23 @@ class Lingualeo(QObject):
         """
         Get the words of a particular user dictionary (wordset)
         """
-        url = 'https://lingualeo.com/ru/userdict/json'
+        url = 'lingualeo.com/ru/userdict/json'
         values = {'filter': 'all', 'page': page_number, 'groupId': group_id}
         return self.get_content(url, values)['userdict3']
 
     def get_content(self, url, values):
         url_values = urllib.parse.urlencode(values) if values else None
-        if not getattr(self, 'opener', None):
-            self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
-        # TODO: Check if it is needed to define an additional method for POST requests
-        full_url = url + '?' + url_values if url_values else url
+        full_url = self.url_prefix + url + '?' + url_values if url_values else self.url_prefix + url
         req = self.opener.open(full_url)
         return json.loads(req.read())
 
-    # TODO: Measure http vs https speed and
-    #  consider adding 'http' option to config
-
-    # TODO: Add processing of http status codes and raise an exception,
+    # TODO: Add processing of http status codes in exceptions,
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
 
 
 def is_word_exist(check_word, words):
     """
-    Helper function to test if check_word dictionary exists in the list of words
+    Helper function to test if a check_word appear in the list of words
     :param check_word: dict
     :param words: list
     :return: bool
