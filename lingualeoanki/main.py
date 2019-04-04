@@ -1,8 +1,10 @@
 # import the main window object (mw) from aqt
 from aqt import mw
 from aqt.qt import QAction
+from aqt.utils import showInfo
 
 from . import gui
+from . import utils
 from ._name import ADDON_NAME
 
 
@@ -13,9 +15,14 @@ def activate():
         mw.lingualeoanki.activateWindow()
         mw.lingualeoanki.raise_()
     else:
-        window = gui.PluginWindow()
-        setattr(mw, ADDON_NAME, window)
-        window.exec_()
+        config = utils.get_config()
+        if config:
+            window = gui.PluginWindow()
+            setattr(mw, ADDON_NAME, window)
+            window.exec_()
+        else:
+            showInfo("Unable to load config. Make sure that config.json "
+                     "is present and not in use by other programs")
 
 
 # create a new menu item

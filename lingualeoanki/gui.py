@@ -28,7 +28,7 @@ class PluginWindow(QDialog):
         # Window Icon
         if pm.system() == 'Windows':
             path = os.path.join(utils.get_addon_dir(), 'favicon.ico')
-            # TODO: Check if required
+            # TODO: Check if still required
             # Check Python version for Anki 2.0 support
             if sys.version_info[0] < 3:
                 loc = locale.getdefaultlocale()[1]
@@ -213,7 +213,8 @@ class PluginWindow(QDialog):
         # Delete attribute before closing to allow running the plugin again
         if hasattr(mw, ADDON_NAME):
             delattr(mw, ADDON_NAME)
-        if not self.checkBoxStayLoggedIn.checkState():
+        if hasattr(self, 'checkBoxStayLoggedIn') and \
+                not self.checkBoxStayLoggedIn.checkState():
             utils.clean_cookies()
         mw.reset()
 
