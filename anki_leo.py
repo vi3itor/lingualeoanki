@@ -1,1 +1,1 @@
-import lingualeo
+import lingualeoanki
