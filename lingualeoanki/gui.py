@@ -213,8 +213,8 @@ class PluginWindow(QDialog):
                 event.ignore()
                 return
         # Delete attribute before closing to allow running the plugin again
-        if hasattr(self, ADDON_NAME):
-            delattr(self, ADDON_NAME)
+        if hasattr(mw, ADDON_NAME):
+            delattr(mw, ADDON_NAME)
         if not self.checkBoxStayLoggedIn.checkState():
             utils.clean_cookies()
         mw.reset()
