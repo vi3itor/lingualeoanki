@@ -209,10 +209,28 @@ def clean_cookies():
 
 
 def get_config():
-    # TODO: Support Anki 2.0 by manually reading config from json
     # Load config from config.json file
-    return mw.addonManager.getConfig(__name__)
+    if getattr(getattr(mw, "addonManager", None), "getConfig", None):
+        config = mw.addonManager.getConfig(ADDON_NAME)
+    else:
+        try:
+            config_file = os.path.join(get_addon_dir(), 'config.json')
+            with open(config_file, 'r') as f:
+                config = json.loads(f.read())
+        except IOError:
+            config = None
+
+    return config
 
 
 def update_config(config):
-    mw.addonManager.writeConfig(__name__, config)
+    if getattr(getattr(mw, "addonManager", None), "writeConfig", None):
+        mw.addonManager.writeConfig(ADDON_NAME, config)
+    else:
+        try:
+            config_file = os.path.join(get_addon_dir(), 'config.json')
+            with open(config_file, 'w') as f:
+                json.dump(config, f, sort_keys=True, indent=2)
+        except:
+            # TODO: Improve error handling
+            pass
