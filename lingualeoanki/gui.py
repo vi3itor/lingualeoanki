@@ -27,8 +27,9 @@ class PluginWindow(QDialog):
 
         # Window Icon
         if pm.system() == 'Windows':
-            path = os.path.join(os.path.dirname(__file__), 'favicon.ico')
-            # Check Python version for Anki 2.0 support (in the future)
+            path = os.path.join(utils.get_addon_dir(), 'favicon.ico')
+            # TODO: Check if required
+            # Check Python version for Anki 2.0 support
             if sys.version_info[0] < 3:
                 loc = locale.getdefaultlocale()[1]
                 path = path.decode(loc)
@@ -55,10 +56,10 @@ class PluginWindow(QDialog):
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
         self.exitButton.clicked.connect(self.close)
-        self.rbutton_any = QRadioButton("Any")
-        self.rbutton_any.setChecked(True)
         self.rbutton_studied = QRadioButton("Studied")
         self.rbutton_unstudied = QRadioButton("Unstudied")
+        self.rbutton_any = QRadioButton("Any")
+        self.rbutton_any.setChecked(True)
         self.checkBoxUpdateNotes = QCheckBox('Update existing notes')
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
@@ -85,9 +86,9 @@ class PluginWindow(QDialog):
         # Horizontal layout for radio buttons and update checkbox
         options_layout = QHBoxLayout()
         options_layout.addStretch()
-        options_layout.addWidget(self.rbutton_any)
         options_layout.addWidget(self.rbutton_studied)
         options_layout.addWidget(self.rbutton_unstudied)
+        options_layout.addWidget(self.rbutton_any)
         options_layout.addSpacing(15)
         options_layout.addWidget(self.checkBoxUpdateNotes)
         options_layout.addStretch()
@@ -167,9 +168,6 @@ class PluginWindow(QDialog):
         # Disable logout and other buttons
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
-
-        if hasattr(self, ADDON_NAME):
-            delattr(self, ADDON_NAME)
         utils.clean_cookies()
         self.config['stayLoggedIn'] = False
         utils.update_config(self.config)
