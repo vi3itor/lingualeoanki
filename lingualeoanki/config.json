@@ -1,7 +1,7 @@
 {
   "email": "your@email.com", 
   "password": "yourPassword", 
-  "protocol": "https://", 
+  "protocol": "http://",
   "rememberPassword": true,
   "stayLoggedIn": false
 }

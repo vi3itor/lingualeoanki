@@ -41,12 +41,20 @@ class Lingualeo(QObject):
                 if status['error_msg']:
                     self.msg = status['error_msg']
         except (urllib.error.URLError, socket.error) as e:
+            """
+            SSLError was noticed on MacOS, because Python didn't have 
+            security certificates downloaded. The easiest way is to switch 
+            back to http.
+            """
             if 'SSL' in str(e.args) and self.url_prefix == 'https://':
                 self.msg = "Problem with https connection, switching to http. Please try again"
                 self.url_prefix = 'http://'
                 config = utils.get_config()
                 config['protocol'] = 'http://'
                 utils.update_config(config)
+                utils.clean_cookies()
+                self.cj = http_cookiejar.MozillaCookieJar()
+                self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
             else:
                 self.msg = "Can't authorize. Check your internet connection."
         except ValueError:
