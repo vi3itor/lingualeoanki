@@ -8,6 +8,7 @@ from aqt import mw
 from anki import notes
 
 from . import styles
+from ._name import ADDON_NAME
 
 
 fields = ['en', 'transcription',
@@ -181,9 +182,7 @@ def is_duplicate(word):
 
 def get_addon_dir():
     root = mw.pm.addonFolder()
-    # TODO: check if it possible to get addon's name
-    # TODO: Fix folders naming
-    addon_dir = os.path.join(root, 'lingualeo')
+    addon_dir = os.path.join(root, ADDON_NAME)
     return addon_dir
 
 
@@ -216,8 +215,7 @@ def clean_cookies():
 def get_config():
     # Load config from config.json file
     if getattr(getattr(mw, "addonManager", None), "getConfig", None):
-        # TODO: define an add-on name in one place
-        config = mw.addonManager.getConfig('lingualeo')
+        config = mw.addonManager.getConfig(ADDON_NAME)
     else:
         try:
             config_file = os.path.join(get_addon_dir(), 'config.json')
@@ -231,7 +229,7 @@ def get_config():
 
 def update_config(config):
     if getattr(getattr(mw, "addonManager", None), "writeConfig", None):
-        mw.addonManager.writeConfig('lingualeo', config)
+        mw.addonManager.writeConfig(ADDON_NAME, config)
     else:
         try:
             config_file = os.path.join(get_addon_dir(), 'config.json')

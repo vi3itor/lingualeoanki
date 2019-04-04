@@ -10,6 +10,7 @@ from aqt.qt import *
 from . import connect
 from . import utils
 from . import styles
+from ._name import ADDON_NAME
 
 
 # TODO: Make Russian localization
@@ -167,7 +168,8 @@ class PluginWindow(QDialog):
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
 
-        delattr(self, 'lingualeo')
+        if hasattr(self, ADDON_NAME):
+            delattr(self, ADDON_NAME)
         utils.clean_cookies()
         self.config['stayLoggedIn'] = False
         utils.update_config(self.config)
@@ -211,7 +213,8 @@ class PluginWindow(QDialog):
                 event.ignore()
                 return
         # Delete attribute before closing to allow running the plugin again
-        delattr(mw, 'lingualeoanki')
+        if hasattr(self, ADDON_NAME):
+            delattr(self, ADDON_NAME)
         if not self.checkBoxStayLoggedIn.checkState():
             utils.clean_cookies()
         mw.reset()
@@ -227,7 +230,7 @@ class PluginWindow(QDialog):
         self.allow_to_close(True)
         mw.reset()
 
-# Functions for connecting to lingualeo and downloading words
+# Functions for connecting to LinguaLeo and downloading words
 ###########################################################
 
     def authorize(self, login, password, cookies_path=None):
