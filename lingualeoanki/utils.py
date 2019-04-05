@@ -189,7 +189,7 @@ def get_addon_dir():
 
 def get_cookies_path():
     """
-    Returns a full path to cookies.dat in the user_files folder
+    Returns a full path to cookies.txt in the user_files folder
     :return:
     """
     root = mw.pm.addonFolder()
@@ -202,7 +202,7 @@ def get_cookies_path():
         except:
             # TODO: Improve error handling
             return None
-    return os.path.join(uf_dir, 'cookies.dat')
+    return os.path.join(uf_dir, 'cookies.txt')
 
 
 def clean_cookies():
