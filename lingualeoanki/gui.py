@@ -27,8 +27,9 @@ class PluginWindow(QDialog):
 
         # Window Icon
         if pm.system() == 'Windows':
-            path = os.path.join(os.path.dirname(__file__), 'favicon.ico')
-            # Check Python version for Anki 2.0 support (in the future)
+            path = os.path.join(utils.get_addon_dir(), 'favicon.ico')
+            # TODO: Check if still required
+            # Check Python version for Anki 2.0 support
             if sys.version_info[0] < 3:
                 loc = locale.getdefaultlocale()[1]
                 path = path.decode(loc)
@@ -55,10 +56,10 @@ class PluginWindow(QDialog):
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
         self.exitButton.clicked.connect(self.close)
-        self.rbutton_any = QRadioButton("Any")
-        self.rbutton_any.setChecked(True)
         self.rbutton_studied = QRadioButton("Studied")
         self.rbutton_unstudied = QRadioButton("Unstudied")
+        self.rbutton_any = QRadioButton("Any")
+        self.rbutton_any.setChecked(True)
         self.checkBoxUpdateNotes = QCheckBox('Update existing notes')
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
@@ -85,9 +86,9 @@ class PluginWindow(QDialog):
         # Horizontal layout for radio buttons and update checkbox
         options_layout = QHBoxLayout()
         options_layout.addStretch()
-        options_layout.addWidget(self.rbutton_any)
         options_layout.addWidget(self.rbutton_studied)
         options_layout.addWidget(self.rbutton_unstudied)
+        options_layout.addWidget(self.rbutton_any)
         options_layout.addSpacing(15)
         options_layout.addWidget(self.checkBoxUpdateNotes)
         options_layout.addStretch()
@@ -167,8 +168,6 @@ class PluginWindow(QDialog):
         # Disable logout and other buttons
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
-
-        delattr(self, 'lingualeo')
         utils.clean_cookies()
         self.config['stayLoggedIn'] = False
         utils.update_config(self.config)
@@ -212,8 +211,10 @@ class PluginWindow(QDialog):
                 event.ignore()
                 return
         # Delete attribute before closing to allow running the plugin again
-        delattr(mw, 'lingualeoanki')
-        if not self.checkBoxStayLoggedIn.checkState():
+        if hasattr(mw, ADDON_NAME):
+            delattr(mw, ADDON_NAME)
+        if hasattr(self, 'checkBoxStayLoggedIn') and \
+                not self.checkBoxStayLoggedIn.checkState():
             utils.clean_cookies()
         mw.reset()
 
@@ -228,7 +229,7 @@ class PluginWindow(QDialog):
         self.allow_to_close(True)
         mw.reset()
 
-# Functions for connecting to lingualeo and downloading words
+# Functions for connecting to LinguaLeo and downloading words
 ###########################################################
 
     def authorize(self, login, password, cookies_path=None):

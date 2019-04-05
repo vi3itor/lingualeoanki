@@ -47,7 +47,7 @@ def is_model_exist(collection, fields):
                                                 'LinguaLeo_model')) == fields
     else:
         fields_ok = False
-    return (name_exist and fields_ok)
+    return name_exist and fields_ok
 
 
 def prepare_model(collection, fields, model_css):
@@ -73,13 +73,12 @@ def download_media_file(url):
     abs_path = os.path.join(destination_folder, name)
     resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
     media_file = resp.read()
-    # TODO: Handle exceptions of writing to file
     with open(abs_path, "wb") as binfile:
         binfile.write(media_file)
 
 
 def send_to_download(word, thread):
-    # TODO: Move to config following settings
+    # TODO: Move to config following settings and DOWNLOAD_TIMEOUT
     NUM_RETRIES = 5
     SLEEP_SECONDS = 5
     # try to download the picture and the sound the specified number of times,
@@ -189,12 +188,12 @@ def get_addon_dir():
 
 def get_cookies_path():
     """
-    Returns a full path to cookies.txt in the user_files folder
+    Returns a full path to cookies.dat in the user_files folder
     :return:
     """
-    root = mw.pm.addonFolder()
+
     # user_files folder in the current addon's dir
-    uf_dir = os.path.join(root, ADDON_NAME, 'user_files')
+    uf_dir = os.path.join(get_addon_dir(), 'user_files')
     # Create a folder if doesn't exist
     if not os.path.exists(uf_dir):
         try:
@@ -239,3 +238,4 @@ def update_config(config):
         except:
             # TODO: Improve error handling
             pass
+

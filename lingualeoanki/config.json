@@ -1,5 +1,7 @@
-{"email": "your@email.com",
-  "password": "password",
+{
+  "email": "your@email.com",
+  "password": "yourPassword",
   "protocol": "http://",
   "rememberPassword": true,
-  "stayLoggedIn": false}
+  "stayLoggedIn": false
+}

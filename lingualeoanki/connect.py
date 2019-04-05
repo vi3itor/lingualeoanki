@@ -60,7 +60,7 @@ class Lingualeo(QObject):
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
         except Exception as e:
-            # TODO improve exception handling
+            # TODO improve exception handling and suggest posting the error as an issue on GitHub
             self.msg = "There's been an unexpected error. Sorry about that! " + str(e.args)
         if self.msg:
             self.Error.emit(self.msg)
@@ -77,7 +77,7 @@ class Lingualeo(QObject):
             return None
         try:
             url = 'lingualeo.com/ru/userdict3/getWordSets'
-            all_wordsets = self.get_content(url, None)["result"]
+            all_wordsets = self.get_content(url, values=None)["result"]
             wordsets = []
             for wordset in all_wordsets:
                 # Add only non-empty dictionaries
@@ -189,16 +189,13 @@ class Lingualeo(QObject):
         req = self.opener.open(full_url)
         return json.loads(req.read())
 
-    # TODO: Measure http vs https speed and
-    #  consider adding 'http' option to config
-
-    # TODO: Add processing of http status codes and raise an exception,
+    # TODO: Add processing of http status codes in exceptions,
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
 
 
 def is_word_exist(check_word, words):
     """
-    Helper function to test if check_word dictionary exists in the list of words
+    Helper function to test if a check_word appear in the list of words
     :param check_word: dict
     :param words: list
     :return: bool
