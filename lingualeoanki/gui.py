@@ -10,6 +10,7 @@ from aqt.qt import *
 from . import connect
 from . import utils
 from . import styles
+from ._name import ADDON_NAME
 
 
 # TODO: Make Russian localization

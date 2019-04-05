@@ -8,6 +8,7 @@ from aqt import mw
 from anki import notes
 
 from . import styles
+from ._name import ADDON_NAME
 
 
 fields = ['en', 'transcription',
@@ -188,8 +189,7 @@ def get_cookies_path():
     """
     root = mw.pm.addonFolder()
     # user_files folder in the current addon's dir
-    # TODO: check if it possible to get addon's name
-    uf_dir = os.path.join(root, 'lingualeoanki', 'user_files')
+    uf_dir = os.path.join(root, ADDON_NAME, 'user_files')
     # Create a folder if doesn't exist
     if not os.path.exists(uf_dir):
         try:
