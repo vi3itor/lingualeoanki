@@ -1,8 +1,8 @@
 import os
 from random import randint
+import json
+from .six.moves import urllib
 import socket
-import urllib.request
-import urllib.error
 
 from aqt import mw
 from anki import notes
@@ -96,7 +96,6 @@ def send_to_download(word, thread):
             except (urllib.error.URLError, socket.error) as e:
                 exc_happened = e
                 thread.sleep(SLEEP_SECONDS)
-            # TODO: Handle possible exceptions
         if exc_happened:
             raise exc_happened
     sound_url = word.get('sound_url')
@@ -180,6 +179,12 @@ def is_duplicate(word):
     note_dupes2 = collection.findNotes('en:"%s"' % word['word_value'])
     note_dupes = note_dupes1 + note_dupes2
     return True if dupes or note_dupes else False
+
+
+def get_addon_dir():
+    root = mw.pm.addonFolder()
+    addon_dir = os.path.join(root, ADDON_NAME)
+    return addon_dir
 
 
 def get_cookies_path():
