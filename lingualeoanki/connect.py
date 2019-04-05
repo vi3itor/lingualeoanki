@@ -30,6 +30,8 @@ class Lingualeo(QObject):
                     # TODO: Handle corrupt cookies loading
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+        config = utils.get_config()
+        self.url_prefix = config['protocol'] if config else 'http://'
         self.msg = ''
 
     def get_connection(self):
@@ -39,7 +41,22 @@ class Lingualeo(QObject):
                 if status['error_msg']:
                     self.msg = status['error_msg']
         except (urllib.error.URLError, socket.error) as e:
-            self.msg = "Can't authorize. Check your internet connection."
+            """
+            SSLError was noticed on MacOS, because Python didn't have 
+            security certificates downloaded. The easiest way is to switch 
+            back to http.
+            """
+            if 'SSL' in str(e.args) and self.url_prefix == 'https://':
+                self.msg = "Problem with https connection, switching to http. Please try again"
+                self.url_prefix = 'http://'
+                config = utils.get_config()
+                config['protocol'] = 'http://'
+                utils.update_config(config)
+                utils.clean_cookies()
+                self.cj = http_cookiejar.MozillaCookieJar()
+                self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+            else:
+                self.msg = "Can't authorize. Check your internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
         except Exception as e:
@@ -59,7 +76,7 @@ class Lingualeo(QObject):
         if not self.get_connection():
             return None
         try:
-            url = 'https://lingualeo.com/ru/userdict3/getWordSets'
+            url = 'lingualeo.com/ru/userdict3/getWordSets'
             all_wordsets = self.get_content(url, None)["result"]
             wordsets = []
             for wordset in all_wordsets:
@@ -142,19 +159,19 @@ class Lingualeo(QObject):
     #########################
 
     def auth(self):
-        url = 'https://api.lingualeo.com/api/login'
+        url = 'api.lingualeo.com/api/login'
         values = {'email': self.email, 'password': self.password}
         content = self.get_content(url, values)
         self.save_cookies()
         return content
 
     def is_authorized(self):
-        url = 'https://api.lingualeo.com/api/isauthorized'
+        url = 'api.lingualeo.com/api/isauthorized'
         status = self.get_content(url, None)['is_authorized']
         return status
 
     def get_page(self, page_number):
-        url = 'https://lingualeo.com/ru/userdict/json'
+        url = 'lingualeo.com/ru/userdict/json'
         values = {'filter': 'all', 'page': page_number}
         return self.get_content(url, values)['userdict3']
 
@@ -162,13 +179,13 @@ class Lingualeo(QObject):
         """
         Get the words of a particular user dictionary (wordset)
         """
-        url = 'https://lingualeo.com/ru/userdict/json'
+        url = 'lingualeo.com/ru/userdict/json'
         values = {'filter': 'all', 'page': page_number, 'groupId': group_id}
         return self.get_content(url, values)['userdict3']
 
     def get_content(self, url, values):
         url_values = urllib.parse.urlencode(values) if values else None
-        full_url = url + '?' + url_values if url_values else url
+        full_url = self.url_prefix + url + '?' + url_values if url_values else self.url_prefix + url
         req = self.opener.open(full_url)
         return json.loads(req.read())
 
