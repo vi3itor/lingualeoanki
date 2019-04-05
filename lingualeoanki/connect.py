@@ -31,7 +31,7 @@ class Lingualeo(QObject):
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
         config = utils.get_config()
-        self.url_prefix = config['protocol']
+        self.url_prefix = config['protocol'] if config else 'http://'
         self.msg = ''
 
     def get_connection(self):
