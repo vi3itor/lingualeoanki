@@ -2,7 +2,7 @@
 from aqt import mw
 from aqt.qt import QAction
 
-from .lingualeo import gui
+from .lingualeoanki import gui
 
 
 def activate():

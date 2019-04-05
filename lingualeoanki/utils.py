@@ -70,9 +70,9 @@ def download_media_file(url):
     destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
     abs_path = os.path.join(destination_folder, name)
-    # TODO: change to Requests library
     resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
     media_file = resp.read()
+    # TODO: Handle exceptions of writing to file
     with open(abs_path, "wb") as binfile:
         binfile.write(media_file)
 
