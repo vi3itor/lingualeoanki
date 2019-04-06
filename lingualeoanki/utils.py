@@ -114,6 +114,8 @@ def send_to_download(word, thread):
 
 def fill_note(word, note):
     note['en'] = word['word_value']
+    # TODO: Allow user to collect more than one translation
+    #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
     note['ru'] = word['user_translates'][0]['translate_value']
     if word.get('transcription'):
         note['transcription'] = '[' + word.get('transcription') + ']'
