@@ -1,9 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog][1],
+and this project adheres to [Semantic Versioning][2].
 
+[English][3] / [Russian][4]
+## English
 ## [Unreleased]
 Section to track upcoming changes 
 
@@ -11,8 +13,8 @@ Section to track upcoming changes
 ### Added
 - Full support of Anki 2.1.x and (at least) Anki 2.0.52.
 - Ability to import not only all words, but words from one or several user dictionaries.
-- Log in and log out buttons and ability to stay logged in (by storing cookies in the user_files folder).
-- Import 'Studied', 'Unstudied' or 'Any' words.
+- Log in and log out buttons and ability to stay logged in (by storing cookies in the user\_files folder).
+- Select words to import: 'Studied', 'Unstudied' or 'Any'.
 - Option to update existing notes (otherwise check for duplicates first).
 - Configuration file to store user's login and (optionally) password as well as other settings (stay logged in, protocol, remember the password)
 - Six.py module for write Python 2 and 3 compatible code easier.
@@ -50,3 +52,56 @@ Section to track upcoming changes
 ### Added
 - Download words from user's dictionary in LinguaLeo.
 - Option to download unstudied words only.
+
+## Russian
+## [Неизданное]
+В этом разделе будут записываться изменения, которые ожидаются в будущих релизах. 
+
+## [2.0.0] - 2019-04-07
+### Добавлено
+- Полная поддержка Anki 2.1.x и (как минимум) Anki 2.0.52.
+- Возможность импортировать не только все слова, но выбирать пользовательские словари для импорта слов.
+- Кнопки "Войти" и "Выйти", а также опция оставаться в системе (сохраняя cookies в папке user\_files).
+- Возможность выбрать, какие слова импортировать: 'Изученные', 'Неизученные' или 'Любые'.
+- Опция "Обновить существующие карточки", чтобы обновить медиафайлы.
+- Конфигурационный файл для хранения логина, пароля (если активирована соответствующая опция),а также других пользовательских настроек (оставаться в системе, протокол: http либо https) 
+- Библиотека Six.py для удобного написания совместимого кода для Python 2 и 3.
+- Changelog для ведения лога изменений программы.
+
+### Изменено
+- Прежде чем загружать медиафайлы, проверять были ли эти слова загружены ранее (и не загружать медиафайлы, если опция "Обновить существующие карточки" не активна).
+- Не запускать более, чем одну копию аддона.
+- При выходе из Anki разрешить программе закрывать окно аддона, если нет активных загрузок.
+
+### Удалено
+- Опция "missed words", так как по умолчанию аддон загружает медиафайлы только для слов, которые не были заргужены ранее.
+
+## [1.3.1] - 2019-01-04
+### Изменено
+- Исправлена ошибка при первом запуске аддона, вызванная опцией "missed words".
+
+## [1.3.0] - 2018-11-11
+### Добавлено
+- Опция "missed words" для загрузки с последнего удачно загруженного слова.
+
+## [1.2.0] - 2018-01-25
+### Добавлено
+- Поддержка для слов с апострофом.
+
+### Изменено
+- Обновление медиафайлов (картинок либо звуков) в словах только в том случае, если они были обновлены пользователем.
+
+## [1.1.0] - 2018-01-06
+### Добавлено
+- Проверка дупликатов при добавлении новых слов в коллекцию.
+- При возникновении ошибки загрузки пытаться загрузить слова снова. 
+
+## [1.0.0] - 2017-12-28
+### Добавлено
+- Загрузка слов из пользовательского словаря LinguaLeo.
+- Опция загружать только неизученные слова.
+
+[1]:	https://keepachangelog.com/en/1.0.0/
+[2]:	https://semver.org/spec/v2.0.0.html
+[3]:	#english
+[4]:	#russian
