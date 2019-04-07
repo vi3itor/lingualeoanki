@@ -1,6 +1,5 @@
 import locale
 import sys
-
 import platform as pm
 
 from aqt import mw
@@ -254,7 +253,7 @@ class PluginWindow(QDialog):
             self.start_download_thread(filtered)
         else:
             progress = self.get_progress_type()
-            msg = 'No %s words to download' % progress if progress != 'Any' else 'No words to download'
+            msg = 'No %s words to download' % progress if progress != 'Any' else 'No new words to download'
             self.showErrorMessage(msg)
             self.set_download_form_enabled(True)
             self.allow_to_close(True)
