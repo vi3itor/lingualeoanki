@@ -11,7 +11,7 @@ Section to track upcoming changes
 
 ## [2.0.0] - 2019-04-07
 ### Added
-- Full support of Anki 2.1.x and (at least) Anki 2.0.52.
+- Full support of Anki 2.1.x and Anki 2.0 (tested on Anki 2.0.52).
 - Ability to import not only all words, but words from one or several user dictionaries.
 - Log in and log out buttons and ability to stay logged in (by storing cookies in the user\_files folder).
 - Select words to import: "Studied", "Unstudied" or "Any".
@@ -60,7 +60,7 @@ Section to track upcoming changes
 
 ## [2.0.0] - 2019-04-07
 ### Добавлено
-- Полная поддержка Anki 2.1.x и (как минимум) Anki 2.0.52.
+- Полная поддержка Anki 2.1.x и Anki 2.0 (тестировалось на Anki 2.0.52).
 - Возможность импортировать не только все слова, но также выбирать пользовательские словари для импорта слов.
 - Кнопки "Войти" и "Выйти", а также опция оставаться в системе (сохраняя cookies в папке user\_files).
 - Возможность выбрать, какие слова импортировать: 'Изученные', 'Неизученные' или 'Любые'.
