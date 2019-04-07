@@ -14,13 +14,14 @@ Section to track upcoming changes
 - Full support of Anki 2.1.x and (at least) Anki 2.0.52.
 - Ability to import not only all words, but words from one or several user dictionaries.
 - Log in and log out buttons and ability to stay logged in (by storing cookies in the user\_files folder).
-- Select words to import: 'Studied', 'Unstudied' or 'Any'.
-- Option to update existing notes (otherwise check for duplicates first).
-- Configuration file to store user's login and (optionally) password as well as other settings (stay logged in, protocol, remember the password)
+- Select words to import: "Studied", "Unstudied" or "Any".
+- Option to update existing notes (see also "Changed" section).
+- Configuration file to store user's login and (optionally) password as well as other settings (stay logged in, protocol, remember the password).
 - Six.py module for write Python 2 and 3 compatible code easier.
 - Changelog to keep updates and changes in one place.
 
 ### Changed
+- Fixed issues with duplicates.
 - Check for duplicates before starting to download media (don't check for duplicates only if "Update existing notes" option is selected).
 - Prevent multiple runs of the plugin at the same time.
 - When exiting allow Anki's main window to close add-on window if no words are downloading.
@@ -60,25 +61,26 @@ Section to track upcoming changes
 ## [2.0.0] - 2019-04-07
 ### Добавлено
 - Полная поддержка Anki 2.1.x и (как минимум) Anki 2.0.52.
-- Возможность импортировать не только все слова, но выбирать пользовательские словари для импорта слов.
+- Возможность импортировать не только все слова, но также выбирать пользовательские словари для импорта слов.
 - Кнопки "Войти" и "Выйти", а также опция оставаться в системе (сохраняя cookies в папке user\_files).
 - Возможность выбрать, какие слова импортировать: 'Изученные', 'Неизученные' или 'Любые'.
 - Опция "Обновить существующие карточки", чтобы обновить медиафайлы.
-- Конфигурационный файл для хранения логина, пароля (если активирована соответствующая опция),а также других пользовательских настроек (оставаться в системе, протокол: http либо https) 
+- Конфигурационный файл для хранения логина, пароля (если выбрана соответствующая опция), а также других пользовательских настроек: оставаться в системе, протокол (http либо https). 
 - Библиотека Six.py для удобного написания совместимого кода для Python 2 и 3.
 - Changelog для ведения лога изменений программы.
 
 ### Изменено
-- Прежде чем загружать медиафайлы, проверять были ли эти слова загружены ранее (и не загружать медиафайлы, если опция "Обновить существующие карточки" не активна).
-- Не запускать более, чем одну копию аддона.
-- При выходе из Anki разрешить программе закрывать окно аддона, если нет активных загрузок.
+- Исправлена загрузка дупликатов.
+- Прежде чем загружать медиафайлы, дополнение проверяет, были ли эти слова загружены ранее (и не загружает медиафайлы для существующих слов, если опция "Обновить существующие карточки" неактивна).
+- Невозможно запустить более одной копии дополнения одновременно.
+- При выходе из Anki и отсутствии активных загрузок окно дополнения будет закрыто автоматически.
 
 ### Удалено
-- Опция "missed words", так как по умолчанию аддон загружает медиафайлы только для слов, которые не были заргужены ранее.
+- Опция "missed words", так как по умолчанию дополнение создаёт карточки и загружает медиафайлы только для слов, которые не были импортированы ранее.
 
 ## [1.3.1] - 2019-01-04
 ### Изменено
-- Исправлена ошибка при первом запуске аддона, вызванная опцией "missed words".
+- Исправлена ошибка при первом запуске дополнения, вызванная опцией "missed words".
 
 ## [1.3.0] - 2018-11-11
 ### Добавлено
