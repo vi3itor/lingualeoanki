@@ -17,7 +17,7 @@ Section to track upcoming changes
 - Select words to import: "Studied", "Unstudied" or "Any".
 - Option to update existing notes (see also "Changed" section).
 - Configuration file to store user's login and (optionally) password as well as other settings: stay logged in, protocol (http or https), remember the password.
-- Six.py module for write Python 2 and 3 compatible code easier.
+- Six.py module for writing Python 2 and 3 compatible code easier.
 - Changelog to keep updates and changes in one place.
 
 ### Changed
