@@ -9,21 +9,21 @@ and this project adheres to [Semantic Versioning][2].
 ## [Unreleased]
 Section to track upcoming changes 
 
-## [2.0.0] - 2019-04-07
+## [2.0.0] - 2019-04-xx
 ### Added
 - Full support of Anki 2.1.x and Anki 2.0 (tested on Anki 2.0.52).
-- Ability to import not only all words, but words from one or several user dictionaries.
+- Ability to import not only all words, but words from one or several user dictionaries (word sets).
 - Log in and log out buttons and ability to stay logged in (by storing cookies in the user\_files folder).
 - Select words to import: "Studied", "Unstudied" or "Any".
 - Option to update existing notes (see also "Changed" section).
-- Configuration file to store user's login and (optionally) password as well as other settings (stay logged in, protocol, remember the password).
+- Configuration file to store user's login and (optionally) password as well as other settings: stay logged in, protocol (http or https), remember the password.
 - Six.py module for write Python 2 and 3 compatible code easier.
 - Changelog to keep updates and changes in one place.
 
 ### Changed
-- Fixed issues with duplicates.
-- Check for duplicates before starting to download media (don't check for duplicates only if "Update existing notes" option is selected).
-- Prevent multiple runs of the plugin at the same time.
+- Fixed issues with downloading duplicates.
+- Check for duplicates first before starting to import words (don't check for duplicates only if "Update existing notes" option is selected).
+- Prevent multiple runs of the add-on at the same time.
 - When exiting allow Anki's main window to close add-on window if no words are downloading.
 
 ### Removed
@@ -58,10 +58,10 @@ Section to track upcoming changes
 ## [Неизданное]
 В этом разделе будут записываться изменения, которые ожидаются в будущих релизах. 
 
-## [2.0.0] - 2019-04-07
+## [2.0.0] - 2019-04-xx
 ### Добавлено
 - Полная поддержка Anki 2.1.x и Anki 2.0 (тестировалось на Anki 2.0.52).
-- Возможность импортировать не только все слова, но также выбирать пользовательские словари для импорта слов.
+- Возможность импортировать не только все слова, но выбирать пользовательские словари (наборы) для импорта.
 - Кнопки "Войти" и "Выйти", а также опция оставаться в системе (сохраняя cookies в папке user\_files).
 - Возможность выбрать, какие слова импортировать: 'Изученные', 'Неизученные' или 'Любые'.
 - Опция "Обновить существующие карточки", чтобы обновить медиафайлы.
@@ -70,7 +70,7 @@ Section to track upcoming changes
 - Changelog для ведения лога изменений программы.
 
 ### Изменено
-- Исправлена загрузка дупликатов.
+- Исправлена загрузка дубликатов.
 - Прежде чем загружать медиафайлы, дополнение проверяет, были ли эти слова загружены ранее (и не загружает медиафайлы для существующих слов, если опция "Обновить существующие карточки" неактивна).
 - Невозможно запустить более одной копии дополнения одновременно.
 - При выходе из Anki и отсутствии активных загрузок окно дополнения будет закрыто автоматически.
@@ -95,7 +95,7 @@ Section to track upcoming changes
 
 ## [1.1.0] - 2018-01-06
 ### Добавлено
-- Проверка дупликатов при добавлении новых слов в коллекцию.
+- Проверка дубликатов при добавлении новых слов в коллекцию.
 - При возникновении ошибки загрузки пытаться загрузить слова снова. 
 
 ## [1.0.0] - 2017-12-28
