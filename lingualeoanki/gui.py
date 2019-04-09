@@ -182,13 +182,15 @@ class PluginWindow(QDialog):
 
     def wordsetButtonClicked(self):
         self.allow_to_close(False)
+        self.set_download_form_enabled(False)
         wordsets = self.lingualeo.get_wordsets()
         if wordsets:
-            self.set_download_form_enabled(False)
             wordset_window = WordsetsWindow(wordsets)
             wordset_window.Wordsets.connect(self.download_words)
             wordset_window.Cancel.connect(self.set_download_form_enabled)
             wordset_window.exec_()
+        else:
+            self.set_download_form_enabled(True)
 
     def reject(self):
         """
@@ -323,6 +325,16 @@ class PluginWindow(QDialog):
         showInfo(msg)
         mw.reset()
 
+    def update_window(self):
+        """
+        It's not recommended to call self.repaint() directly,
+        but at least on MacOS Anki 2.1.11 doesn't update widget's
+        window for several seconds even when self.update() is called
+        TODO: Remove when it works as expected
+        """
+        # self.update()
+        self.repaint()
+
     def get_progress_type(self):
         progress = 'Any'
         if self.rbutton_studied.isChecked():
@@ -342,6 +354,7 @@ class PluginWindow(QDialog):
         self.rbutton_studied.setEnabled(mode)
         self.rbutton_unstudied.setEnabled(mode)
         self.checkBoxUpdateNotes.setEnabled(mode)
+        self.update_window()
 
     def set_login_form_enabled(self, mode):
         """
