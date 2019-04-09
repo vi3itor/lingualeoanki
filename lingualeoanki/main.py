@@ -12,8 +12,9 @@ def activate():
     # Not to run multiple copies of a plugin window,
     # we create an attribute in the mw object
     if hasattr(mw, ADDON_NAME):
-        mw.lingualeoanki.activateWindow()
-        mw.lingualeoanki.raise_()
+        addon_window = getattr(mw, ADDON_NAME, None)
+        addon_window.activateWindow()
+        addon_window.raise_()
     else:
         config = utils.get_config()
         if config:
