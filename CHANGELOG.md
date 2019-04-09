@@ -4,10 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog][1],
 and this project adheres to [Semantic Versioning][2].
 
-[English][3] / [Russian][4]
-## English
+#### English
+[show in Russian][4]
 ## [Unreleased]
-Section to track upcoming changes 
+Section to track upcoming changes
+
+##### UI:
+- "Loading..." window to show user that list of words or list of dictionaries is being downloaded.
+- Add Russian localization since beginners are more comfortable with native language.
+- Additional window for settings such as: 
+   - what style of cards to create: with typing answer or without;
+   - download timeout, number of retries and sleep seconds;
+   - choose from-to dates for importing words;
+   - option to highlight the word in context;
+   - show number of words in progress bar. 
+- Improve error messages by narrowing down the reason.
+
+##### Import :
+- Import more than one translation (allow user to choose how many translations to import).
+- Add user dictionaries (wordsets) as tags.
+- Save problem words in json format and ask to retry downloading problem words only.
+- Update not only media, but also translation(s), context, tags.
+- Improve duplicate search to automatically update notes when any information was changed.
 
 ## [2.0.0] - 2019-04-xx
 ### Added
@@ -54,9 +72,28 @@ Section to track upcoming changes
 - Download words from user's dictionary in LinguaLeo.
 - Option to download unstudied words only.
 
-## Russian
+#### Russian
+[show in English][3]
 ## [Неизданное]
 В этом разделе будут записываться изменения, которые ожидаются в будущих релизах. 
+
+##### Пользовательский интерфейс:
+- Окно "Загружается...", чтобы уведомлять пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
+- Добавить русский перевод, так как начинающим комфортнее работать с дополнением на родном языке.
+- Дополнительное окно конфигурации для установки настроек импорта, таких как: 
+   - какой стиль карточек использовать: с вводом ответа либо без;
+   - таймаут запроса, количество попыток и продолжительность ожидания перед повторным скачиванием;
+   - выбор промежутка времени для импортирования слов;
+   - опция подсветки слова в контексте;
+   - показывать количество слов во время загрузки. 
+- Уточнить сообщения об ошибках.
+
+##### Загрузка слов:
+- Импортировать более одного перевода для слова (добавить соответствующую опцию в окне конфигурации).
+- Добавлять пользовательские словари как теги.
+- Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
+- Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
+- Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
 
 ## [2.0.0] - 2019-04-xx
 ### Добавлено
