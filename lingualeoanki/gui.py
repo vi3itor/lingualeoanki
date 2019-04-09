@@ -269,6 +269,8 @@ class PluginWindow(QDialog):
         Eliminates unnecessary to download words.
         We need to do it in main thread by using signals and slots
         """
+        if not words:
+            return None
         word_progress = self.get_progress_type()
         if word_progress == 'Unstudied':
             words = [word for word in words if word.get('progress_percent') < 100]
