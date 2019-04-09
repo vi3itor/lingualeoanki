@@ -15,6 +15,8 @@ from ._name import ADDON_NAME
 # TODO: Make Russian localization
 #  (since beginners are more comfortable with native language)
 
+# TODO: Implement "Loading..." window to show user that list of words or list of dictionaries is being downloaded
+
 class PluginWindow(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
