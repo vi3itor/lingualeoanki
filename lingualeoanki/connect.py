@@ -56,12 +56,12 @@ class Lingualeo(QObject):
                 self.cj = http_cookiejar.MozillaCookieJar()
                 self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
             else:
-                self.msg = "Can't authorize. Check your internet connection."
+                self.msg = "Can't authorize. Problems with internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
         except Exception as e:
-            # TODO improve exception handling and suggest posting the error as an issue on GitHub
-            self.msg = "There's been an unexpected error. Sorry about that! " + str(e.args)
+            self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
+                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e.args)
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
@@ -87,9 +87,12 @@ class Lingualeo(QObject):
             if not wordsets:
                 self.msg = 'No user dictionaries found'
         except (urllib.error.URLError, socket.error):
-            self.msg = "Can't get dictionaries. Check your internet connection."
+            self.msg = "Can't get dictionaries. Problem with internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
+        except Exception as e:
+            self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
+                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e.args)
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
@@ -103,10 +106,12 @@ class Lingualeo(QObject):
             words = self.get_words_by_wordsets(wordsets) if wordsets else self.get_all_words()
             self.save_cookies()
         except (urllib.error.URLError, socket.error):
-            self.msg = "Can't download words. Check your internet connection."
+            self.msg = "Can't download words. Problem with internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
-
+        except Exception as e:
+            self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
+                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e.args)
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
