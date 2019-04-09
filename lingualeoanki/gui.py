@@ -254,9 +254,15 @@ class PluginWindow(QDialog):
         else:
             progress = self.get_progress_type()
             msg = 'No %s words to download' % progress if progress != 'Any' else 'No new words to download'
-            self.showErrorMessage(msg)
-            self.set_download_form_enabled(True)
+            showInfo(msg)
             self.allow_to_close(True)
+            self.set_download_form_enabled(True)
+            # TODO: Check if it is needed in other functions too
+            # Activate add-on window
+            addon_window = getattr(mw, ADDON_NAME, None)
+            if addon_window:
+                addon_window.activateWindow()
+                addon_window.raise_()
 
     def filter_words(self, words):
         """
