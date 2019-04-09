@@ -78,8 +78,8 @@ def download_media_file(url):
 
 def send_to_download(word, thread):
     # TODO: Move to config following settings and DOWNLOAD_TIMEOUT
-    NUM_RETRIES = 5
-    SLEEP_SECONDS = 5
+    NUM_RETRIES = 3
+    SLEEP_SECONDS = 3
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
     picture_url = word.get('picture_url')
