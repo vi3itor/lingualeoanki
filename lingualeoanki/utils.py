@@ -128,17 +128,17 @@ def fill_note(word, note):
     if sound_url:
         sound_name = sound_url.split('/')[-1]
         note['sound_name'] = '[sound:%s]' % sound_name
+    # TODO: Add user dictionaries (wordsets) as tags
     return note
 
 
 def add_word(word, model):
-    # TODO: Introduce new fields to the model (pic_url and sound_url)
-    #  for testing if update is needed and implement a function
-    #  to update existing models (to introduce new fields) for compatibility
+    # TODO: Use picture_name and sound_name to check
+    #  if update is needed and don't download media if not
     collection = mw.col
     note = notes.Note(collection, model)
     note = fill_note(word, note)
-    # TODO: Rewrite and use is_duplicate()
+    # TODO: Rewrite to use is_duplicate()
     dupes = collection.findDupes("en", word['word_value'])
     # a hack to support words with apostrophes
     note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
@@ -146,6 +146,7 @@ def add_word(word, model):
     note_dupes = note_dupes1 + note_dupes2
     if not dupes and not note_dupes:
         collection.addNote(note)
+    # TODO: Update notes if translation or tags (user wordsets) changed
     elif (note['picture_name'] or note['sound_name']) and note_dupes:
         # update existing notes with new pictures and sounds in case
         # they have been changed in LinguaLeo's UI

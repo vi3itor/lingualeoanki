@@ -27,7 +27,6 @@ class PluginWindow(QDialog):
         # Window Icon
         if pm.system() == 'Windows':
             path = os.path.join(utils.get_addon_dir(), 'favicon.ico')
-            # TODO: Check if still required
             # Check Python version for Anki 2.0 support
             if sys.version_info[0] < 3:
                 loc = locale.getdefaultlocale()[1]
@@ -200,7 +199,7 @@ class PluginWindow(QDialog):
 
     def closeEvent(self, event):
         """
-        Override close event to safely close plugin
+        Override close event to safely close add-on window
         """
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
             qm = QMessageBox()
@@ -211,7 +210,7 @@ class PluginWindow(QDialog):
             elif answer == qm.Cancel:
                 event.ignore()
                 return
-        # Delete attribute before closing to allow running the plugin again
+        # Delete attribute before closing to allow running the add-on again
         if hasattr(mw, ADDON_NAME):
             delattr(mw, ADDON_NAME)
         if hasattr(self, 'checkBoxStayLoggedIn') and \
@@ -366,11 +365,12 @@ class PluginWindow(QDialog):
         self.passField.setEnabled(mode)
         self.checkBoxStayLoggedIn.setEnabled(mode)
         self.checkBoxSavePass.setEnabled(mode)
+        self.update_window()
 
     def allow_to_close(self, flag):
         """
         Sets attribute 'silentlyClose' to allow Anki's main window
-        to automatically close plugin windows on exit
+        to automatically close add-on windows on exit
         :param flag: bool
         """
         if flag:
@@ -417,7 +417,7 @@ class WordsetsWindow(QDialog):
         main_layout.addWidget(label)
         main_layout.addLayout(hbox)
         self.setLayout(main_layout)
-        # Set attribute to allow Anki to close the plugin window
+        # Set attribute to allow Anki to close the add-on window
         setattr(self, 'silentlyClose', 1)
         self.show()
 
@@ -434,6 +434,6 @@ class WordsetsWindow(QDialog):
         self.Wordsets.emit(selected_wordsets)
 
     def cancelButtonClicked(self):
-        # Send signal to activate buttons and radio buttons on the main plugin window
+        # Send signal to activate buttons and radio buttons on the main add-on window
         self.Cancel.emit(True)
         self.close()
