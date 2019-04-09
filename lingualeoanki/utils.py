@@ -8,7 +8,6 @@ from aqt import mw
 from anki import notes
 
 from . import styles
-from ._name import ADDON_NAME
 
 
 fields = ['en', 'transcription',
@@ -182,18 +181,21 @@ def is_duplicate(word):
     return True if dupes or note_dupes else False
 
 
+def get_module_name():
+    return __name__.split(".")[0]
+
+
 def get_addon_dir():
     root = mw.pm.addonFolder()
-    addon_dir = os.path.join(root, ADDON_NAME)
+    addon_dir = os.path.join(root, get_module_name())
     return addon_dir
 
 
 def get_cookies_path():
     """
-    Returns a full path to cookies.dat in the user_files folder
+    Returns a full path to cookies.txt in the user_files folder
     :return:
     """
-
     # user_files folder in the current addon's dir
     uf_dir = os.path.join(get_addon_dir(), 'user_files')
     # Create a folder if doesn't exist
@@ -217,7 +219,7 @@ def clean_cookies():
 def get_config():
     # Load config from config.json file
     if getattr(getattr(mw, "addonManager", None), "getConfig", None):
-        config = mw.addonManager.getConfig(ADDON_NAME)
+        config = mw.addonManager.getConfig(get_module_name())
     else:
         try:
             config_file = os.path.join(get_addon_dir(), 'config.json')
@@ -225,13 +227,12 @@ def get_config():
                 config = json.loads(f.read())
         except IOError:
             config = None
-
     return config
 
 
 def update_config(config):
     if getattr(getattr(mw, "addonManager", None), "writeConfig", None):
-        mw.addonManager.writeConfig(ADDON_NAME, config)
+        mw.addonManager.writeConfig(get_module_name(), config)
     else:
         try:
             config_file = os.path.join(get_addon_dir(), 'config.json')
