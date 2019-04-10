@@ -10,7 +10,7 @@ The add-on downloads your dictionary words from [LinguaLeo][3] - another great r
 
 ![screenshot][27]
 
-[LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary easily. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
+[LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
 ### New in version 2.0:
 #### Added
@@ -37,17 +37,16 @@ The full [log of changes][6] can be found in the repository.
 ### Installation
 
 The easiest (and preferable) way to install the add-on is by using the Anki's built-in add-ons managing system. In this case, it will be easy to [update][28] the add-on and get the latest version with new features and bug fixes. To install the add-on go to:  
-(for Anki 2.1.x) "Tools" \> "Add-ons" \> "Get add-ons..."  
-(for Anki 2.0) "Tools" \> "Add-ons" \> "Browse & Install"  
+(in Anki 2.1.x) "Tools" \> "Add-ons" \> "Get add-ons..."  
+(in Anki 2.0) "Tools" \> "Add-ons" \> "Browse & Install"  
 and input add-on's code: 1411073333. Restart Anki.
 
 If for some reason you wish to install the add-on manually, download the archive with the latest version from the [repository on GitHub][7] ([for Anki 2.1.x][24], [for Anki 2.0][25]), open Anki on your computer, go to:  
-(for Anki 2.1.x) "Tools" \> "Add-ons" \> "View Files"  
-(for Anki 2.0) "Tools" \> "Add-ons" \> "Open Add-ons Folder"  
+(in Anki 2.1.x) "Tools" \> "Add-ons" \> "View Files"  
+(in Anki 2.0) "Tools" \> "Add-ons" \> "Open Add-ons Folder"  
 and put the content of the archive there. If you use Anki 2.1.x create an additional folder named "lingualeoanki" inside "addons21" folder and put the content of the archive there. Restart Anki.   
 Watch the following gif for the details of manual installation on Anki 2.0 (with Russian captures):
 [how to manually install][8]
-
 
 #### Update
 
@@ -118,7 +117,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 
 Дополнение для [Anki][2] - программы для облегчения запоминания слов, выражений и любой другой информации с помощью интервальных повторений.
 
-Дополнение позволяет в один клик скачать ваши сохранённые слова из [LinguaLeo][3], другой замечательной образовательной платформы для изучения и практики английского, и создать для них карточки Anki. Карточки создаются как в варианте "русский - английский", так и "английский - русский" и включают в себя изображения, транскрипцию, аудио с произношением и предложение с контекстом из ЛингваЛео.  
+Дополнение позволяет в один клик скачать ваши сохранённые слова из [LinguaLeo][3], другой замечательной образовательной платформы для изучения и практики английского языка, и создать для них карточки Anki. Карточки создаются как в варианте "русский - английский", так и "английский - русский" и включают в себя изображения, транскрипцию, аудио с произношением и предложение с контекстом из ЛингваЛео.  
 
 ![screenshot][27]
 
@@ -184,15 +183,15 @@ And to all users who gave valuable comments and feedback and helped to test on d
 
 ### Кроме того
 
-Для того, чтобы оценить дополнение и оставить комментарий перейдите на [его страницу][9], войдите в аккаунт AnkiWeb в правом верхнем углу и кликните "Rate this." Но если вы хотите новую функцию или обнаружили ошибку, пожалуйста, не оставляйте сообщение о ней в комментариях, а скопируйте текст ошибки и [создайте issue на GitHub][10], либо напишите на email: 4yourquestions [собачка] gmail.com. 
+Для того, чтобы оценить дополнение и оставить комментарий перейдите на [его страницу][9], войдите в аккаунт AnkiWeb в правом верхнем углу и кликните "Rate this." Но если вы хотите новую функцию или обнаружили ошибку, пожалуйста, не оставляйте сообщение о ней в комментарии, а скопируйте текст ошибки и [создайте issue на GitHub][10], либо напишите на email: 4yourquestions [собачка] gmail.com. 
 
 #### Ожидается в следующих версиях:
 
 ##### Пользовательский интерфейс:
 - Сообщение "Загружается...", чтобы уведомлять пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
-- Добавить русский перевод, так как начинающим комфортнее работать с дополнением на родном языке.
+- Русский язык интерфейса, так как начинающим комфортнее работать с дополнением на родном языке.
 - Дополнительное окно конфигурации для установки настроек импорта, таких как: 
-   - какой стиль карточек использовать: с вводом ответа либо без;
+   - какого типа карточки создавать: с вводом ответа или без (для русско-английских карточек);
    - таймаут запроса, количество попыток и продолжительность ожидания перед повторным скачиванием;
    - выбор промежутка времени для импортирования слов;
    - опция подсветки слова в контексте;
@@ -218,7 +217,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [Илья Исаев][15] за [вдохновение][16] и проект [LeoPort][17].  
 [Serge][18] за функцию поиска дубликатов, поддержку слов с апострофом и функцию повторного скачивания слов.  
 [Николай Байков][19] за [PostMan Collection][20], дополнение [alfred-lingualeo][21] и за помощь с тестированием на MacOs.  
-А также всем, кто пользовался приложением, оставлял ценные комментарии и помогал тестировать на различных платформах.
+А также всем, кто пользовался приложением, оставлял ценные комментарии и помогал с тестированием на различных платформах.
 
 [1]:	#russian
 [2]:	https://apps.ankiweb.net/
