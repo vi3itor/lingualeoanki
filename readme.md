@@ -2,13 +2,15 @@
 
 ### Description
 
-[show description in Russian][1]
+[show description in Russian (описание на русском языке)][1]
 
 This is an add-on for [Anki][2] - powerful, intelligent flashcards, that makes remembering things easy via space repetition.
 
-The add-on downloads your dictionary words from [LinguaLeo][3] - another great resource to learn English and transforms them into Anki cards. Cards are created both for 'English to Russian' and 'Russian to English' sides and include pronunciation, images, transcription, and context.
+The add-on downloads your dictionary words from [LinguaLeo][3] - another great resource to learn English, and transforms them into Anki cards. Both 'English to Russian' and 'Russian to English' cards are created and they include pronunciation sound, image, transcription, and context.
 
-[LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and easily add words to the dictionary. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
+![screenshot][27]
+
+[LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary easily. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
 ### New in version 2.0:
 #### Added
@@ -34,7 +36,7 @@ The full [log of changes][6] can be found in the repository.
 
 ### Installation
 
-The easiest (and preferable) way to install the add-on is by using the Anki's built-in add-ons managing system. In this case, you will automatically receive an up-to-date version of the add-on with the latest features and bug fixes. To install the add-on go to:  
+The easiest (and preferable) way to install the add-on is by using the Anki's built-in add-ons managing system. In this case, it will be easy to [update][28] the add-on and get the latest version with new features and bug fixes. To install the add-on go to:  
 (for Anki 2.1.x) "Tools" \> "Add-ons" \> "Get add-ons..."  
 (for Anki 2.0) "Tools" \> "Add-ons" \> "Browse & Install"  
 and input add-on's code: 1411073333. Restart Anki.
@@ -42,10 +44,15 @@ and input add-on's code: 1411073333. Restart Anki.
 If for some reason you wish to install the add-on manually, download the archive with the latest version from the [repository on GitHub][7] ([for Anki 2.1.x][24], [for Anki 2.0][25]), open Anki on your computer, go to:  
 (for Anki 2.1.x) "Tools" \> "Add-ons" \> "View Files"  
 (for Anki 2.0) "Tools" \> "Add-ons" \> "Open Add-ons Folder"  
-and put the content of the archive there. For Anki 2.1.x make sure that you are copying it into "addons21" folder. Restart Anki.
-
+and put the content of the archive there. If you use Anki 2.1.x create an additional folder named "lingualeoanki" inside "addons21" folder and put the content of the archive there. Restart Anki.   
 Watch the following gif for the details of manual installation on Anki 2.0 (with Russian captures):
 [how to manually install][8]
+
+
+#### Update
+
+To update the add-on in Anki 2.1.x go to "Tools" > "Add-ons". Select the add-on and click "Check for updates."
+In Anki 2.0 you need to repeat [installation][29] procedure and it will automatically replace the files.  
 
 ### Compatibility
 
@@ -66,22 +73,43 @@ When finished press the "Exit" button.
 
 ### Additional
 
-To rate this add-on and leave feedback, go to [its page][9], log in to your AnkiWeb account in top right corner and press "Rate this." If you'd like to see a new feature or found a bug, please, don't leave a comment on the add-on's page, instead copy an error message and [create an issue on GitHub][10], or send me an email to 4yourquestions [at] gmail.com. 
+To rate this add-on and leave feedback, go to [its page][9], log in to your AnkiWeb account in top right corner and click "Rate this." If you'd like to see a new feature or found a bug, please, don't leave a comment on the add-on's page, instead copy an error message and [create an issue on GitHub][10], or send me an email to 4yourquestions [at] gmail.com. 
 
-This project is licensed under the GPL License - see the [LICENSE][11] file for details. 
+#### Features expected to appear in next releases:
+
+##### User Interface:
+- "Loading..." message to show user that list of words or list of dictionaries is being downloaded.
+- Add Russian localization since beginners are more comfortable with native language.
+- Additional configuration window to set up: 
+   - what style of "Russian to English" cards to create: with typing answer or without;
+   - download timeout, number of retries and sleep seconds;
+   - choose from-to dates for importing words;
+   - option to highlight the word in context;
+   - show number of words in progress bar. 
+- Improve error messages by narrowing down the reason.
+
+##### Import :
+- Import more than one translation (allow user to choose how many translations to import).
+- Add user dictionaries (wordsets) as tags.
+- Save problem words in json format and ask to retry downloading problem words only.
+- Update not only media, but also translation(s), context, tags.
+- Improve duplicate search to automatically update notes when any information was changed.
 
 
 ### Authors
 
 Version 1: [Alex Trutanov][12], [original project on bitbucket][13].  
-Version 2: [Victor Khaustov][14], [project on GitHub][7].
+Version 2: [Victor Khaustov][14], [project on GitHub][7] or [on bitbucket][26].
+
+This project is licensed under the GPL License - see the [LICENSE][11] file for details. 
+
 
 ### Acknowledgments
 
-[Ilya Isaev][15] for [inspiration][16] and his project [LeoPort][17]. 
+[Ilya Isaev][15] for [inspiration][16] and his project [LeoPort][17].  
 [Serge][18] for duplicate search feature, support words with apostrophes and function to redownload words if initially failed.  
 [Nikolay Bikov][19] for [PostMan Collection][20], [alfred-lingualeo][21] add-on and for helping to test on MacOS.  
-And to all users who left valuable comments and feedback and helped to test on different platforms.
+And to all users who gave valuable comments and feedback and helped to test on different platforms.
 
 ##### Russian
 [show description in English][22]
@@ -91,6 +119,8 @@ And to all users who left valuable comments and feedback and helped to test on d
 Дополнение для [Anki][2] - программы для облегчения запоминания слов, выражений и любой другой информации с помощью интервальных повторений.
 
 Дополнение позволяет в один клик скачать ваши сохранённые слова из [LinguaLeo][3], другой замечательной образовательной платформы для изучения и практики английского, и создать для них карточки Anki. Карточки создаются как в варианте "русский - английский", так и "английский - русский" и включают в себя изображения, транскрипцию, аудио с произношением и предложение с контекстом из ЛингваЛео.  
+
+![screenshot][27]
 
 [ЛингваЛео][3] имеет удобный интерфейс для добавления новых слов и неплохое [расширение для браузера][4] для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких [тренировок][5], Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.
 
@@ -120,17 +150,15 @@ And to all users who left valuable comments and feedback and helped to test on d
 ### Установка
 
 Наиболее простой (и предпочтительный) способ установки: с помощью системы управления дополнениями Anki. В таком случае вы сможете автоматически получать обновления с исправлением ошибок и новыми функциями. Для этого выберите пункт меню программы:  
-в Anki 2.1.x "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Скачать дополнения" (Get Add-ons...)  
-в Anki 2.0 "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Обзор и установка" (Browse & Install)  
+(для Anki 2.1.x) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Скачать дополнения" (Get Add-ons...)  
+(для Anki 2.0) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Обзор и установка" (Browse & Install)  
 введите код 1411073333 и перезапустите Anki.  
 
 Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из [репозитория на GitHub][7] ([для Anki 2.1.x][24], [для Anki 2.0][25]), откройте Anki на вашем компьютере, выберите пункт меню:  
 (для Anki 2.1.x) "Инструменты" (Tools) \> "Дополнения" (Add-ons) и кликните на кнопку "Просмотреть файлы" (View Files)  
 (для Anki 2.0) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Открыть папку с дополнениями" (Open Add-ons Folder)  
-и скопируйте туда содержимое архива. Для Anki 2.1.x убедитесь, что вы копируете в папку "addons21". Перезапустите программу.
-
-Гифка с наглядным изображением процесса ручной установки для Anki 2.0
-[Как установить дополнение вручную][8]
+и скопируйте туда содержимое архива. Если вы используете Anki 2.1.x, создайте папку с именем "lingualeoanki" в папку "addons21" и скопируйте содержимое архива туда. Перезапустите программу.   
+Гифка с наглядным изображением процесса ручной установки для Anki 2.0: [как установить дополнение вручную][8]
 
 ### Совместимость
 
@@ -153,12 +181,32 @@ And to all users who left valuable comments and feedback and helped to test on d
 
 Для того, чтобы оценить дополнение и оставить комментарий перейдите на [его страницу][9], войдите в аккаунт AnkiWeb в правом верхнем углу и кликните "Rate this." Но если вы хотите новую функцию или обнаружили ошибку, пожалуйста, не оставляйте сообщение о ней в комментариях, а скопируйте текст ошибки и [создайте issue на GitHub][10], либо напишите на email: 4yourquestions [собачка] gmail.com. 
 
-Свободное копирование и использование. Лицензия [GPL][11]. 
+#### Ожидается в следующих версиях:
+
+##### Пользовательский интерфейс:
+- Сообщение "Загружается...", чтобы уведомлять пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
+- Добавить русский перевод, так как начинающим комфортнее работать с дополнением на родном языке.
+- Дополнительное окно конфигурации для установки настроек импорта, таких как: 
+   - какой стиль карточек использовать: с вводом ответа либо без;
+   - таймаут запроса, количество попыток и продолжительность ожидания перед повторным скачиванием;
+   - выбор промежутка времени для импортирования слов;
+   - опция подсветки слова в контексте;
+   - показывать количество слов во время загрузки. 
+- Уточнить сообщения об ошибках.
+
+##### Загрузка слов:
+- Импортировать более одного перевода для слова (добавить соответствующую опцию в окне конфигурации).
+- Добавлять пользовательские словари как теги.
+- Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
+- Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
+- Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
 
 ### Авторы
 
 Версия 1: [Александр Трутанов][12], [оригинальный проект на bitbucket][13].  
-Версия 2: [Виктор Хаустов][14], [проект на GitHub][7].
+Версия 2: [Виктор Хаустов][14], ссылка на проект [на GitHub][7] или [на bitbucket][26].
+
+Свободное копирование и использование. Лицензия [GPL][11]. 
 
 ### Благодарности
 
@@ -190,5 +238,9 @@ And to all users who left valuable comments and feedback and helped to test on d
 [21]:	https://github.com/bikenik/alfred-lingualeo
 [22]:	#description
 [23]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
-[24]:   https://github.com/vi3itor/lingualeoanki/version_archive/for_anki_2_1
-[25]:   https://github.com/vi3itor/lingualeoanki/version_archive/for_anki_2_0
+[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-0.zip
+[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-0.zip
+[26]:   https://bitbucket.org/vkhaustov/lingualeoanki/
+[27]:   https://i.imgur.com/CtPGtUnl.png
+[28]:   #update
+[29]:   #installation
