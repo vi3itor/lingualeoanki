@@ -2,7 +2,7 @@
 
 ### Description
 
-[show description in Russian (описание на русском языке)][1]
+[show description in Russian (показать описание на русском языке)][1]
 
 This is an add-on for [Anki][2] - powerful, intelligent flashcards, that makes remembering things easy via space repetition.
 
@@ -45,7 +45,7 @@ If for some reason you wish to install the add-on manually, download the archive
 (in Anki 2.1.x) "Tools" \> "Add-ons" \> "View Files"  
 (in Anki 2.0) "Tools" \> "Add-ons" \> "Open Add-ons Folder"  
 and put the content of the archive there. If you use Anki 2.1.x create an additional folder named "lingualeoanki" inside "addons21" folder and put the content of the archive there. Restart Anki.   
-Watch the following gif for the details of manual installation on Anki 2.0 (with Russian captures):
+See the following gif for the details on manual installation in Anki 2.0 (with Russian captures):
 [how to manually install][8]
 
 #### Update
@@ -106,7 +106,7 @@ This project is licensed under the GPL License - see the [LICENSE][11] file for 
 ### Acknowledgments
 
 [Ilya Isaev][15] for [inspiration][16] and his project [LeoPort][17].  
-[Serge][18] for duplicate search feature, support words with apostrophes and function to redownload words if initially failed.  
+[Serge][18] for duplicate search feature, support words with apostrophes and function to retry downloading words if initially failed.  
 [Nikolay Bikov][19] for [PostMan Collection][20], [alfred-lingualeo][21] add-on and for helping to test on MacOS.  
 And to all users who gave valuable comments and feedback and helped to test on different platforms.
 
@@ -148,7 +148,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 
 ### Установка
 
-Наиболее простой (и предпочтительный) способ установки: с помощью системы управления дополнениями Anki. В таком случае вы сможете с лёгкостью обновлять дополнение и получать новые верии с новыми функциями и исправленными ошибками. Для этого выберите пункт меню программы:  
+Наиболее простой (и рекомендуемый) способ установки: с помощью системы управления дополнениями Anki. В таком случае вы сможете с лёгкостью обновлять дополнение и получать новые верии с новыми функциями и исправленными ошибками. Для этого выберите пункт меню программы:  
 (для Anki 2.1.x) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Скачать дополнения" (Get Add-ons...)  
 (для Anki 2.0) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Обзор и установка" (Browse & Install)  
 введите код 1411073333 и перезапустите Anki.  

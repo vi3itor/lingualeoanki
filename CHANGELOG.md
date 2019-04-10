@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog][1],
 and this project adheres to [Semantic Versioning][2].
 
 #### English
-[show in Russian][4]
+[show in Russian (отобразить на русском языке)][4]
 ## [Unreleased]
 Section to track upcoming changes
 
