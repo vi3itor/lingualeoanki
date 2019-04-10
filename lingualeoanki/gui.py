@@ -1,6 +1,5 @@
 import locale
 import sys
-
 import platform as pm
 
 from aqt import mw
@@ -16,6 +15,8 @@ from ._name import ADDON_NAME
 # TODO: Make Russian localization
 #  (since beginners are more comfortable with native language)
 
+# TODO: Implement "Loading..." window to show user that list of words or list of dictionaries is being downloaded
+
 class PluginWindow(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -28,7 +29,6 @@ class PluginWindow(QDialog):
         # Window Icon
         if pm.system() == 'Windows':
             path = os.path.join(utils.get_addon_dir(), 'favicon.ico')
-            # TODO: Check if still required
             # Check Python version for Anki 2.0 support
             if sys.version_info[0] < 3:
                 loc = locale.getdefaultlocale()[1]
@@ -183,13 +183,15 @@ class PluginWindow(QDialog):
 
     def wordsetButtonClicked(self):
         self.allow_to_close(False)
+        self.set_download_form_enabled(False)
         wordsets = self.lingualeo.get_wordsets()
         if wordsets:
-            self.set_download_form_enabled(False)
             wordset_window = WordsetsWindow(wordsets)
             wordset_window.Wordsets.connect(self.download_words)
             wordset_window.Cancel.connect(self.set_download_form_enabled)
             wordset_window.exec_()
+        else:
+            self.set_download_form_enabled(True)
 
     def reject(self):
         """
@@ -199,7 +201,7 @@ class PluginWindow(QDialog):
 
     def closeEvent(self, event):
         """
-        Override close event to safely close plugin
+        Override close event to safely close add-on window
         """
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
             qm = QMessageBox()
@@ -210,7 +212,7 @@ class PluginWindow(QDialog):
             elif answer == qm.Cancel:
                 event.ignore()
                 return
-        # Delete attribute before closing to allow running the plugin again
+        # Delete attribute before closing to allow running the add-on again
         if hasattr(mw, ADDON_NAME):
             delattr(mw, ADDON_NAME)
         if hasattr(self, 'checkBoxStayLoggedIn') and \
@@ -254,16 +256,24 @@ class PluginWindow(QDialog):
             self.start_download_thread(filtered)
         else:
             progress = self.get_progress_type()
-            msg = 'No %s words to download' % progress if progress != 'Any' else 'No words to download'
-            self.showErrorMessage(msg)
-            self.set_download_form_enabled(True)
+            msg = 'No %s words to download' % progress if progress != 'Any' else 'No new words to download'
+            showInfo(msg)
             self.allow_to_close(True)
+            self.set_download_form_enabled(True)
+            # TODO: Check if it is needed in other functions too
+            # Activate add-on window
+            addon_window = getattr(mw, ADDON_NAME, None)
+            if addon_window:
+                addon_window.activateWindow()
+                addon_window.raise_()
 
     def filter_words(self, words):
         """
         Eliminates unnecessary to download words.
         We need to do it in main thread by using signals and slots
         """
+        if not words:
+            return None
         word_progress = self.get_progress_type()
         if word_progress == 'Unstudied':
             words = [word for word in words if word.get('progress_percent') < 100]
@@ -316,6 +326,16 @@ class PluginWindow(QDialog):
         showInfo(msg)
         mw.reset()
 
+    def update_window(self):
+        """
+        It's not recommended to call self.repaint() directly,
+        but at least on MacOS Anki 2.1.11 doesn't update widget's
+        window for several seconds even when self.update() is called
+        TODO: Remove when it works as expected
+        """
+        # self.update()
+        self.repaint()
+
     def get_progress_type(self):
         progress = 'Any'
         if self.rbutton_studied.isChecked():
@@ -335,6 +355,7 @@ class PluginWindow(QDialog):
         self.rbutton_studied.setEnabled(mode)
         self.rbutton_unstudied.setEnabled(mode)
         self.checkBoxUpdateNotes.setEnabled(mode)
+        self.update_window()
 
     def set_login_form_enabled(self, mode):
         """
@@ -346,11 +367,12 @@ class PluginWindow(QDialog):
         self.passField.setEnabled(mode)
         self.checkBoxStayLoggedIn.setEnabled(mode)
         self.checkBoxSavePass.setEnabled(mode)
+        self.update_window()
 
     def allow_to_close(self, flag):
         """
         Sets attribute 'silentlyClose' to allow Anki's main window
-        to automatically close plugin windows on exit
+        to automatically close add-on windows on exit
         :param flag: bool
         """
         if flag:
@@ -397,7 +419,7 @@ class WordsetsWindow(QDialog):
         main_layout.addWidget(label)
         main_layout.addLayout(hbox)
         self.setLayout(main_layout)
-        # Set attribute to allow Anki to close the plugin window
+        # Set attribute to allow Anki to close the add-on window
         setattr(self, 'silentlyClose', 1)
         self.show()
 
@@ -414,6 +436,6 @@ class WordsetsWindow(QDialog):
         self.Wordsets.emit(selected_wordsets)
 
     def cancelButtonClicked(self):
-        # Send signal to activate buttons and radio buttons on the main plugin window
+        # Send signal to activate buttons and radio buttons on the main add-on window
         self.Cancel.emit(True)
         self.close()

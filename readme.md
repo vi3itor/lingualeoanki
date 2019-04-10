@@ -1,87 +1,250 @@
-# Import Words From LinguaLeo to Anki
+# Import Words From LinguaLeo to Anki 2
 
-[English](#markdown-header-english) / [Russian](#markdown-header-russian)
+### Description
 
-##English
-### Description ###
+[show description in Russian (показать описание на русском языке)][1]
 
-This is an add-on for [Anki](https://apps.ankiweb.net/) - powerful, intelligent flash cards, which makes remembering things easy.
+This is an add-on for [Anki][2] - powerful, intelligent flashcards, that makes remembering things easy via space repetition.
 
-The add-on downloads your dictionary from [LinguaLeo](https://lingualeo.com/) - another great resource to learn English and transforms it into Anki cards. Cards are created both for 'english to russian' and 'russian to english' sides and include pronunciation, images, transcription and context.
+The add-on downloads your dictionary words from [LinguaLeo][3] - another great resource to learn English, and transforms them into Anki cards. Both 'English to Russian' and 'Russian to English' cards are created and they include pronunciation sound, image, transcription, and context.
 
-### Installation ###
+![screenshot][27]
 
-To install this add-on, open Anki on your computer, go to the Tools menu and then Add-ons > Open Add-ons Folder and put the source code there. 
+[LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
-Watch this gif for the details (with russian captures):
+### New in version 2.0:
+#### Added
+- Full support of Anki 2.1.x and Anki 2.0 (tested on Anki 2.0.52).
+- Ability to import not only all words, but words from one or several user dictionaries (word sets).
+- Log in and log out buttons and ability to stay logged in (by storing cookies in the user\_files folder).
+- Select words to import: "Studied", "Unstudied" or "Any".
+- Option to update existing notes (see also "Changed" section).
+- Configuration file to store user's login and (optionally) password as well as other settings: stay logged in, protocol (http or https), remember the password.
+- Six.py module for writing Python 2 and 3 compatible code easier.
+- Changelog to keep updates and changes in one place.
 
-![how to install the plugin](https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif)
+#### Changed
+- Fixed issues with downloading duplicates.
+- Check for duplicates first before starting to import words (don't check for duplicates only if "Update existing notes" option is selected).
+- Prevent multiple runs of the add-on at the same time.
+- When exiting allow Anki's main window to close add-on window if no words are downloading.
 
-But the easiest way to install the plugin is by using the Anki's built-in add-ons system. Check it out on the plugin page on [Anki add-ons forum](https://ankiweb.net/shared/info/1411073333).
+#### Removed
+- Option "missed words": it is not necessary anymore, because, by default, the add-on only downloads media for the words that are not in the deck.
 
-### Usage ###
+The full [log of changes][6] can be found in the repository.
 
-To download your words simply go to the Tools menu > Import from LinguaLeo, enter your login and password for the site and that's all. You don't need to create decks, models, templates or anything else. The add-on will make it all for you. As simple as that. 
+### Installation
 
-You can also choose whether you want to download all words from your LinguaLeo dictionary or only unstudied ones.
+The easiest (and preferable) way to install the add-on is by using the Anki's built-in add-ons managing system. In this case, it will be easy to [update][28] the add-on and get the latest version with new features and bug fixes. To install the add-on go to:  
+(in Anki 2.1.x) "Tools" \> "Add-ons" \> "Get add-ons..."  
+(in Anki 2.0) "Tools" \> "Add-ons" \> "Browse & Install"  
+and input add-on's code: 1411073333. Restart Anki.
 
-Please, be patient, it can take up to 10 minutes to download 1000 words due to size of images and sounds. 
+If for some reason you wish to install the add-on manually, download the archive with the latest version from the [repository on GitHub][7] ([for Anki 2.1.x][24], [for Anki 2.0][25]), open Anki on your computer, go to:  
+(in Anki 2.1.x) "Tools" \> "Add-ons" \> "View Files"  
+(in Anki 2.0) "Tools" \> "Add-ons" \> "Open Add-ons Folder"  
+and put the content of the archive there. If you use Anki 2.1.x create an additional folder named "lingualeoanki" inside "addons21" folder and put the content of the archive there. Restart Anki.   
+See the following gif for the details on manual installation in Anki 2.0 (with Russian captures):
+[how to manually install][8]
 
-### Compatibility ###
+#### Update
 
-This add-on only works with Anki's stable release branch (2.0.x ≥ 2.0.44). The 2.1 beta branch is not supported at this point in time.
+To update the add-on in Anki 2.1.x go to "Tools" > "Add-ons". Select the add-on and click "Check for updates."
+In Anki 2.0 you need to repeat [installation][29] procedure and it will automatically replace the files.  
 
-### Meta ###
+### Compatibility
 
-Fell free to write me about add-on or anything else here on [bitbucket](https://bitbucket.org/alex-altay/) or [vk](https://vk.com/trutanov.alex).
+The add-on works with Anki 2.1.x and Anki 2.0 (tested on 2.0.52). It is recommended to install the latest version of Anki 2.1, because the future releases of the add-on may not support outdated Anki 2.0.52.
 
-This project is licensed under the GPL License - see the [LICENSE](https://bitbucket.org/alex-altay/lingualeoanki/src/70f0add7da031166f3fbd50dfd8e634236488840/LICENSE?at=master&fileviewer=file-view-default) file for details. 
+### Usage
 
-### Acknowledgments ###
+To run the add-on go to the "Tools" menu and click "Import from LinguaLeo." Enter your login and password. If you'd like to stay logged in choose "Stay logged in" option, and you can also save the password (stored in the configuration file), and click "Log in" button.  
+If the authorization is successful, you can choose the words to import: "Studied", "Unstudied" or "Any."  
+If you updated media for some notes that had been previously imported, choose "Update existing notes" option.  
 
-[Ilya Isaev](https://github.com/relaxart) for [inspiration](https://habrahabr.ru/post/276495/) and his project [LeoPort](https://github.com/relaxart/LeoPort).
-[Nikolay Bikov](https://github.com/bikenik) and everyone who helps with testing on MacOs.
+To download all user words click "Import all words" button. If you want to choose user dictionaries (word sets) to download words from: click "Import from dictionaries" button and hold Ctrl (or Cmd) to choose several dictionaries. Then click "Import."  
+And that's all. You don't need to create decks, models, templates or anything else. The add-on will make it all for you. As simple as that. 
 
-##Russian
-
-### Описание ###
-
-Дополнение для [Anki](https://apps.ankiweb.net/) - программы для облегчения запоминания слов, выражений и любой другой информации с помощью интервальных повторений.
-
-Дополнение позволяет в один клик скачать ваши сохранённые слова из [LinguaLeo](https://lingualeo.com/), другой замечательной образовательной платформы для изучения и практики английского, и создать для них карточки Anki. Карточки создаются как в варианте "русский - английский", так и "английский - русский" и включают в себя изображения, транскрипцию, аудио с произношением и предложение с контекстом с ЛингваЛео. 
-
-### Установка ###
-
-Для установки дополнения скачайте архив с исходным кодом, откройте Anki на вашем компьютере, выберите меню "Инструменты" (Tools) > "Дополнения" (Add-ons) > "Открыть папку с дополнениями" ("Open Add-ons Folder") и скопируйте в него содержимое архива.
-
-Гифка с наглядным изображением процесса установки:
-
-![how to install the plugin](https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif)
-
-Альтернативный (и самый простой способ) установки это система управления дополнениями самой Анки. Для этого зайдите на [страницу плагина](https://ankiweb.net/shared/info/1411073333) на форуме дополнений Анки. В разделе Download скопируйте код в синей рамке. Откройте программу на вашем компьютере. Выберите меню Инструменты (Tools) > Дополнения (Add-ons) > Обзор и установка (Browse & Install) и вставьте скопированный код. Перезапустите программу.
-
-### Как это работает? ###
-
-После установки, чтобы импортировать ваши слова из LinguaLeo в Anki откройте меню "Инструменты" (Tools) и выберите пункт Import from LinguaLeo. Введите ваш логин и пароль для сайта и нажмите "Импорт". Никаких моделей, шаблонов, колод создавать не нужно, дополнение сделает всю работу за вас. Проще некуда.
-
-Если вы хотите импортировать не все слова, а только неизученные, поставьте галочку в поле "Unstudied only?"
-
-Наберитесь терпения. Импорт 1000 слов может занять минут 10 и более в зависимости от веса аудио с произношением и картинок.
+Please, be patient, it can take up to 10 minutes (or even more) to download 1000 words depending on the size of images and sounds and the speed of your internet connection.  
+When finished press the "Exit" button.
 
 
-### Совместимость ###
+### Additional
 
-Дополнение будет работать только с версией Anki 2.0.x ≥ 2.0.44.
-Бета-версия 2.1 ещё не поддерживается.
+To rate this add-on and leave feedback, go to [its page][9], log in to your AnkiWeb account in top right corner and click "Rate this." If you'd like to see a new feature or found a bug, please, don't leave a comment on the add-on's page, instead copy an error message and [create an issue on GitHub][10], or send me an email to 4yourquestions [at] gmail.com. 
 
-### Кроме того ###
+#### Features expected to appear in next releases:
 
-По вопросам работы дополнения (и любым другим) пишите мне сюда на [bitbucket](https://bitbucket.org/alex-altay/) или [вконтакт](https://vk.com/trutanov.alex).
+##### User Interface:
+- "Loading..." message to show user that list of words or list of dictionaries is being downloaded.
+- Add Russian localization since beginners are more comfortable with native language.
+- Additional configuration window to set up: 
+   - what style of "Russian to English" cards to create: with typing answer or without;
+   - download timeout, number of retries and sleep seconds;
+   - choose from-to dates for importing words;
+   - option to highlight the word in context;
+   - show number of words in progress bar. 
+- Improve error messages by narrowing down the reason.
 
-Свободное копирование и использование. Лицензия [GPL](https://bitbucket.org/alex-altay/lingualeoanki/src/70f0add7da031166f3fbd50dfd8e634236488840/LICENSE?at=master&fileviewer=file-view-default). 
+##### Import :
+- Import more than one translation (allow user to choose how many translations to import).
+- Add user dictionaries (wordsets) as tags.
+- Save problem words in json format and ask to retry downloading problem words only.
+- Update not only media, but also translation(s), context, tags.
+- Improve duplicate search to automatically update notes when any information was changed.
 
-### Благодарности ###
 
-[Илья Исаев](https://github.com/relaxart) за [вдохновение](https://habrahabr.ru/post/276495/) и проект [LeoPort](https://github.com/relaxart/LeoPort).
-[Николай Байков](https://github.com/bikenik) и всем кто помогал с тестированием на MacOs.
+### Authors
 
+Version 1: [Alex Trutanov][12], [original project on bitbucket][13].  
+Version 2: [Victor Khaustov][14], [project on GitHub][7] or [on bitbucket][26].
+
+This project is licensed under the GPL License - see the [LICENSE][11] file for details. 
+
+
+### Acknowledgments
+
+[Ilya Isaev][15] for [inspiration][16] and his project [LeoPort][17].  
+[Serge][18] for duplicate search feature, support words with apostrophes and function to retry downloading words if initially failed.  
+[Nikolay Bikov][19] for [PostMan Collection][20], [alfred-lingualeo][21] add-on and for helping to test on MacOS.  
+And to all users who gave valuable comments and feedback and helped to test on different platforms.
+
+##### Russian
+[show description in English][22]
+
+### Описание
+
+Дополнение для [Anki][2] - программы для облегчения запоминания слов, выражений и любой другой информации с помощью интервальных повторений.
+
+Дополнение позволяет в один клик скачать ваши сохранённые слова из [LinguaLeo][3], другой замечательной образовательной платформы для изучения и практики английского языка, и создать для них карточки Anki. Карточки создаются как в варианте "русский - английский", так и "английский - русский" и включают в себя изображения, транскрипцию, аудио с произношением и предложение с контекстом из ЛингваЛео.  
+
+![screenshot][27]
+
+[ЛингваЛео][3] имеет удобный интерфейс для добавления новых слов и неплохое [расширение для браузера][4] для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких [тренировок][5], Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.
+
+### Новое в версии 2.0:
+
+#### Добавлено
+- Полная поддержка Anki 2.1.x и Anki 2.0 (тестировалось на Anki 2.0.52).
+- Возможность импортировать не только все слова, но выбирать пользовательские словари (наборы) для импорта.
+- Кнопки "Войти" и "Выйти", а также опция оставаться в системе (сохраняя cookies в папке user\_files).
+- Возможность выбрать, какие слова импортировать: 'Изученные', 'Неизученные' или 'Любые'.
+- Опция "Обновить существующие карточки", чтобы обновить медиафайлы.
+- Конфигурационный файл для хранения логина, пароля (если выбрана соответствующая опция), а также других пользовательских настроек: оставаться в системе, протокол (http либо https). 
+- Библиотека Six.py для удобного написания совместимого кода для Python 2 и 3.
+- Changelog для ведения лога изменений программы.
+
+#### Изменено
+- Исправлена загрузка дубликатов.
+- Прежде чем загружать медиафайлы, дополнение проверяет, были ли эти слова загружены ранее (и не загружает медиафайлы для существующих слов, если опция "Обновить существующие карточки" неактивна).
+- Невозможно запустить более одной копии дополнения одновременно.
+- При выходе из Anki и отсутствии активных загрузок окно дополнения будет закрыто автоматически.
+
+#### Удалено
+- Опция "missed words", так как по умолчанию дополнение создаёт карточки и загружает медиафайлы только для слов, которые не были импортированы ранее.
+
+Полный [список изменений][23] хранится в репозитории.
+
+### Установка
+
+Наиболее простой (и рекомендуемый) способ установки: с помощью системы управления дополнениями Anki. В таком случае вы сможете с лёгкостью обновлять дополнение и получать новые верии с новыми функциями и исправленными ошибками. Для этого выберите пункт меню программы:  
+(для Anki 2.1.x) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Скачать дополнения" (Get Add-ons...)  
+(для Anki 2.0) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Обзор и установка" (Browse & Install)  
+введите код 1411073333 и перезапустите Anki.  
+
+Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из [репозитория на GitHub][7] ([для Anki 2.1.x][24], [для Anki 2.0][25]), откройте Anki на вашем компьютере, выберите пункт меню:  
+(для Anki 2.1.x) "Инструменты" (Tools) \> "Дополнения" (Add-ons) и кликните на кнопку "Просмотреть файлы" (View Files)  
+(для Anki 2.0) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Открыть папку с дополнениями" (Open Add-ons Folder)  
+и скопируйте туда содержимое архива. Если вы используете Anki 2.1.x, создайте папку с именем "lingualeoanki" в папку "addons21" и скопируйте туда содержимое архива. Перезапустите программу.   
+Гифка с наглядным изображением процесса ручной установки для Anki 2.0: [как установить дополнение вручную][8]
+
+### Обновление
+
+Чтобы обновить дополнение в Anki 2.1.x перейдите в "Инструменты" (Tools) > "Дополнения" (Add-ons). Выберите название дополнения и кликните на "Проверить обновления" (Check for updates).
+В Anki 2.0 вам следует повторить процедуру установки.  
+
+### Совместимость
+
+Дополнение работает с новыми версиями (Anki 2.1.x), а также с Анки 2.0 (тестировалось на 2.0.52).
+Рекомендуется установить Anki 2.1, актуальную версию программы, так как новые версии дополнения могут не поддерживать устаревшую версию Anki 2.0. 
+
+### Как это работает?
+
+После установки, чтобы импортировать ваши слова из LinguaLeo в Anki, откройте меню "Инструменты" (Tools) и выберите пункт "Import from LinguaLeo." Введите ваш логин и пароль для сервиса LinguaLeo. Если вы хотите оставаться в системе, выберите пункт "Stay logged in," и если вы хотите, чтобы дополнение запомнило пароль, выберите "Save password" (в таком случае пароль будет храниться в конфигурационном файле), после этого нажмите "Log in."  
+Если авторизация прошла успешно, вы можете выбрать какие слова импортировать: "Studied" (изученные), "Unstudied" (неизученные) либо "Any" (и те и другие). 
+Если в некоторых словах вы обновили изображение или звук и хотите, чтобы эти изменения попали в Anki, выберите пункт "Update existing notes."  
+
+Для того, чтобы импортировать все слова, нажмите кнопку "Import all words." Для того, чтобы выбрать словари (наборы) для импорта, нажмите "Import from dictionaries" и выберите один или несколько наборов (удерживая клавишу Ctrl либо Cmd) и нажмите "Import."
+Никаких моделей, шаблонов, колод создавать не нужно, дополнение сделает всю работу за вас. Проще некуда.
+
+Наберитесь терпения. Импорт 1000 слов может занять 10 минут и более в зависимости от веса аудио с произношением и картинок и скорости вашего интернета.  
+По окончании работы с дополнением нажмите "Exit."
+
+### Кроме того
+
+Для того, чтобы оценить дополнение и оставить комментарий перейдите на [его страницу][9], войдите в аккаунт AnkiWeb в правом верхнем углу и кликните "Rate this." Но если вы хотите новую функцию или обнаружили ошибку, пожалуйста, не оставляйте сообщение о ней в комментарии, а скопируйте текст ошибки и [создайте issue на GitHub][10], либо напишите на email: 4yourquestions [собачка] gmail.com. 
+
+#### Ожидается в следующих версиях:
+
+##### Пользовательский интерфейс:
+- Сообщение "Загружается...", чтобы уведомлять пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
+- Русский язык интерфейса, так как начинающим комфортнее работать с дополнением на родном языке.
+- Дополнительное окно конфигурации для установки настроек импорта, таких как: 
+   - какого типа карточки создавать: с вводом ответа или без (для русско-английских карточек);
+   - таймаут запроса, количество попыток и продолжительность ожидания перед повторным скачиванием;
+   - выбор промежутка времени для импортирования слов;
+   - опция подсветки слова в контексте;
+   - показывать количество слов во время загрузки. 
+- Уточнить сообщения об ошибках.
+
+##### Загрузка слов:
+- Импортировать более одного перевода для слова (добавить соответствующую опцию в окне конфигурации).
+- Добавлять пользовательские словари как теги.
+- Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
+- Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
+- Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+### Авторы
+
+Версия 1: [Александр Трутанов][12], [оригинальный проект на bitbucket][13].  
+Версия 2: [Виктор Хаустов][14], ссылка на проект [на GitHub][7] или [на bitbucket][26].
+
+Свободное копирование и использование. Лицензия [GPL][11]. 
+
+### Благодарности
+
+[Илья Исаев][15] за [вдохновение][16] и проект [LeoPort][17].  
+[Serge][18] за функцию поиска дубликатов, поддержку слов с апострофом и функцию повторного скачивания слов.  
+[Николай Байков][19] за [PostMan Collection][20], дополнение [alfred-lingualeo][21] и за помощь с тестированием на MacOs.  
+А также всем, кто пользовался приложением, оставлял ценные комментарии и помогал с тестированием на различных платформах.
+
+[1]:	#russian
+[2]:	https://apps.ankiweb.net/
+[3]:	https://lingualeo.com/
+[4]:	https://lingualeo.com/ru/browserapps
+[5]:	https://lingualeo.com/ru/training
+[6]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md
+[7]:	https://github.com/vi3itor/lingualeoanki/
+[8]:	https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif
+[9]:	https://ankiweb.net/shared/info/1411073333
+[10]:	https://github.com/vi3itor/lingualeoanki/issues/new
+[11]:	https://github.com/vi3itor/lingualeoanki/blob/master/LICENSE
+[12]:	https://vk.com/trutanov.alex
+[13]:	https://bitbucket.org/alex-altay/lingualeoanki
+[14]:	https://github.com/vi3itor/
+[15]:	https://github.com/relaxart
+[16]:	https://habrahabr.ru/post/276495/
+[17]:	https://github.com/relaxart/LeoPort
+[18]:	https://bitbucket.org/pioneer/
+[19]:	https://github.com/bikenik
+[20]:	https://github.com/bikenik/alfred-lingualeo/blob/master/Lingua-Leo.postman_collection.json
+[21]:	https://github.com/bikenik/alfred-lingualeo
+[22]:	#description
+[23]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
+[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-0.zip
+[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-0.zip
+[26]:   https://bitbucket.org/vkhaustov/lingualeoanki/
+[27]:   https://i.imgur.com/CtPGtUnl.png
+[28]:   #update
+[29]:   #installation

@@ -1,6 +1,6 @@
 {
-  "email": "your@email.com", 
-  "password": "yourPassword", 
+  "email": "your@email.com",
+  "password": "yourPassword",
   "protocol": "http://",
   "rememberPassword": true,
   "stayLoggedIn": false

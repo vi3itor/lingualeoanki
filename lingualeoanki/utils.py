@@ -8,7 +8,6 @@ from aqt import mw
 from anki import notes
 
 from . import styles
-from ._name import ADDON_NAME
 
 
 fields = ['en', 'transcription',
@@ -79,8 +78,8 @@ def download_media_file(url):
 
 def send_to_download(word, thread):
     # TODO: Move to config following settings and DOWNLOAD_TIMEOUT
-    NUM_RETRIES = 5
-    SLEEP_SECONDS = 5
+    NUM_RETRIES = 3
+    SLEEP_SECONDS = 3
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
     picture_url = word.get('picture_url')
@@ -114,6 +113,8 @@ def send_to_download(word, thread):
 
 def fill_note(word, note):
     note['en'] = word['word_value']
+    # TODO: Allow user to collect more than one translation
+    #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
     note['ru'] = word['user_translates'][0]['translate_value']
     if word.get('transcription'):
         note['transcription'] = '[' + word.get('transcription') + ']'
@@ -127,17 +128,17 @@ def fill_note(word, note):
     if sound_url:
         sound_name = sound_url.split('/')[-1]
         note['sound_name'] = '[sound:%s]' % sound_name
+    # TODO: Add user dictionaries (wordsets) as tags
     return note
 
 
 def add_word(word, model):
-    # TODO: Introduce new fields to the model (pic_url and sound_url)
-    #  for testing if update is needed and implement a function
-    #  to update existing models (to introduce new fields) for compatibility
+    # TODO: Use picture_name and sound_name to check
+    #  if update is needed and don't download media if not
     collection = mw.col
     note = notes.Note(collection, model)
     note = fill_note(word, note)
-    # TODO: Rewrite and use is_duplicate()
+    # TODO: Rewrite to use is_duplicate()
     dupes = collection.findDupes("en", word['word_value'])
     # a hack to support words with apostrophes
     note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
@@ -145,6 +146,7 @@ def add_word(word, model):
     note_dupes = note_dupes1 + note_dupes2
     if not dupes and not note_dupes:
         collection.addNote(note)
+    # TODO: Update notes if translation or tags (user wordsets) changed
     elif (note['picture_name'] or note['sound_name']) and note_dupes:
         # update existing notes with new pictures and sounds in case
         # they have been changed in LinguaLeo's UI
@@ -180,18 +182,21 @@ def is_duplicate(word):
     return True if dupes or note_dupes else False
 
 
+def get_module_name():
+    return __name__.split(".")[0]
+
+
 def get_addon_dir():
     root = mw.pm.addonFolder()
-    addon_dir = os.path.join(root, ADDON_NAME)
+    addon_dir = os.path.join(root, get_module_name())
     return addon_dir
 
 
 def get_cookies_path():
     """
-    Returns a full path to cookies.dat in the user_files folder
+    Returns a full path to cookies.txt in the user_files folder
     :return:
     """
-
     # user_files folder in the current addon's dir
     uf_dir = os.path.join(get_addon_dir(), 'user_files')
     # Create a folder if doesn't exist
@@ -215,7 +220,7 @@ def clean_cookies():
 def get_config():
     # Load config from config.json file
     if getattr(getattr(mw, "addonManager", None), "getConfig", None):
-        config = mw.addonManager.getConfig(ADDON_NAME)
+        config = mw.addonManager.getConfig(get_module_name())
     else:
         try:
             config_file = os.path.join(get_addon_dir(), 'config.json')
@@ -223,13 +228,12 @@ def get_config():
                 config = json.loads(f.read())
         except IOError:
             config = None
-
     return config
 
 
 def update_config(config):
     if getattr(getattr(mw, "addonManager", None), "writeConfig", None):
-        mw.addonManager.writeConfig(ADDON_NAME, config)
+        mw.addonManager.writeConfig(get_module_name(), config)
     else:
         try:
             config_file = os.path.join(get_addon_dir(), 'config.json')
