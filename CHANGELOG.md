@@ -9,25 +9,25 @@ and this project adheres to [Semantic Versioning][2].
 ## [Unreleased]
 Section to track upcoming changes
 
-##### UI:
-- "Loading..." window to show user that list of words or list of dictionaries is being downloaded.
+##### User Interface:
+- "Loading..." message to show user that list of words or list of dictionaries is being downloaded.
 - Add Russian localization since beginners are more comfortable with native language.
-- Additional window for settings such as: 
-   - what style of cards to create: with typing answer or without;
+- Additional configuration window to set up: 
+   - what type of "Russian to English" cards to create: with typing answer or without;
    - download timeout, number of retries and sleep seconds;
    - choose from-to dates for importing words;
    - option to highlight the word in context;
    - show number of words in progress bar. 
 - Improve error messages by narrowing down the reason.
 
-##### Import :
+##### Import:
 - Import more than one translation (allow user to choose how many translations to import).
 - Add user dictionaries (wordsets) as tags.
 - Save problem words in json format and ask to retry downloading problem words only.
 - Update not only media, but also translation(s), context, tags.
 - Improve duplicate search to automatically update notes when any information was changed.
 
-## [2.0.0] - 2019-04-xx
+## [2.0.0] - 2019-04-10
 ### Added
 - Full support of Anki 2.1.x and Anki 2.0 (tested on Anki 2.0.52).
 - Ability to import not only all words, but words from one or several user dictionaries (word sets).
@@ -78,10 +78,10 @@ Section to track upcoming changes
 В этом разделе будут записываться изменения, которые ожидаются в будущих релизах. 
 
 ##### Пользовательский интерфейс:
-- Окно "Загружается...", чтобы уведомлять пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
+- Сообщение "Загружается...", чтобы уведомлять пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
 - Добавить русский перевод, так как начинающим комфортнее работать с дополнением на родном языке.
 - Дополнительное окно конфигурации для установки настроек импорта, таких как: 
-   - какой стиль карточек использовать: с вводом ответа либо без;
+   - какого типа карточки создавать: с вводом ответа или без (для русско-английских карточек);
    - таймаут запроса, количество попыток и продолжительность ожидания перед повторным скачиванием;
    - выбор промежутка времени для импортирования слов;
    - опция подсветки слова в контексте;
@@ -95,7 +95,7 @@ Section to track upcoming changes
 - Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
 
-## [2.0.0] - 2019-04-xx
+## [2.0.0] - 2019-04-10
 ### Добавлено
 - Полная поддержка Anki 2.1.x и Anki 2.0 (тестировалось на Anki 2.0.52).
 - Возможность импортировать не только все слова, но выбирать пользовательские словари (наборы) для импорта.
