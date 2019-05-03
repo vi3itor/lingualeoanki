@@ -3,6 +3,7 @@ from .six.moves import http_cookiejar
 from .six.moves import urllib
 import socket
 import json
+import ssl
 
 from aqt.qt import *
 from . import utils
@@ -31,8 +32,9 @@ class Lingualeo(QObject):
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
         config = utils.get_config()
-        self.url_prefix = config['protocol'] if config else 'http://'
+        self.url_prefix = config['protocol'] if config else 'https://'
         self.msg = ''
+        self.tried_ssl_fix = False
 
     def get_connection(self):
         try:
@@ -41,22 +43,26 @@ class Lingualeo(QObject):
                 if status['error_msg']:
                     self.msg = status['error_msg']
         except (urllib.error.URLError, socket.error) as e:
+            # TODO: Find better (secure) fix
             """
-            SSLError was noticed on MacOS, because Python didn't have 
-            security certificates downloaded. The easiest way is to switch 
-            back to http.
+            SSLError was noticed on MacOS, because Python 3.6m used in Anki doesn't have 
+            security certificates downloaded. The easiest (but unsecure) way is to create SSL context.
             """
-            if 'SSL' in str(e.args) and self.url_prefix == 'https://':
-                self.msg = "Problem with https connection, switching to http. Please try again"
-                self.url_prefix = 'http://'
-                config = utils.get_config()
-                config['protocol'] = 'http://'
-                utils.update_config(config)
-                utils.clean_cookies()
-                self.cj = http_cookiejar.MozillaCookieJar()
-                self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+            if 'SSL' in str(e.args) and not self.tried_ssl_fix:
+                # Problem with https connection, trying ssl fix
+                # TODO: check if necessary to clean cookies and create empty
+                # utils.clean_cookies()
+                # self.cj = http_cookiejar.MozillaCookieJar()
+
+                context = ssl.create_default_context()
+                context.check_hostname = False
+                context.verify_mode = ssl.CERT_NONE
+                https_handler = urllib.request.HTTPSHandler(context=context)
+                self.opener = urllib.request.build_opener(https_handler, urllib.request.HTTPCookieProcessor(self.cj))
+                self.tried_ssl_fix = True
+                return self.get_connection()
             else:
-                self.msg = "Can't authorize. Problems with internet connection."
+                self.msg = "Can't authorize. Problems with internet connection. Error message: " + str(e.args)
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
         except Exception as e:
