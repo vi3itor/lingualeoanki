@@ -12,6 +12,9 @@ The add-on downloads your dictionary words from [LinguaLeo][3] - another great r
 
 [LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
+### Notice on recent update of LinguaLeo 
+The [update][30] of Lingualeo on April 30 2019 brought several [issues][31]. If you find some problems with importing your dictionary, please check on [Lingualeo][3] first. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. 
+
 ### New in version 2.0:
 #### Added
 - Full support of Anki 2.1.x and Anki 2.0 (tested on Anki 2.0.52).
@@ -122,6 +125,9 @@ And to all users who gave valuable comments and feedback and helped to test on d
 ![screenshot][27]
 
 [ЛингваЛео][3] имеет удобный интерфейс для добавления новых слов и неплохое [расширение для браузера][4] для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких [тренировок][5], Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.
+
+### Внимание! Обновление Lingualeo 30.04.2019
+В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. Если вы заметили, что аддон работает неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3]. Если же проблема в аддоне - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. 
 
 ### Новое в версии 2.0:
 
@@ -248,3 +254,6 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [27]:   https://i.imgur.com/CtPGtUnl.png
 [28]:   #update
 [29]:   #installation
+[30]:   https://corp.lingualeo.com/ru/2019/04/30/news/
+[31]:   https://corp.lingualeo.com/ru/2019/05/01/spasibo-druzya-rabota-nad-oshibkami/
+
