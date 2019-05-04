@@ -29,6 +29,7 @@ The [update][30] of Lingualeo on April 30 2019 brought several [issues][31]. If 
 #### Changed
 - Fixed issues with downloading duplicates.
 - Check for duplicates first before starting to import words (don't check for duplicates only if "Update existing notes" option is selected).
+- Default protocol changed to https.
 - Prevent multiple runs of the add-on at the same time.
 - When exiting allow Anki's main window to close add-on window if no words are downloading.
 
@@ -144,6 +145,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 #### Изменено
 - Исправлена загрузка дубликатов.
 - Прежде чем загружать медиафайлы, дополнение проверяет, были ли эти слова загружены ранее (и не загружает медиафайлы для существующих слов, если опция "Обновить существующие карточки" неактивна).
+- Https протокол используется по-умолчанию.
 - Невозможно запустить более одной копии дополнения одновременно.
 - При выходе из Anki и отсутствии активных загрузок окно дополнения будет закрыто автоматически.
 
@@ -248,8 +250,8 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [21]:	https://github.com/bikenik/alfred-lingualeo
 [22]:	#description
 [23]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
-[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-0.zip
-[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-0.zip
+[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-0-1.zip
+[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-0-1.zip
 [26]:   https://bitbucket.org/vkhaustov/lingualeoanki/
 [27]:   https://i.imgur.com/CtPGtUnl.png
 [28]:   #update

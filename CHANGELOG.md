@@ -29,8 +29,8 @@ Section to track upcoming changes
 
 ## [2.0.1] - 2019-05-04
 ### Changed
-- Fixed connection issue on MacOS
-- Changed default protocol to https
+- Fixed connection issue on MacOS.
+- Changed default protocol to https.
 
 ## [2.0.0] - 2019-04-10
 ### Added
@@ -103,7 +103,7 @@ Section to track upcoming changes
 ## [2.0.1] - 2019-05-04
 ### Изменено
 - Исправлена ошибка соединения на MacOS.
-- Https протокол используется по-умолчанию
+- Https протокол используется по-умолчанию.
 
 ## [2.0.0] - 2019-04-10
 ### Добавлено
