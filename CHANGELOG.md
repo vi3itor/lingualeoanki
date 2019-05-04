@@ -27,6 +27,11 @@ Section to track upcoming changes
 - Update not only media, but also translation(s), context, tags.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.0.1] - 2019-05-04
+### Changed
+- Fixed connection issue on MacOS
+- Changed default protocol to https
+
 ## [2.0.0] - 2019-04-10
 ### Added
 - Full support of Anki 2.1.x and Anki 2.0 (tested on Anki 2.0.52).
@@ -94,6 +99,11 @@ Section to track upcoming changes
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.0.1] - 2019-05-04
+### Изменено
+- Исправлена ошибка соединения на MacOS.
+- Https протокол используется по-умолчанию
 
 ## [2.0.0] - 2019-04-10
 ### Добавлено
