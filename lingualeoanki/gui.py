@@ -388,6 +388,8 @@ class WordsetsWindow(QDialog):
     def __init__(self, wordsets, parent=None):
         QDialog.__init__(self, parent)
         self.wordsets = wordsets
+        # TODO: Set Studied, Unstudied or Any
+        self.filter_words = 'Unstudied'
         self.initUI()
 
     def initUI(self):
@@ -402,7 +404,16 @@ class WordsetsWindow(QDialog):
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         for wordset in self.wordsets:
-            item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words in total)'
+            if 'countWords' in wordset:
+                item_name = wordset['name'] + ' (' + str(wordset['countWords']) + 'total (studied and unstudied) words)'
+            elif self.filter_words == 'Any':
+                item_name = wordset['name'] + ' (' + str(wordset['cw']) + ' words)'
+            elif self.filter_words == 'Studied':
+                learned = wordset['cl'] if 'cl' in wordset else 0
+                item_name = wordset['name'] + ' (' + str(learned) + ' learned words)'
+            else: # Unstudied
+                learned = wordset['cl'] if 'cl' in wordset else 0
+                item_name = wordset['name'] + ' (' + str(wordset['cw'] - learned) + ' unstudied words)'
             item = QListWidgetItem(item_name)
             item.wordset_id = wordset['id']
             self.listWidget.addItem(item)

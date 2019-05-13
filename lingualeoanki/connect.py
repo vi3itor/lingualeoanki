@@ -82,12 +82,22 @@ class Lingualeo(QObject):
         if not self.get_connection():
             return None
         try:
-            url = 'lingualeo.com/ru/userdict3/getWordSets'
-            all_wordsets = self.get_content(url, values=None)["result"]
+            url = 'mobile-api.lingualeo.com/GetWordSets'
+            # TODO: Should we download 'not user' dictionaries too? 
+            values = {'apiVersion': '1.0.0',
+                      'request': [{'type': 'user', 'perPage': 500}],
+                      'token': self.token}
+            all_wordsets = self.get_content_new(url, values)['data'][0]['items']
             wordsets = []
+            # Add only non-empty dictionaries
             for wordset in all_wordsets:
-                # Add only non-empty dictionaries
-                if wordset['countWords'] != 0:
+                """
+                Apparently, first dictionary has attribute 'countWords', 
+                while others has attribute 'cw'
+                """
+                if 'cw' in wordset and wordset['cw'] != 0:
+                    wordsets.append(wordset.copy())
+                elif 'countWords' in wordset and wordset['countWords'] != 0:
                     wordsets.append(wordset.copy())
             self.save_cookies()
             if not wordsets:
@@ -169,16 +179,53 @@ class Lingualeo(QObject):
     # Low level methods
     #########################
 
+    def get_token(self):
+        for cookie in self.cj:
+            if cookie.name == 'remember':
+                return cookie.value
+
+    def get_content_new(self, url, values):
+        """
+        A new API method to request content
+        """
+        token = self.get_token()
+        full_url = self.url_prefix + url
+        json_data = json.dumps(values)
+        data = json_data.encode('utf-8')
+        req = urllib.request.Request(full_url)
+        req.add_header('Content-Type', 'text/plain')
+        response = urllib.request.urlopen(req, data=data)
+        return json.loads(response.read())
+
+    """
+    Using requests module (only Anki 2.1) it can be performed as:
+
+    def requests_get_content(self, url, data):
+        full_url = self.url_prefix + url
+        headers = {'Content-Type': 'text/plain'}
+        r = requests.post(full_url, json=data, headers=headers)
+        # print(r.status_code)
+        return r.json()
+    """
+
+    """
+    OLD API Methods. Some are still used for authorization
+    """
+
     def auth(self):
         url = 'api.lingualeo.com/api/login'
         values = {'email': self.email, 'password': self.password}
         content = self.get_content(url, values)
         self.save_cookies()
+        self.token = self.get_token()
         return content
 
     def is_authorized(self):
         url = 'api.lingualeo.com/api/isauthorized'
         status = self.get_content(url, None)['is_authorized']
+        # TODO: Find better place for getting token
+        if not hasattr(self, 'token'):
+            self.token = self.get_token()
         return status
 
     def get_page(self, page_number):
@@ -195,9 +242,13 @@ class Lingualeo(QObject):
         return self.get_content(url, values)['userdict3']
 
     def get_content(self, url, values):
-        url_values = urllib.parse.urlencode(values) if values else None
-        full_url = self.url_prefix + url + '?' + url_values if url_values else self.url_prefix + url
-        req = self.opener.open(full_url)
+        if values:
+            url_values = urllib.parse.urlencode(values)
+            data = url_values.encode('utf-8')
+        else:
+            data = None
+        full_url = self.url_prefix + url  # + '?' + url_values if url_values else self.url_prefix + url
+        req = self.opener.open(full_url, data=data)
         return json.loads(req.read())
 
     # TODO: Add processing of http status codes in exceptions,
