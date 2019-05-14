@@ -34,7 +34,6 @@ ru_question = """
     <br><br>
     {{picture_name}}
     <br><br>
-    {{type:en}}
     """
 
 ru_answer = """

@@ -276,9 +276,9 @@ class PluginWindow(QDialog):
             return None
         word_progress = self.get_progress_type()
         if word_progress == 'Unstudied':
-            words = [word for word in words if word.get('progress_percent') < 100]
+            words = [word for word in words if word.get('pi') < 4]  # 0: for new words
         elif word_progress == 'Studied':
-            words = [word for word in words if word.get('progress_percent') == 100]
+            words = [word for word in words if word.get('pi') == 4]
         update = self.checkBoxUpdateNotes.checkState()
         if not update:
             # Exclude duplicates, if full update is not required
@@ -405,15 +405,15 @@ class WordsetsWindow(QDialog):
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         for wordset in self.wordsets:
             if 'countWords' in wordset:
-                item_name = wordset['name'] + ' (' + str(wordset['countWords']) + 'total (studied and unstudied) words)'
+                item_name = wordset['name'] + ' (total (studied and unstudied) ' + str(wordset['countWords']) + ' words)'
             elif self.filter_words == 'Any':
-                item_name = wordset['name'] + ' (' + str(wordset['cw']) + ' words)'
+                item_name = wordset['name'] + ' (' + str(wordset['cw']) + ' word(s))'
             elif self.filter_words == 'Studied':
                 learned = wordset['cl'] if 'cl' in wordset else 0
-                item_name = wordset['name'] + ' (' + str(learned) + ' learned words)'
+                item_name = wordset['name'] + ' (' + str(learned) + ' learned word(s))'
             else: # Unstudied
                 learned = wordset['cl'] if 'cl' in wordset else 0
-                item_name = wordset['name'] + ' (' + str(wordset['cw'] - learned) + ' unstudied words)'
+                item_name = wordset['name'] + ' (' + str(wordset['cw'] - learned) + ' unstudied word(s))'
             item = QListWidgetItem(item_name)
             item.wordset_id = wordset['id']
             self.listWidget.addItem(item)

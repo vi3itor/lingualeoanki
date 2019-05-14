@@ -58,6 +58,7 @@ def prepare_model(collection, fields, model_css):
         model = collection.models.byName('LinguaLeo_model')
     else:
         model = create_new_model(collection, fields, model_css)
+    # TODO: Move Deck name to config?
     # Create a deck "LinguaLeo" and write id to deck_id
     model['did'] = collection.decks.id('LinguaLeo')
     collection.models.setCurrent(model)
@@ -82,10 +83,11 @@ def send_to_download(word, thread):
     SLEEP_SECONDS = 3
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
-    picture_url = word.get('picture_url')
-    if picture_url:
+    # TODO: Choose picture for the correct translation
+    pictures = word['trs'][0]['pics']
+    if pictures:
         exc_happened = None
-        picture_url = 'http:' + picture_url
+        picture_url = 'https:' + pictures[0]
         for i in list(range(NUM_RETRIES)):
             exc_happened = None
             try:
@@ -96,7 +98,7 @@ def send_to_download(word, thread):
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
             raise exc_happened
-    sound_url = word.get('sound_url')
+    sound_url = word['pron']
     if sound_url:
         exc_happened = None
         for i in list(range(NUM_RETRIES)):
@@ -112,19 +114,20 @@ def send_to_download(word, thread):
 
 
 def fill_note(word, note):
-    note['en'] = word['word_value']
+    note['en'] = word['wd']
     # TODO: Allow user to collect more than one translation
     #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
-    note['ru'] = word['user_translates'][0]['translate_value']
-    if word.get('transcription'):
-        note['transcription'] = '[' + word.get('transcription') + ']'
-    if word.get('context'):
-        note['context'] = word.get('context')
-    picture_url = word.get('picture_url')
-    if picture_url:
-        picture_name = picture_url.split('/')[-1]
+    # TODO: Check if it is correct to use word['wt']
+    translation = word['trs'][0]#word['wt']]
+    note['ru'] = translation['tr']
+    note['context'] = translation['ctx']
+    pictures = translation['pics']
+    if pictures:
+        picture_name = pictures[0].split('/')[-1]
         note['picture_name'] = '<img src="%s" />' % picture_name
-    sound_url = word.get('sound_url')
+    if word['scr']:
+        note['transcription'] = '[' + word['scr'] + ']'
+    sound_url = word['pron']
     if sound_url:
         sound_name = sound_url.split('/')[-1]
         note['sound_name'] = '[sound:%s]' % sound_name
@@ -139,10 +142,10 @@ def add_word(word, model):
     note = notes.Note(collection, model)
     note = fill_note(word, note)
     # TODO: Rewrite to use is_duplicate()
-    dupes = collection.findDupes("en", word['word_value'])
+    dupes = collection.findDupes("en", word['wd'])
     # a hack to support words with apostrophes
-    note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
-    note_dupes2 = collection.findNotes('en:"%s"' % word['word_value'])
+    note_dupes1 = collection.findNotes("en:'%s'" % word['wd'])
+    note_dupes2 = collection.findNotes('en:"%s"' % word['wd'])
     note_dupes = note_dupes1 + note_dupes2
     if not dupes and not note_dupes:
         collection.addNote(note)
@@ -173,11 +176,11 @@ def is_duplicate(word):
     :return: bool
     """
     collection = mw.col
-    dupes = collection.findDupes("en", word['word_value'])
+    dupes = collection.findDupes("en", word['wd'])
     # a hack to support words with apostrophes
     # TODO: Debug to find out if it is still required
-    note_dupes1 = collection.findNotes("en:'%s'" % word['word_value'])
-    note_dupes2 = collection.findNotes('en:"%s"' % word['word_value'])
+    note_dupes1 = collection.findNotes("en:'%s'" % word['wd'])
+    note_dupes2 = collection.findNotes('en:"%s"' % word['wd'])
     note_dupes = note_dupes1 + note_dupes2
     return True if dupes or note_dupes else False
 

@@ -35,6 +35,8 @@ class Lingualeo(QObject):
         self.url_prefix = config['protocol'] if config else 'https://'
         self.msg = ''
         self.tried_ssl_fix = False
+        # TODO: Temporary fix until know how to request words from a particular wordset
+        self.words = []
 
     def get_connection(self):
         try:
@@ -83,7 +85,7 @@ class Lingualeo(QObject):
             return None
         try:
             url = 'mobile-api.lingualeo.com/GetWordSets'
-            # TODO: Should we download 'not user' dictionaries too? 
+            # TODO: Should we download 'not user' dictionaries too?
             values = {'apiVersion': '1.0.0',
                       'request': [{'type': 'user', 'perPage': 500}],
                       'token': self.token}
@@ -137,19 +139,30 @@ class Lingualeo(QObject):
 
     def get_all_words(self):
         """
-        The JSON consists of list "userdict3" on each page
-        Inside of each userdict there is a list of periods with names
-        such as "October 2015". And inside of them lay our words.
-        Returns: type == list of dictionaries
+        TODO: Update description
         """
+
+        url = 'mobile-api.lingualeo.com/GetWords'
+        values = {'apiVersion': '1.0.0',
+                  'page': 1,
+                  # 'request': [{}],  # 'perPage': 500
+                  'token': self.token}
+
         words = []
-        page_number = 1
-        periods = self.get_page(page_number)
-        while len(periods) > 0:
-            for period in periods:
-                words += period['words']
-            page_number += 1
-            periods = self.get_page(page_number)
+        response = self.get_content_new(url, values)
+        words += response['data']
+        pages = 0
+        # Calculate total number of pages since each response contains 20 words only
+        if 'wordSet' in response:
+            pages = response['wordSet']['countWords'] // 20 + 1
+
+        if pages < 2:  # Only one page or something is wrong
+            return words
+
+        # Continue getting the words from the second page
+        for page in range(2, pages + 1):
+            values['page'] = page
+            words += self.get_content_new(url, values)['data']
         return words
 
     def get_words_by_wordsets(self, wordsets):
