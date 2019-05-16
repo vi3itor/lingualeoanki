@@ -83,7 +83,6 @@ def send_to_download(word, thread):
     SLEEP_SECONDS = 3
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
-    # TODO: Choose picture for the correct translation
     pictures = word['trs'][0]['pics']
     if pictures:
         exc_happened = None
@@ -117,10 +116,11 @@ def fill_note(word, note):
     note['en'] = word['wd']
     # TODO: Allow user to collect more than one translation
     #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
-    # TODO: Check if it is correct to use word['wt']
-    translation = word['trs'][0]#word['wt']]
+    # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
+    translation = word['trs'][0]
     note['ru'] = translation['tr']
-    note['context'] = translation['ctx']
+    if translation.get('ctx'):
+        note['context'] = translation['ctx']
     pictures = translation['pics']
     if pictures:
         picture_name = pictures[0].split('/')[-1]
@@ -245,4 +245,3 @@ def update_config(config):
         except:
             # TODO: Improve error handling
             pass
-
