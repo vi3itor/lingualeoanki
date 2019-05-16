@@ -112,11 +112,11 @@ class Lingualeo(QObject):
             return None
         return wordsets
 
-    def get_words_to_add(self, wordsets=None):
+    def get_words_to_add(self, status, wordsets=None):
         if not self.get_connection():
             return None
         try:
-            words = self.get_words_by_wordsets(wordsets) if wordsets else self.get_all_words()
+            words = self.get_words(status, wordsets)
             self.save_cookies()
         except (urllib.error.URLError, socket.error):
             self.msg = "Can't download words. Problem with internet connection."
@@ -174,15 +174,18 @@ class Lingualeo(QObject):
         if hasattr(self, 'cookies_path'):
             self.cj.save(self.cookies_path)
 
+    def get_token(self):
+        if hasattr(self, 'token'):
+            return self.token
+        for cookie in self.cj:
+            if cookie.name == 'remember':
+                self.token = cookie.value
+                return self.token
+
     # Low level methods
     #########################
 
-    def get_token(self):
-        for cookie in self.cj:
-            if cookie.name == 'remember':
-                return cookie.value
-
-    def get_content_new(self, url, values):
+    def get_content_new(self, url, more_values):
         """
         A new API method to request content
         """
@@ -217,15 +220,12 @@ class Lingualeo(QObject):
         values = {'email': self.email, 'password': self.password}
         content = self.get_content(url, values)
         self.save_cookies()
-        self.token = self.get_token()
+        self.get_token()
         return content
 
     def is_authorized(self):
         url = 'api.lingualeo.com/api/isauthorized'
         status = self.get_content(url, None)['is_authorized']
-        # TODO: Find better place for getting token
-        if not hasattr(self, 'token'):
-            self.token = self.get_token()
         return status
 
     def get_page(self, page_number):
