@@ -56,10 +56,11 @@ class PluginWindow(QDialog):
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
         self.exitButton.clicked.connect(self.close)
-        self.rbutton_studied = QRadioButton("Studied")
-        self.rbutton_unstudied = QRadioButton("Unstudied")
-        self.rbutton_any = QRadioButton("Any")
-        self.rbutton_any.setChecked(True)
+        self.rbutton_all = QRadioButton("All")
+        self.rbutton_new = QRadioButton("New")
+        self.rbutton_learning = QRadioButton("Learning")
+        self.rbutton_learned = QRadioButton("Learned")
+        self.rbutton_all.setChecked(True)
         self.checkBoxUpdateNotes = QCheckBox('Update existing notes')
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
@@ -86,9 +87,10 @@ class PluginWindow(QDialog):
         # Horizontal layout for radio buttons and update checkbox
         options_layout = QHBoxLayout()
         options_layout.addStretch()
-        options_layout.addWidget(self.rbutton_studied)
-        options_layout.addWidget(self.rbutton_unstudied)
-        options_layout.addWidget(self.rbutton_any)
+        options_layout.addWidget(self.rbutton_all)
+        options_layout.addWidget(self.rbutton_new)
+        options_layout.addWidget(self.rbutton_learning)
+        options_layout.addWidget(self.rbutton_learned)
         options_layout.addSpacing(15)
         options_layout.addWidget(self.checkBoxUpdateNotes)
         options_layout.addStretch()
@@ -179,6 +181,7 @@ class PluginWindow(QDialog):
     def importAllButtonClicked(self):
         # Disable buttons
         self.set_download_form_enabled(False)
+        # TODO: Change 'Exit' Button label to 'Stop' and back
         self.download_words()
 
     def wordsetButtonClicked(self):
@@ -186,7 +189,8 @@ class PluginWindow(QDialog):
         self.set_download_form_enabled(False)
         wordsets = self.lingualeo.get_wordsets()
         if wordsets:
-            wordset_window = WordsetsWindow(wordsets)
+            word_status = self.get_progress_status()
+            wordset_window = WordsetsWindow(wordsets, word_status)
             wordset_window.Wordsets.connect(self.download_words)
             wordset_window.Cancel.connect(self.set_download_form_enabled)
             wordset_window.exec_()
@@ -212,6 +216,7 @@ class PluginWindow(QDialog):
             elif answer == qm.Cancel:
                 event.ignore()
                 return
+            # TODO: Don't close add-on window if the 'Stop' button was pressed
         # Delete attribute before closing to allow running the add-on again
         if hasattr(mw, ADDON_NAME):
             delattr(mw, ADDON_NAME)
@@ -250,13 +255,14 @@ class PluginWindow(QDialog):
     def download_words(self, wordsets=None):
         # TODO: Run it inside the other thread to handle big dictionaries
         self.allow_to_close(False)
-        words = self.lingualeo.get_words_to_add(wordsets)
+        status = self.get_progress_status()
+        words = self.lingualeo.get_words_to_add(status, wordsets)
         filtered = self.filter_words(words)
         if filtered:
             self.start_download_thread(filtered)
         else:
-            progress = self.get_progress_type()
-            msg = 'No %s words to download' % progress if progress != 'Any' else 'No new words to download'
+            progress = self.get_progress_status()
+            msg = 'No %s words to download' % progress if progress != 'all' else 'No words to download'
             showInfo(msg)
             self.allow_to_close(True)
             self.set_download_form_enabled(True)
@@ -270,15 +276,10 @@ class PluginWindow(QDialog):
     def filter_words(self, words):
         """
         Eliminates unnecessary to download words.
-        We need to do it in main thread by using signals and slots
+        We have to do it in main thread to query database for duplicates
         """
         if not words:
             return None
-        word_progress = self.get_progress_type()
-        if word_progress == 'Unstudied':
-            words = [word for word in words if word.get('pi') < 4]  # 0: for new words
-        elif word_progress == 'Studied':
-            words = [word for word in words if word.get('pi') == 4]
         update = self.checkBoxUpdateNotes.checkState()
         if not update:
             # Exclude duplicates, if full update is not required
@@ -336,12 +337,15 @@ class PluginWindow(QDialog):
         # self.update()
         self.repaint()
 
-    def get_progress_type(self):
-        progress = 'Any'
-        if self.rbutton_studied.isChecked():
-            progress = 'Studied'
-        elif self.rbutton_unstudied.isChecked():
-            progress = 'Unstudied'
+    def get_progress_status(self):
+        progress = 'all'
+
+        if self.rbutton_learned.isChecked():
+            progress = 'learned'
+        elif self.rbutton_learning.isChecked():
+            progress = 'learning'
+        elif self.rbutton_new.isChecked():
+            progress = 'new';
         return progress
 
     def set_download_form_enabled(self, mode):
@@ -351,9 +355,10 @@ class PluginWindow(QDialog):
         """
         self.importAllButton.setEnabled(mode)
         self.importByDictionaryButton.setEnabled(mode)
-        self.rbutton_any.setEnabled(mode)
-        self.rbutton_studied.setEnabled(mode)
-        self.rbutton_unstudied.setEnabled(mode)
+        self.rbutton_all.setEnabled(mode)
+        self.rbutton_new.setEnabled(mode)
+        self.rbutton_learning.setEnabled(mode)
+        self.rbutton_learned.setEnabled(mode)
         self.checkBoxUpdateNotes.setEnabled(mode)
         self.update_window()
 
@@ -385,11 +390,10 @@ class WordsetsWindow(QDialog):
     Wordsets = pyqtSignal(list)
     Cancel = pyqtSignal(bool)
 
-    def __init__(self, wordsets, parent=None):
+    def __init__(self, wordsets, word_status, parent=None):
         QDialog.__init__(self, parent)
         self.wordsets = wordsets
-        # TODO: Set Studied, Unstudied or Any
-        self.filter_words = 'Unstudied'
+        self.word_status = word_status
         self.initUI()
 
     def initUI(self):
@@ -404,16 +408,17 @@ class WordsetsWindow(QDialog):
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         for wordset in self.wordsets:
-            if 'countWords' in wordset:
-                item_name = wordset['name'] + ' (total (studied and unstudied) ' + str(wordset['countWords']) + ' words)'
-            elif self.filter_words == 'Any':
-                item_name = wordset['name'] + ' (' + str(wordset['cw']) + ' word(s))'
-            elif self.filter_words == 'Studied':
+            if 'countWords' in wordset:  # Main dictionary with all words
+                if self.word_status == 'learned':
+                    learned = wordset['countWordsLearned'] if 'countWordsLearned' in wordset else 0
+                    item_name = wordset['name'] + ' (' + str(learned) + ' learned words)'
+                else:  #
+                    item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words in total)'
+            elif self.word_status == 'learned':  # for learned status in other user dictionaries
                 learned = wordset['cl'] if 'cl' in wordset else 0
-                item_name = wordset['name'] + ' (' + str(learned) + ' learned word(s))'
-            else: # Unstudied
-                learned = wordset['cl'] if 'cl' in wordset else 0
-                item_name = wordset['name'] + ' (' + str(wordset['cw'] - learned) + ' unstudied word(s))'
+                item_name = wordset['name'] + ' (' + str(learned) + ' learned words)'
+            else:    # for other statuses (all, new, learning) of other user dictionaries
+                item_name = wordset['name'] + ' (' + str(wordset['cw']) + ' words in total)'
             item = QListWidgetItem(item_name)
             item.wordset_id = wordset['id']
             self.listWidget.addItem(item)
