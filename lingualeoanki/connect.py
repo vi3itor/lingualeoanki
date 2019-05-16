@@ -35,8 +35,6 @@ class Lingualeo(QObject):
         self.url_prefix = config['protocol'] if config else 'https://'
         self.msg = ''
         self.tried_ssl_fix = False
-        # TODO: Temporary fix until know how to request words from a particular wordset
-        self.words = []
 
     def get_connection(self):
         try:
@@ -85,10 +83,7 @@ class Lingualeo(QObject):
             return None
         try:
             url = 'mobile-api.lingualeo.com/GetWordSets'
-            # TODO: Should we download 'not user' dictionaries too?
-            values = {'apiVersion': '1.0.0',
-                      'request': [{'type': 'user', 'perPage': 500}],
-                      'token': self.token}
+            values = {'request': [{'type': 'user', 'perPage': 999, 'sortBy': 'created'}]}
             all_wordsets = self.get_content_new(url, values)['data'][0]['items']
             wordsets = []
             # Add only non-empty dictionaries
@@ -137,53 +132,43 @@ class Lingualeo(QObject):
 
         return words
 
-    def get_all_words(self):
+    def get_words(self, status, wordsets):
         """
         TODO: Update description
         """
-
         url = 'mobile-api.lingualeo.com/GetWords'
-        values = {'apiVersion': '1.0.0',
-                  'page': 1,
-                  # 'request': [{}],  # 'perPage': 500
-                  'token': self.token}
-
-        words = []
-        response = self.get_content_new(url, values)
-        words += response['data']
+        # TODO: Move parameter to config?
+        PER_PAGE = 30
+        values = {'perPage': PER_PAGE, 'page': 1, 'status': status}
         pages = 0
-        # Calculate total number of pages since each response contains 20 words only
-        if 'wordSet' in response:
-            pages = response['wordSet']['countWords'] // 20 + 1
 
-        if pages < 2:  # Only one page or something is wrong
-            return words
+        if wordsets:
+            wordset_ids = []
+            # Since words can repeat in the wordsets, we calculate upper bound
+            max_words = 0
+            for wordset in wordsets:
+                wordset_ids.append(wordset['id'])
+                max_words += wordset['cw'] if 'cw' in wordset else wordset['countWords']
+            values['wordSetIds'] = wordset_ids
+            pages = max_words // PER_PAGE + 1
 
-        # Continue getting the words from the second page
+        response = self.get_content_new(url, values)
+        words = response['data']
+
+        if not wordsets:
+            # Calculate total number of pages since each response contains PER_PAGE words only
+            pages = response['wordSet']['countWords'] // PER_PAGE + 1
+
+        # Continue getting the words starting from the second page
         for page in range(2, pages + 1):
             values['page'] = page
-            words += self.get_content_new(url, values)['data']
+            next_chunk = self.get_content_new(url, values)['data']
+            if next_chunk:
+                words += next_chunk
+            else:
+                # Empty page, there are no more words
+                return words
         return words
-
-    def get_words_by_wordsets(self, wordsets):
-        """
-        Since each word can belong to multiple dictionaries (wordsets),
-        we return a list of unique words only.
-        """
-        unique_words = []
-        for wordset in wordsets:
-            page_number = 1
-            group_id = wordset['id']
-            periods = self.get_page_by_group_id(group_id, page_number)
-            while len(periods) > 0:
-                for period in periods:
-                    words = period['words']
-                    for word in words:
-                        if not is_word_exist(word, unique_words):
-                            unique_words.append(word)
-                page_number += 1
-                periods = self.get_page_by_group_id(group_id, page_number)
-        return unique_words
 
     def save_cookies(self):
         if hasattr(self, 'cookies_path'):
@@ -201,7 +186,9 @@ class Lingualeo(QObject):
         """
         A new API method to request content
         """
-        token = self.get_token()
+        values = {'apiVersion': '1.0.0',
+                  'token': self.get_token()}
+        values.update(more_values)
         full_url = self.url_prefix + url
         json_data = json.dumps(values)
         data = json_data.encode('utf-8')
@@ -311,7 +298,7 @@ class Download(QThread):
             try:
                 utils.send_to_download(word, self)
             except (urllib.error.URLError, socket.error):
-                problem_words.append(word.get('word_value'))
+                problem_words.append(word.get('wd'))
             counter += 1
             self.Counter.emit(counter)
         self.FinalCounter.emit(counter)
