@@ -50,8 +50,7 @@ class Lingualeo(QObject):
             """
             if 'SSL' in str(e.args) and not self.tried_ssl_fix:
                 # Problem with https connection, trying ssl fix
-                # TODO: check if necessary to clean cookies and create empty
-                # utils.clean_cookies()
+                # TODO: check if necessary to create empty cookies
                 # self.cj = http_cookiejar.MozillaCookieJar()
 
                 context = ssl.create_default_context()
@@ -134,7 +133,10 @@ class Lingualeo(QObject):
 
     def get_words(self, status, wordsets):
         """
-        TODO: Update description
+        Get words either from main ('my') vocabulary or from user's dictionaries (wordsets)
+        :param status: progress status of the word: 'all', 'new', 'learning', learned'
+        :param wordsets: List of wordset ids, or None to download all words (from main dictionary)
+        :return: list of words, where each word is a dict
         """
         url = 'mobile-api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
@@ -201,7 +203,7 @@ class Lingualeo(QObject):
         return json.loads(response.read())
 
     """
-    Using requests module (only Anki 2.1) it can be performed as:
+    Using requests module (only in Anki 2.1) it can be performed as:
 
     def requests_get_content(self, url, data):
         full_url = self.url_prefix + url
@@ -212,7 +214,7 @@ class Lingualeo(QObject):
     """
 
     """
-    OLD API Methods. Some are still used for authorization
+    OLD API Methods. Used for authorization
     """
 
     def auth(self):
@@ -228,19 +230,6 @@ class Lingualeo(QObject):
         status = self.get_content(url, None)['is_authorized']
         return status
 
-    def get_page(self, page_number):
-        url = 'lingualeo.com/ru/userdict/json'
-        values = {'filter': 'all', 'page': page_number}
-        return self.get_content(url, values)['userdict3']
-
-    def get_page_by_group_id(self, group_id, page_number):
-        """
-        Get the words of a particular user dictionary (wordset)
-        """
-        url = 'lingualeo.com/ru/userdict/json'
-        values = {'filter': 'all', 'page': page_number, 'groupId': group_id}
-        return self.get_content(url, values)['userdict3']
-
     def get_content(self, url, values):
         if values:
             url_values = urllib.parse.urlencode(values)
@@ -253,19 +242,6 @@ class Lingualeo(QObject):
 
     # TODO: Add processing of http status codes in exceptions,
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
-
-
-def is_word_exist(check_word, words):
-    """
-    Helper function to test if a check_word appear in the list of words
-    :param check_word: dict
-    :param words: list
-    :return: bool
-    """
-    for word in words:
-        if word['word_id'] == check_word['word_id']:
-            return True
-    return False
 
 
 class Download(QThread):
