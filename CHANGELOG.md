@@ -23,11 +23,22 @@ Section to track upcoming changes
 ##### Import:
 - Import more than one translation (allow user to choose how many translations to import).
 - Add user dictionaries (wordsets) as tags.
-- Save problem words in json format and ask to retry downloading problem words only.
+- Save problem words in json format and ask to retry downloading only them.
 - Update not only media, but also translation(s), context, tags.
 - Improve duplicate search to automatically update notes when any information was changed.
 
-## [2.0.1] - 2019-05-04
+## [2.1.0] - 2019-05-17
+### Added
+- Updated to be compatible with a new API introduced in LinguaLeo update on 30.04.2019.
+- Added option (radiobutton) for downloading "New" words.
+
+### Changed
+- Renamed "Studied" and "Unstudied" options to "Learned" and "Learning".
+- List of user dictionaries shows number of learned words to download (if "Learned" option is selected).
+- A list of words to download by status ("New", "Learning" or "Learned") is loading faster now. 
+- For new users of add-on, Russian to English cards don't require typing a correct answer by default.
+
+##[2.0.1] - 2019-05-04
 ### Changed
 - Fixed connection issue on MacOS.
 - Changed default protocol to https.
@@ -99,6 +110,17 @@ Section to track upcoming changes
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.1.0] - 2019-05-17
+### Добавлено
+- Аддон переехал на новый API, который был представлен с обновлением LinguaLeo от 30.04.2019.
+- Добавлена опция "New" для загрузки новых слов (как в сервисе LinguaLeo).
+
+### Изменено
+- Изменены названия опций "Studied" и "Unstudied" на "Learned" и "Learning" соответственно.
+- При выборе опции "Learned" и нажатии "Import from Dictionaries" список словарей показывает кол-во изученных слов.
+- Загрузка списка слов из категорий "New", "Learning" и "Learned" занимает меньше времени (особенно для больших словарей).
+- Для новых пользователей дополнения, создаваемые карточки не требуют печатать правильный ответ на английском. 
 
 ## [2.0.1] - 2019-05-04
 ### Изменено
