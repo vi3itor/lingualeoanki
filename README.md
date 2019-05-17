@@ -2,7 +2,7 @@
 
 ### Description
 
-[show description in Russian (показать описание на русском языке)][1]
+[scroll down for description in Russian (пролистайте вниз для описания на русском языке)][1]
 
 This is an add-on for [Anki][2] - powerful, intelligent flashcards, that makes remembering things easy via space repetition.
 
@@ -13,7 +13,20 @@ The add-on downloads your dictionary words from [LinguaLeo][3] - another great r
 [LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
 ### Notice on recent update of LinguaLeo 
-The [update][30] of Lingualeo on April 30 2019 brought several [issues][31]. If you find some problems with importing your dictionary, please check on [Lingualeo][3] first. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. 
+The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. Current version of add-on (2.1.0) is fully compatible with the update. If you find some problems with your words, translations or pictures, please check on [Lingualeo][3] first. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
+
+### New in version 2.1:
+#### Added
+- Updated to a new API because of LinguaLeo update on 30.04.2019.
+- Added option (radiobutton) for downloading "New" words.
+
+#### Changed
+- Renamed "Studied" and "Unstudied" options to "Learned" and "Learning".
+- List of user dictionaries shows number of learned words to download (if "Learned" option is selected).
+- A list of words to download by status ("New", "Learning" or "Learned") is loading faster now. 
+- For new users of add-on, Russian to English cards don't require typing a correct answer by default.
+- Fixed connection issue on MacOS.
+- Changed default protocol to https.
 
 ### New in version 2.0:
 #### Added
@@ -115,7 +128,7 @@ This project is licensed under the GPL License - see the [LICENSE][11] file for 
 And to all users who gave valuable comments and feedback and helped to test on different platforms.
 
 ##### Russian
-[show description in English][22]
+[scroll up for description in English][22]
 
 ### Описание
 
@@ -128,10 +141,22 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [ЛингваЛео][3] имеет удобный интерфейс для добавления новых слов и неплохое [расширение для браузера][4] для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких [тренировок][5], Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.
 
 ### Внимание! Обновление Lingualeo 30.04.2019
-В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. Если вы заметили, что аддон работает неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3]. Если же проблема в аддоне - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. 
+В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. В актуальной версия дополнения (2.1.0) полностью восстановлена его работа. Если вы заметили, что ваши слова, их переводы и картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3]. Если же проблема в аддоне - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
+
+### Новое в версии 2.1:
+####  Добавлено
+- Аддон переехал на новый API в связи с обновлением LinguaLeo от 30.04.2019.
+- Добавлена опция "New" для загрузки новых слов (как в сервисе LinguaLeo).
+
+#### Изменено
+- Изменены названия опций "Studied" и "Unstudied" на "Learned" и "Learning" соответственно.
+- При выборе опции "Learned" и нажатии "Import from Dictionaries" список словарей показывает кол-во изученных слов.
+- Загрузка списка слов из категорий "New", "Learning" и "Learned" занимает меньше времени (особенно для больших словарей).
+- Для новых пользователей дополнения, создаваемые карточки не требуют печатать правильный ответ на английском. 
+- Исправлена ошибка соединения на MacOS.
+- Https протокол используется по-умолчанию.
 
 ### Новое в версии 2.0:
-
 #### Добавлено
 - Полная поддержка Anki 2.1.x и Anki 2.0 (тестировалось на Anki 2.0.52).
 - Возможность импортировать не только все слова, но выбирать пользовательские словари (наборы) для импорта.

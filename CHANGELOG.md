@@ -29,7 +29,7 @@ Section to track upcoming changes
 
 ## [2.1.0] - 2019-05-17
 ### Added
-- Updated to be compatible with a new API introduced in LinguaLeo update on 30.04.2019.
+- Updated to a new API because of LinguaLeo update on 30.04.2019.
 - Added option (radiobutton) for downloading "New" words.
 
 ### Changed
@@ -113,7 +113,7 @@ Section to track upcoming changes
 
 ## [2.1.0] - 2019-05-17
 ### Добавлено
-- Аддон переехал на новый API, который был представлен с обновлением LinguaLeo от 30.04.2019.
+- Аддон переехал на новый API в связи с обновлением LinguaLeo от 30.04.2019.
 - Добавлена опция "New" для загрузки новых слов (как в сервисе LinguaLeo).
 
 ### Изменено
