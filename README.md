@@ -275,10 +275,10 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [21]:	https://github.com/bikenik/alfred-lingualeo
 [22]:	#description
 [23]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
-[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-0-1.zip
-[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-0-1.zip
+[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-0.zip
+[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-0.zip
 [26]:   https://bitbucket.org/vkhaustov/lingualeoanki/
-[27]:   https://i.imgur.com/CtPGtUnl.png
+[27]:   https://i.imgur.com/qSwZn5bl.png
 [28]:   #update
 [29]:   #installation
 [30]:   https://corp.lingualeo.com/ru/2019/04/30/news/
