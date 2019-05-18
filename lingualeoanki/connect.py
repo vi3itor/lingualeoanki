@@ -32,7 +32,7 @@ class Lingualeo(QObject):
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
         config = utils.get_config()
-        self.url_prefix = config['protocol'] if config else 'https://'
+        self.url_prefix = 'https://'
         self.msg = ''
         self.tried_ssl_fix = False
 
@@ -53,10 +53,7 @@ class Lingualeo(QObject):
                 # TODO: check if necessary to create empty cookies
                 # self.cj = http_cookiejar.MozillaCookieJar()
 
-                context = ssl.create_default_context()
-                context.check_hostname = False
-                context.verify_mode = ssl.CERT_NONE
-                https_handler = urllib.request.HTTPSHandler(context=context)
+                https_handler = urllib.request.HTTPSHandler(context=ssl._create_unverified_context())
                 self.opener = urllib.request.build_opener(https_handler, urllib.request.HTTPCookieProcessor(self.cj))
                 self.tried_ssl_fix = True
                 return self.get_connection()
