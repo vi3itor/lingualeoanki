@@ -199,7 +199,12 @@ class Lingualeo(QObject):
         data = json_data.encode('utf-8')
         req = urllib.request.Request(full_url)
         req.add_header('Content-Type', 'text/plain')
-        response = urllib.request.urlopen(req, data=data)
+        if self.tried_ssl_fix:
+            # Have to do it on MacOS for now
+            response = urllib.request.urlopen(req, data=data, context=ssl._create_unverified_context())
+        else:
+            # Default behavior
+            response = urllib.request.urlopen(req, data=data)
         return json.loads(response.read())
 
     """
