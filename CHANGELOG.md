@@ -27,6 +27,13 @@ Section to track upcoming changes
 - Update not only media, but also translation(s), context, tags.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.1.1] - 2019-05-19
+### Changed
+- Fixed connection issue on MacOS.
+
+### Removed
+- Protocol setting in config, since LinguaLeo doesn't work with http anymore.
+
 ## [2.1.0] - 2019-05-17
 ### Added
 - Updated to a new API because of LinguaLeo update on 30.04.2019.
@@ -110,6 +117,13 @@ Section to track upcoming changes
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.1.1] - 2019-05-19
+### Изменено
+- Исправлена ошибка соединения на MacOS, связанная с отсутствием сертификатов.
+
+### Удалено
+- Настройка протокола соединения в конфигурационном файле, так как LinguaLeo больше не работает с http.
 
 ## [2.1.0] - 2019-05-17
 ### Добавлено
