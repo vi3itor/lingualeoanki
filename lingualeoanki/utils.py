@@ -3,6 +3,7 @@ from random import randint
 import json
 from .six.moves import urllib
 import socket
+import ssl
 
 from aqt import mw
 from anki import notes
@@ -71,7 +72,8 @@ def download_media_file(url):
     destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
     abs_path = os.path.join(destination_folder, name)
-    resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT)
+    # TODO: find a better way for unsecure connection
+    resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT, context=ssl._create_unverified_context())
     media_file = resp.read()
     with open(abs_path, "wb") as binfile:
         binfile.write(media_file)
@@ -86,7 +88,8 @@ def send_to_download(word, thread):
     pictures = word['trs'][0]['pics']
     if pictures:
         exc_happened = None
-        picture_url = 'https:' + pictures[0]
+        pic_url = pictures[0]
+        picture_url = pic_url if pic_url.startswith('https:') else 'https:' + pic_url
         for i in list(range(NUM_RETRIES)):
             exc_happened = None
             try:
