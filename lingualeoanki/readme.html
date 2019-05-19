@@ -14,7 +14,7 @@
 
 <h3>Notice on recent update of LinguaLeo</h3>
 
-<p>The <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">update</a> of Lingualeo on April 30, 2019 brought several <a href="https://corp.lingualeo.com/ru/2019/05/01/spasibo-druzya-rabota-nad-oshibkami/">issues</a>. Current version of add-on (2.1.0) is fully compatible with the update. If you find some problems with your words, translations or pictures, please check on <a href="https://lingualeo.com/">Lingualeo</a> first. For the add-on problems please <a href="https://github.com/vi3itor/lingualeoanki/issues/new">create an issue on Github</a> or mail me at 4yourquestions {at} gmail.com. Thank you! </p>
+<p>The <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">update</a> of Lingualeo on April 30, 2019 brought several <a href="https://corp.lingualeo.com/ru/2019/05/01/spasibo-druzya-rabota-nad-oshibkami/">issues</a>. Current version of add-on (2.1.1) is fully compatible with the update. If you find some problems with your words, translations or pictures, please check on <a href="https://lingualeo.com/">Lingualeo</a> first. For the add-on problems please <a href="https://github.com/vi3itor/lingualeoanki/issues/new">create an issue on Github</a> or mail me at 4yourquestions {at} gmail.com. Thank you! </p>
 
 <h3>New in version 2.1:</h3>
 
@@ -33,7 +33,12 @@
 	<li>A list of words to download by status (&quot;New&quot;, &quot;Learning&quot; or &quot;Learned&quot;) is loading faster now. </li>
 	<li>For new users of add-on, Russian to English cards don&#39;t require typing a correct answer by default.</li>
 	<li>Fixed connection issue on MacOS.</li>
-	<li>Changed default protocol to https.</li>
+</ul>
+
+<h4>Removed</h4>
+
+<ul>
+	<li>Protocol setting in config, since LinguaLeo doesn&#39;t work with http anymore.</li>
 </ul>
 
 <h3>New in version 2.0:</h3>
@@ -73,15 +78,24 @@
 
 <p>The easiest (and preferable) way to install the add-on is by using the Anki&#39;s built-in add-ons managing system. In this case, it will be easy to <a href="#update">update</a> the add-on and get the latest version with new features and bug fixes. To install the add-on go to:<br/>(in Anki 2.1.x) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Get add-ons...&quot;<br/>(in Anki 2.0) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Browse &amp; Install&quot;<br/>and input add-on&#39;s code: 1411073333. Restart Anki.</p>
 
-<p>If for some reason you wish to install the add-on manually, download the archive with the latest version from the <a href="https://github.com/vi3itor/lingualeoanki/">repository on GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-0.zip">for Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-0.zip">for Anki 2.0</a>), open Anki on your computer, go to:<br/>(in Anki 2.1.x) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;View Files&quot;<br/>(in Anki 2.0) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Open Add-ons Folder&quot;<br/>and put the content of the archive there. If you use Anki 2.1.x create an additional folder named &quot;lingualeoanki&quot; inside &quot;addons21&quot; folder and put the content of the archive there. Restart Anki.<br/>See the following gif for the details on manual installation in Anki 2.0 (with Russian captures):</p>
+<p>If for some reason you wish to install the add-on manually, download the archive with the latest version from the <a href="https://github.com/vi3itor/lingualeoanki/">repository on GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-1.zip">for Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-1.zip">for Anki 2.0</a>), open Anki on your computer, go to:<br/>(in Anki 2.1.x) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;View Files&quot;<br/>(in Anki 2.0) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Open Add-ons Folder&quot;<br/>and put the content of the archive there. If you use Anki 2.1.x create an additional folder named &quot;lingualeoanki&quot; inside &quot;addons21&quot; folder and put the content of the archive there. Restart Anki.<br/>See the following gif for the details on manual installation in Anki 2.0 (with Russian captures):</p>
 
 <p><a href="https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif">how to manually install</a></p>
 
 <h4>Update</h4>
 
-<p>To update the add-on in Anki 2.1.x go to &quot;Tools&quot; &gt; &quot;Add-ons&quot;. Select the add-on and click &quot;Check for updates.&quot;</p>
+<p>To update the add-on in Anki 2.1.x go to &quot;Tools&quot; &gt; &quot;Add-ons&quot;. Select the add-on and click &quot;Check for updates.&quot; Click &quot;Yes&quot; to update and <strong>restart Anki</strong>, for changes to take effect.</p>
 
-<p>In Anki 2.0 you need to repeat <a href="#installation">installation</a> procedure and it will automatically replace the files.<br/></p>
+<p>In Anki 2.0 you need to repeat <a href="#installation">installation</a> procedure and it will automatically replace the files. </p>
+
+<p>If after the update the add-on doesn&#39;t work as expected try:</p>
+
+<ul>
+	<li>restarting Anki;</li>
+	<li>clicking Log Out and authorizing again.</li>
+</ul>
+
+<p>If it is still not working - try to delete the add-on and install it again. </p>
 
 <h3>Compatibility</h3>
 
@@ -89,7 +103,11 @@
 
 <h3>Usage</h3>
 
-<p>To run the add-on go to the &quot;Tools&quot; menu and click &quot;Import from LinguaLeo.&quot; Enter your login and password. If you&#39;d like to stay logged in choose &quot;Stay logged in&quot; option, and you can also save the password (stored in the configuration file), and click &quot;Log in&quot; button.<br/>If the authorization is successful, you can choose the words to import: &quot;Studied&quot;, &quot;Unstudied&quot; or &quot;Any.&quot;<br/>If you updated media for some notes that had been previously imported, choose &quot;Update existing notes&quot; option.<br/></p>
+<p>To run the add-on go to the &quot;Tools&quot; menu and click &quot;Import from LinguaLeo.&quot; Enter your login and password. If you&#39;d like to stay logged in choose &quot;Stay logged in&quot; option, and you can also save the password (stored in the configuration file), and click &quot;Log in&quot; button.</p>
+
+<p>If the authorization is successful, you can choose the words to import: &quot;All&quot; (no matter what status), &quot;New&quot;, &quot;Learning&quot; or &quot;Learned&quot;.</p>
+
+<p>If you updated media for some notes that had been previously imported, choose &quot;Update existing notes&quot; option.<br/></p>
 
 <p>To download all user words click &quot;Import all words&quot; button. If you want to choose user dictionaries (word sets) to download words from: click &quot;Import from dictionaries&quot; button and hold Ctrl (or Cmd) to choose several dictionaries. Then click &quot;Import.&quot;<br/>And that&#39;s all. You don&#39;t need to create decks, models, templates or anything else. The add-on will make it all for you. As simple as that. </p>
 
@@ -133,7 +151,7 @@
 
 <h3>Acknowledgments</h3>
 
-<p><a href="https://github.com/relaxart">Ilya Isaev</a> for <a href="https://habrahabr.ru/post/276495/">inspiration</a> and his project <a href="https://github.com/relaxart/LeoPort">LeoPort</a>.<br/><a href="https://bitbucket.org/pioneer/">Serge</a> for duplicate search feature, support words with apostrophes and function to retry downloading words if initially failed.<br/><a href="https://github.com/bikenik">Nikolay Bikov</a> for <a href="https://github.com/bikenik/alfred-lingualeo/blob/master/Lingua-Leo.postman_collection.json">PostMan Collection</a>, <a href="https://github.com/bikenik/alfred-lingualeo">alfred-lingualeo</a> add-on and for helping to test on MacOS.<br/>And to all users who gave valuable comments and feedback and helped to test on different platforms.</p>
+<p><a href="https://github.com/troggy">Kosta Korenkov</a> for <a href="http://troggy.github.io/anki-leo/">Chrome extension</a> that exports LinguaLeo dictionary and for the help with transitioning to a new API.<br/><a href="https://github.com/relaxart">Ilya Isaev</a> for <a href="https://habrahabr.ru/post/276495/">inspiration</a> and his project <a href="https://github.com/relaxart/LeoPort">LeoPort</a>.<br/><a href="https://bitbucket.org/pioneer/">Serge</a> for duplicate search feature, support words with apostrophes and function to retry downloading words if initially failed.<br/><a href="https://github.com/bikenik">Nikolay Bikov</a> for <a href="https://github.com/bikenik/alfred-lingualeo/blob/master/Lingua-Leo.postman_collection.json">PostMan Collection</a>, <a href="https://github.com/bikenik/alfred-lingualeo">alfred-lingualeo</a> add-on and for helping to test on MacOS.<br/>And to all users who gave valuable comments and feedback and helped to test on different platforms.</p>
 
 <h5>Russian</h5>
 
@@ -151,7 +169,7 @@
 
 <h3>Внимание! Обновление Lingualeo 30.04.2019</h3>
 
-<p>В связи с <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">обновлением</a> сервиса Lingualeo от 30 апреля 2019 возможны временные <a href="https://corp.lingualeo.com/ru/2019/05/01/spasibo-druzya-rabota-nad-oshibkami/">неполадки</a> в его работе. В актуальной версия дополнения (2.1.0) полностью восстановлена его работа. Если вы заметили, что ваши слова, их переводы и картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте <a href="https://lingualeo.com/">Lingualeo</a>. Если же проблема в аддоне - <a href="https://github.com/vi3itor/lingualeoanki/issues/new">создайте issue на Github</a> либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! </p>
+<p>В связи с <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">обновлением</a> сервиса Lingualeo от 30 апреля 2019 возможны временные <a href="https://corp.lingualeo.com/ru/2019/05/01/spasibo-druzya-rabota-nad-oshibkami/">неполадки</a> в его работе. В актуальной версия дополнения (2.1.1) полностью восстановлена его работа. Если вы заметили, что ваши слова, их переводы и картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте <a href="https://lingualeo.com/">Lingualeo</a>. Если же проблема в аддоне - <a href="https://github.com/vi3itor/lingualeoanki/issues/new">создайте issue на Github</a> либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! </p>
 
 <h3>Новое в версии 2.1:</h3>
 
@@ -169,8 +187,13 @@
 	<li>При выборе опции &quot;Learned&quot; и нажатии &quot;Import from Dictionaries&quot; список словарей показывает кол-во изученных слов.</li>
 	<li>Загрузка списка слов из категорий &quot;New&quot;, &quot;Learning&quot; и &quot;Learned&quot; занимает меньше времени (особенно для больших словарей).</li>
 	<li>Для новых пользователей дополнения, создаваемые карточки не требуют печатать правильный ответ на английском. </li>
-	<li>Исправлена ошибка соединения на MacOS.</li>
-	<li>Https протокол используется по-умолчанию.</li>
+	<li>Исправлена ошибка соединения на MacOS, связанная с отсутствием сертификатов.</li>
+</ul>
+
+<h4>Удалено</h4>
+
+<ul>
+	<li>Настройка протокола соединения в конфигурационном файле, так как LinguaLeo больше не работает с http.</li>
 </ul>
 
 <h3>Новое в версии 2.0:</h3>
@@ -210,13 +233,22 @@
 
 <p>Наиболее простой (и рекомендуемый) способ установки: с помощью системы управления дополнениями Anki. В таком случае вы сможете с лёгкостью обновлять дополнение и получать новые верии с новыми функциями и исправленными ошибками. Для этого выберите пункт меню программы:<br/>(для Anki 2.1.x) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Скачать дополнения&quot; (Get Add-ons...)<br/>(для Anki 2.0) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Обзор и установка&quot; (Browse &amp; Install)<br/>введите код 1411073333 и перезапустите Anki.<br/></p>
 
-<p>Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из <a href="https://github.com/vi3itor/lingualeoanki/">репозитория на GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-0.zip">для Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-0.zip">для Anki 2.0</a>), откройте Anki на вашем компьютере, выберите пункт меню:<br/>(для Anki 2.1.x) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) и кликните на кнопку &quot;Просмотреть файлы&quot; (View Files)<br/>(для Anki 2.0) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Открыть папку с дополнениями&quot; (Open Add-ons Folder)<br/>и скопируйте туда содержимое архива. Если вы используете Anki 2.1.x, создайте папку с именем &quot;lingualeoanki&quot; в папку &quot;addons21&quot; и скопируйте туда содержимое архива. Перезапустите программу.<br/>Гифка с наглядным изображением процесса ручной установки для Anki 2.0: <a href="https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif">как установить дополнение вручную</a></p>
+<p>Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из <a href="https://github.com/vi3itor/lingualeoanki/">репозитория на GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-1.zip">для Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-1.zip">для Anki 2.0</a>), откройте Anki на вашем компьютере, выберите пункт меню:<br/>(для Anki 2.1.x) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) и кликните на кнопку &quot;Просмотреть файлы&quot; (View Files)<br/>(для Anki 2.0) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Открыть папку с дополнениями&quot; (Open Add-ons Folder)<br/>и скопируйте туда содержимое архива. Если вы используете Anki 2.1.x, создайте папку с именем &quot;lingualeoanki&quot; в папку &quot;addons21&quot; и скопируйте туда содержимое архива. Перезапустите программу.<br/>Гифка с наглядным изображением процесса ручной установки для Anki 2.0: <a href="https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif">как установить дополнение вручную</a></p>
 
 <h3>Обновление</h3>
 
-<p>Чтобы обновить дополнение в Anki 2.1.x перейдите в &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons). Выберите название дополнения и кликните на &quot;Проверить обновления&quot; (Check for updates).</p>
+<p>Чтобы обновить дополнение в Anki 2.1.x перейдите в &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons). Выберите название дополнения и кликните на &quot;Проверить обновления&quot; (Check for updates). Нажмите &quot;Да&quot; для обновления и <strong>перезапустите Anki</strong>, чтобы изменения вступили в силу.</p>
 
-<p>В Anki 2.0 вам следует повторить процедуру установки.<br/></p>
+<p>В Anki 2.0 вам следует повторить процедуру установки.</p>
+
+<p>Если после обновления дополнение не работает, попробуйте:</p>
+
+<ul>
+	<li>перезапустить Anki;</li>
+	<li>нажать Log Out и ещё раз авторизоваться.</li>
+</ul>
+
+<p>Если вышеперечисленные действия не помогают - попробуйте удалить дополнение и загрузить снова.</p>
 
 <h3>Совместимость</h3>
 
@@ -226,11 +258,13 @@
 
 <h3>Как это работает?</h3>
 
-<p>После установки, чтобы импортировать ваши слова из LinguaLeo в Anki, откройте меню &quot;Инструменты&quot; (Tools) и выберите пункт &quot;Import from LinguaLeo.&quot; Введите ваш логин и пароль для сервиса LinguaLeo. Если вы хотите оставаться в системе, выберите пункт &quot;Stay logged in,&quot; и если вы хотите, чтобы дополнение запомнило пароль, выберите &quot;Save password&quot; (в таком случае пароль будет храниться в конфигурационном файле), после этого нажмите &quot;Log in.&quot;<br/>Если авторизация прошла успешно, вы можете выбрать какие слова импортировать: &quot;Studied&quot; (изученные), &quot;Unstudied&quot; (неизученные) либо &quot;Any&quot; (и те и другие). </p>
+<p>После установки, чтобы импортировать ваши слова из LinguaLeo в Anki, откройте меню &quot;Инструменты&quot; (Tools) и выберите пункт &quot;Import from LinguaLeo.&quot; Введите ваш логин и пароль для сервиса LinguaLeo. Если вы хотите оставаться в системе, выберите пункт &quot;Stay logged in,&quot; и если вы хотите, чтобы дополнение запомнило пароль, выберите &quot;Save password&quot; (в таком случае пароль будет храниться в конфигурационном файле), после этого нажмите &quot;Log in.&quot;</p>
+
+<p>Если авторизация прошла успешно, вы можете выбрать какие слова импортировать (по текущему статусу, так же как в веб интерфейсе): &quot;All&quot; (все, в независимости от текущего статуса), &quot;New&quot; (только новые), &quot;Learning&quot; (на изучении) либо &quot;Learned&quot; (только изученные).</p>
 
 <p>Если в некоторых словах вы обновили изображение или звук и хотите, чтобы эти изменения попали в Anki, выберите пункт &quot;Update existing notes.&quot;<br/></p>
 
-<p>Для того, чтобы импортировать все слова, нажмите кнопку &quot;Import all words.&quot; Для того, чтобы выбрать словари (наборы) для импорта, нажмите &quot;Import from dictionaries&quot; и выберите один или несколько наборов (удерживая клавишу Ctrl либо Cmd) и нажмите &quot;Import.&quot;</p>
+<p>Для того, чтобы импортировать слова из главного словаря (все пользовательские слова), нажмите кнопку &quot;Import all words.&quot; Для того, чтобы выбрать наборы слов (пользовательские словари) для импорта, нажмите &quot;Import from dictionaries&quot; и выберите один или несколько наборов (удерживая клавишу Ctrl либо Cmd) и нажмите &quot;Import.&quot;</p>
 
 <p>Никаких моделей, шаблонов, колод создавать не нужно, дополнение сделает всю работу за вас. Проще некуда.</p>
 
@@ -274,6 +308,6 @@
 
 <h3>Благодарности</h3>
 
-<p><a href="https://github.com/relaxart">Илья Исаев</a> за <a href="https://habrahabr.ru/post/276495/">вдохновение</a> и проект <a href="https://github.com/relaxart/LeoPort">LeoPort</a>.<br/><a href="https://bitbucket.org/pioneer/">Serge</a> за функцию поиска дубликатов, поддержку слов с апострофом и функцию повторного скачивания слов.<br/><a href="https://github.com/bikenik">Николай Байков</a> за <a href="https://github.com/bikenik/alfred-lingualeo/blob/master/Lingua-Leo.postman_collection.json">PostMan Collection</a>, дополнение <a href="https://github.com/bikenik/alfred-lingualeo">alfred-lingualeo</a> и за помощь с тестированием на MacOs.<br/>А также всем, кто пользовался приложением, оставлял ценные комментарии и помогал с тестированием на различных платформах.</p>
+<p><a href="https://github.com/troggy">Kosta Korenkov</a> за <a href="http://troggy.github.io/anki-leo/">расширение для Chrome</a> для экспорта словаря LinguaLeo, а также за помощь с переездом на новый API.<br/><a href="https://github.com/relaxart">Илья Исаев</a> за <a href="https://habrahabr.ru/post/276495/">вдохновение</a> и проект <a href="https://github.com/relaxart/LeoPort">LeoPort</a>.<br/><a href="https://bitbucket.org/pioneer/">Serge</a> за функцию поиска дубликатов, поддержку слов с апострофом и функцию повторного скачивания слов.<br/><a href="https://github.com/bikenik">Николай Байков</a> за <a href="https://github.com/bikenik/alfred-lingualeo/blob/master/Lingua-Leo.postman_collection.json">PostMan Collection</a>, дополнение <a href="https://github.com/bikenik/alfred-lingualeo">alfred-lingualeo</a> и за помощь с тестированием на MacOs.<br/>А также всем, кто пользовался приложением, оставлял ценные комментарии и помогал с тестированием на различных платформах.</p>
 
 
