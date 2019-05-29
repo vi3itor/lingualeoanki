@@ -39,6 +39,7 @@ ru_question = """
 ru_answer = """
     {{FrontSide}}
     <hr id=answer>
+    {{en}}
     <br>
     {{transcription}}
     <br>
