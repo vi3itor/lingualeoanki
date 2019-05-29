@@ -67,11 +67,29 @@ def prepare_model(collection, fields, model_css):
     return model
 
 
+def get_valid_name(orig_name):
+    """
+    Unfortunately, from April 30, 2019,
+    media filenames can be very long and contain '\n' symbols,
+    the function checks if it is the case
+    and returns a name without '\n' and only up to 30 characters
+    """
+    if len(orig_name) > 50 or orig_name.find('\n'):
+        new_name = orig_name[-30:]
+        new_name = new_name.replace('\n', '')
+        return new_name
+    else:
+        return orig_name
+
+
 def download_media_file(url):
     DOWNLOAD_TIMEOUT = 20
     destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
+    name = get_valid_name(name)
     abs_path = os.path.join(destination_folder, name)
+    # Fix '\n' symbols in the url (they were found in the long sentences)
+    url = url.replace('\n', '')
     # TODO: find a better way for unsecure connection
     resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT, context=ssl._create_unverified_context())
     media_file = resp.read()
@@ -82,7 +100,7 @@ def download_media_file(url):
 def send_to_download(word, thread):
     # TODO: Move to config following settings and DOWNLOAD_TIMEOUT
     NUM_RETRIES = 3
-    SLEEP_SECONDS = 3
+    SLEEP_SECONDS = 5
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
     pictures = word['trs'][0]['pics']
@@ -127,12 +145,14 @@ def fill_note(word, note):
     pictures = translation['pics']
     if pictures:
         picture_name = pictures[0].split('/')[-1]
+        picture_name = get_valid_name(picture_name)
         note['picture_name'] = '<img src="%s" />' % picture_name
     if word['scr']:
         note['transcription'] = '[' + word['scr'] + ']'
     sound_url = word['pron']
     if sound_url:
         sound_name = sound_url.split('/')[-1]
+        sound_name = get_valid_name(sound_name)
         note['sound_name'] = '[sound:%s]' % sound_name
     # TODO: Add user dictionaries (wordsets) as tags
     return note
@@ -161,6 +181,7 @@ def add_word(word, model):
             # a dirty hack below until a new field in the model is introduced
             # put a space before or after a *sound* field of an existing note if you want it to be updated
             # if a note has no picture or sound, it will be updated anyway
+            # TODO: Check if hack is still needed, remove if not
             sound_name = note_in_db['sound_name']
             sound_name = sound_name.replace("&nbsp;", " ")
             note_needs_update = sound_name != sound_name.strip()
