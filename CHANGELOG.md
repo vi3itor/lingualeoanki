@@ -27,6 +27,11 @@ Section to track upcoming changes
 - Update not only media, but also translation(s), context, tags.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.1.2] - 2019-05-29
+### Changed
+- Fixed media downloading for very long sentences (some audio were not downloaded because urls contain newline symbols).
+- Show English answer for Russian to English cards (for new users of add-on only).
+
 ## [2.1.1] - 2019-05-19
 ### Changed
 - Fixed connection issue on MacOS.
@@ -117,6 +122,11 @@ Section to track upcoming changes
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.1.2] - 2019-05-29
+### Изменено
+- Исправлена загрузка медиафайлов для очень длинных предложений (так как URL-ссылка может содержать символы новой строки).
+- Исправлен показ ответа на английском для карточек ru -> en (только для новых пользователей дополнения).
 
 ## [2.1.1] - 2019-05-19
 ### Изменено
