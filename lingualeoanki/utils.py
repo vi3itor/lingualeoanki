@@ -103,7 +103,28 @@ def send_to_download(word, thread):
     SLEEP_SECONDS = 5
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
-    pictures = word['trs'][0]['pics']
+    sound_url = word['pron']
+    if sound_url:
+        exc_happened = None
+        for i in list(range(NUM_RETRIES)):
+            exc_happened = None
+            try:
+                download_media_file(sound_url)
+                break
+            except (urllib.error.URLError, socket.error) as e:
+                exc_happened = e
+                thread.sleep(SLEEP_SECONDS)
+        if exc_happened:
+            raise exc_happened
+    translation = word['trs'][0]
+    if not translation:
+        """
+        There might be no translation for the word
+        """
+        # TODO: Find the example of word with no translation
+        #  and handle it according to structure
+        return
+    pictures = translation['pics']
     if pictures:
         exc_happened = None
         pic_url = pictures[0]
@@ -118,19 +139,6 @@ def send_to_download(word, thread):
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
             raise exc_happened
-    sound_url = word['pron']
-    if sound_url:
-        exc_happened = None
-        for i in list(range(NUM_RETRIES)):
-            exc_happened = None
-            try:
-                download_media_file(sound_url)
-                break
-            except (urllib.error.URLError, socket.error) as e:
-                exc_happened = e
-                thread.sleep(SLEEP_SECONDS)
-        if exc_happened:
-            raise exc_happened
 
 
 def fill_note(word, note):
@@ -139,14 +147,15 @@ def fill_note(word, note):
     #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
     # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
     translation = word['trs'][0]
-    note['ru'] = translation['tr']
-    if translation.get('ctx'):
-        note['context'] = translation['ctx']
-    pictures = translation['pics']
-    if pictures:
-        picture_name = pictures[0].split('/')[-1]
-        picture_name = get_valid_name(picture_name)
-        note['picture_name'] = '<img src="%s" />' % picture_name
+    if translation:  # apparently, there might be no translation
+        note['ru'] = translation['tr']
+        if translation.get('ctx'):
+            note['context'] = translation['ctx']
+        pictures = translation['pics']
+        if pictures:
+            picture_name = pictures[0].split('/')[-1]
+            picture_name = get_valid_name(picture_name)
+            note['picture_name'] = '<img src="%s" />' % picture_name
     if word['scr']:
         note['transcription'] = '[' + word['scr'] + ']'
     sound_url = word['pron']
