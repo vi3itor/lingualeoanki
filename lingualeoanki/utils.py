@@ -116,15 +116,15 @@ def send_to_download(word, thread):
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
             raise exc_happened
-    translation = word['trs'][0]
-    if not translation:
+    translations = word['trs']
+    if not translations:
         """
         There might be no translation for the word
         """
         # TODO: Find the example of word with no translation
         #  and handle it according to structure
         return
-    pictures = translation['pics']
+    pictures = translations[0]['pics']
     if pictures:
         exc_happened = None
         pic_url = pictures[0]
@@ -146,8 +146,9 @@ def fill_note(word, note):
     # TODO: Allow user to collect more than one translation
     #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
     # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
-    translation = word['trs'][0]
-    if translation:  # apparently, there might be no translation
+    translations = word['trs']
+    if translations:  # apparently, there might be no translation
+        translation = translations[0]
         note['ru'] = translation['tr']
         if translation.get('ctx'):
             note['context'] = translation['ctx']
