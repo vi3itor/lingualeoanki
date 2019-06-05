@@ -13,7 +13,7 @@ The add-on downloads your dictionary words from [LinguaLeo][3] - another great r
 [LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
 ### Notice on recent update of LinguaLeo 
-The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. Current version of add-on (2.1.2) is fully compatible with the update. If you find some problems with your words, translations or pictures, please check on [Lingualeo][3] first. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
+The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. Current version of add-on (2.1.3) is fully compatible with the update. If you find some problems with your words, translations or pictures, please check on [Lingualeo][3] first. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
 
 ### New in version 2.1:
 #### Added
@@ -27,6 +27,7 @@ The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. Cu
 - For new users of add-on, Russian to English cards don't require typing a correct answer by default.
 - Fixed connection issue on MacOS.
 - Fixed media downloading for long sentences.
+- Fixed import error when there is no translation for the word (or phrase).
 
 #### Removed
 - Protocol setting in config, since LinguaLeo doesn't work with http anymore. 
@@ -150,7 +151,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [ЛингваЛео][3] имеет удобный интерфейс для добавления новых слов и неплохое [расширение для браузера][4] для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких [тренировок][5], Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.
 
 ### Внимание! Обновление Lingualeo 30.04.2019
-В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. В актуальной версия дополнения (2.1.2) полностью восстановлена его работа. Если вы заметили, что ваши слова, их переводы и картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3]. Если же проблема в аддоне - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
+В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. В актуальной версия дополнения (2.1.3) полностью восстановлена его работа. Если вы заметили, что ваши слова, их переводы и картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3]. Если же проблема в аддоне - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
 
 ### Новое в версии 2.1:
 ####  Добавлено
@@ -164,6 +165,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 - Для новых пользователей дополнения, создаваемые карточки не требуют печатать правильный ответ на английском. 
 - Исправлена ошибка соединения на MacOS, связанная с отсутствием сертификатов.
 - Исправлена загрузка медиафайлов для длинных предложений.
+- Исправлена ошибка при загрузке в случае, когда у слова (или предложения) нет перевода.
 
 #### Удалено
 - Настройка протокола соединения в конфигурационном файле, так как LinguaLeo больше не работает с http.
@@ -293,8 +295,8 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [21]:	https://github.com/bikenik/alfred-lingualeo
 [22]:	#description
 [23]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
-[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-2.zip
-[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-2.zip
+[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-3.zip
+[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-3.zip
 [26]:   https://bitbucket.org/vkhaustov/lingualeoanki/
 [27]:   https://i.imgur.com/qSwZn5bl.png
 [28]:   #update
