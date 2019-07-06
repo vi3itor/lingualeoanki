@@ -157,7 +157,7 @@ def fill_note(word, note):
             picture_name = pictures[0].split('/')[-1]
             picture_name = get_valid_name(picture_name)
             note['picture_name'] = '<img src="%s" />' % picture_name
-    if word['scr']:
+    if word.get('scr'):
         note['transcription'] = '[' + word['scr'] + ']'
     sound_url = word['pron']
     if sound_url:
