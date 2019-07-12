@@ -110,7 +110,7 @@ def send_to_download(word, thread):
         #  and handle it according to structure
         return
     pictures = translations[0]['pics']
-    if pictures:
+    if pictures and is_not_default_picture(pictures[0]):
         exc_happened = None
         pic_url = pictures[0]
         if not is_valid_ascii(pic_url):
@@ -142,8 +142,10 @@ def fill_note(word, note):
         pictures = translation['pics']
         if pictures:
             picture_name = pictures[0].split('/')[-1]
-            picture_name = get_valid_name(picture_name)
-            note['picture_name'] = '<img src="%s" />' % picture_name
+            if is_valid_ascii(picture_name) and \
+                    is_not_default_picture(picture_name):
+                picture_name = get_valid_name(picture_name)
+                note['picture_name'] = '<img src="%s" />' % picture_name
     if word.get('scr'):
         note['transcription'] = '[' + word['scr'] + ']'
     sound_url = word.get('pron')
@@ -217,6 +219,16 @@ def is_valid_ascii(url):
     except:
         return False
     return True
+
+
+def is_not_default_picture(picture_name):
+    """
+    All words that have no picture link to the same .png file.
+    We shouldn't download it or fill into the note.
+    """
+    if picture_name != '0bbdd3793cb97ec4189557013fc4d6e4bed4f714.png':
+        return True
+    return False
 
 
 def get_valid_name(orig_name):
