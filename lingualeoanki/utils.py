@@ -88,8 +88,8 @@ def send_to_download(word, thread):
     SLEEP_SECONDS = 5
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
-    sound_url = word['pron']
-    if sound_url:
+    sound_url = word.get('pron')
+    if sound_url and is_valid_ascii(sound_url):
         exc_happened = None
         for i in list(range(NUM_RETRIES)):
             exc_happened = None
@@ -101,7 +101,7 @@ def send_to_download(word, thread):
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
             raise exc_happened
-    translations = word['trs']
+    translations = word.get('trs')
     if not translations:
         """
         There might be no translation for the word
@@ -113,6 +113,8 @@ def send_to_download(word, thread):
     if pictures:
         exc_happened = None
         pic_url = pictures[0]
+        if not is_valid_ascii(pic_url):
+            raise urllib.error.URLError('Invalid picture url: ' + pic_url)
         picture_url = pic_url if pic_url.startswith('https:') else 'https:' + pic_url
         for i in list(range(NUM_RETRIES)):
             exc_happened = None
@@ -131,7 +133,7 @@ def fill_note(word, note):
     # TODO: Allow user to collect more than one translation
     #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
     # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
-    translations = word['trs']
+    translations = word.get('trs')
     if translations:  # apparently, there might be no translation
         translation = translations[0]
         note['ru'] = translation['tr']
@@ -144,7 +146,7 @@ def fill_note(word, note):
             note['picture_name'] = '<img src="%s" />' % picture_name
     if word.get('scr'):
         note['transcription'] = '[' + word['scr'] + ']'
-    sound_url = word['pron']
+    sound_url = word.get('pron')
     if sound_url:
         sound_name = sound_url.split('/')[-1]
         sound_name = get_valid_name(sound_name)
