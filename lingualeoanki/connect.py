@@ -274,6 +274,7 @@ class Download(QThread):
         for word in self.words:
             self.Word.emit(word)
             try:
+                # print('Downloading media for word: {}'.format(word.get('wd')))
                 utils.send_to_download(word, self)
             except (urllib.error.URLError, socket.error):
                 problem_words.append(word.get('wd'))

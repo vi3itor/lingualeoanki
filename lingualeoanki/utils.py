@@ -108,6 +108,7 @@ def send_to_download(word, thread):
         """
         # TODO: Find the example of word with no translation
         #  and handle it according to structure
+        # print("Found a word with no translation: {}!".format(word.get('wd')))
         return
     pictures = translations[0]['pics']
     if pictures and is_not_default_picture(pictures[0]):
@@ -130,6 +131,7 @@ def send_to_download(word, thread):
 
 def fill_note(word, note):
     note['en'] = word['wd']
+    # print("Filling word {}".format(word['wd']))
     # TODO: Allow user to collect more than one translation
     #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
     # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
