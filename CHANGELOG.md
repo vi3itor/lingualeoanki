@@ -27,6 +27,12 @@ Section to track upcoming changes
 - Update not only media, but also translation(s), context, tags.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.1.4] - 2019-07-12
+### Changed
+- Fixed import error for words without a transcription.
+- Fixed import error for words with broken media links.
+- Stop downloading a default picture for the translations without pictures.
+
 ## [2.1.3] - 2019-06-05
 ### Changed
 - Fixed import error when there is no translation for the word (or phrase).
@@ -126,6 +132,12 @@ Section to track upcoming changes
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.1.4] - 2019-07-12
+### Изменено
+- Исправлена ошибка, возникающая при загрузке слов без транскрипции.
+- Исправлена ошибка, возникающая из-за некорректных ссылок на медиа файлы.
+- Исправлена загрузка изображения по-умолчанию для слов без изображения.
 
 ## [2.1.3] - 2019-06-05
 ### Изменено
