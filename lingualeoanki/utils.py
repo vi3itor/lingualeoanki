@@ -67,21 +67,6 @@ def prepare_model(collection, fields, model_css):
     return model
 
 
-def get_valid_name(orig_name):
-    """
-    Unfortunately, from April 30, 2019,
-    media filenames can be very long and contain '\n' symbols,
-    the function checks if it is the case
-    and returns a name without '\n' and only up to 30 characters
-    """
-    if len(orig_name) > 50 or orig_name.find('\n'):
-        new_name = orig_name[-30:]
-        new_name = new_name.replace('\n', '')
-        return new_name
-    else:
-        return orig_name
-
-
 def download_media_file(url):
     DOWNLOAD_TIMEOUT = 20
     destination_folder = mw.col.media.dir()
@@ -217,6 +202,34 @@ def is_duplicate(word):
     note_dupes2 = collection.findNotes('en:"%s"' % word['wd'])
     note_dupes = note_dupes1 + note_dupes2
     return True if dupes or note_dupes else False
+
+
+def is_valid_ascii(url):
+    """
+    Check an url if it is a valid ascii string
+    After the LinguaLeo update some images
+    have broken links with cyrillic characters
+    """
+    try:
+        url.encode('ascii')
+    except:
+        return False
+    return True
+
+
+def get_valid_name(orig_name):
+    """
+    Unfortunately, from April 30, 2019,
+    media filenames can be very long and contain '\n' symbols,
+    the function checks if it is the case
+    and returns a name without '\n' and only up to 30 characters
+    """
+    if len(orig_name) > 50 or orig_name.find('\n'):
+        new_name = orig_name[-30:]
+        new_name = new_name.replace('\n', '')
+        return new_name
+    else:
+        return orig_name
 
 
 def get_module_name():
