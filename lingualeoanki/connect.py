@@ -310,7 +310,7 @@ class Download(QThread):
                 # print('Downloading media for word: {}'.format(word.get('wd')))
                 utils.send_to_download(word, self)
             except (urllib.error.URLError, socket.error):
-                problem_words.append(word.get('wd'))
+                problem_words.append(word.get('wordValue'))
             counter += 1
             self.Counter.emit(counter)
         self.FinalCounter.emit(counter)

@@ -130,7 +130,7 @@ def send_to_download(word, thread):
 
 
 def fill_note(word, note):
-    note['en'] = word.get('wd') if word.get('wd') else 'NO_WORD_VALUE'
+    note['en'] = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
     # print("Filling word {}".format(word['wd']))
     # TODO: Allow user to collect more than one translation
     #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
@@ -166,7 +166,7 @@ def add_word(word, model):
     note = notes.Note(collection, model)
     note = fill_note(word, note)
     # TODO: Rewrite to use is_duplicate()
-    word_value = word.get('wd') if word.get('wd') else 'NO_WORD_VALUE'
+    word_value = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
     dupes = collection.findDupes("en", word_value)
     # a hack to support words with apostrophes
     note_dupes1 = collection.findNotes("en:'%s'" % word_value)
@@ -202,11 +202,12 @@ def is_duplicate(word):
     :return: bool
     """
     collection = mw.col
-    dupes = collection.findDupes("en", word['wd'])
+    word_value = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
+    dupes = collection.findDupes("en", word_value)
     # a hack to support words with apostrophes
     # TODO: Debug to find out if it is still required
-    note_dupes1 = collection.findNotes("en:'%s'" % word['wd'])
-    note_dupes2 = collection.findNotes('en:"%s"' % word['wd'])
+    note_dupes1 = collection.findNotes("en:'%s'" % word_value)
+    note_dupes2 = collection.findNotes('en:"%s"' % word_value)
     note_dupes = note_dupes1 + note_dupes2
     return True if dupes or note_dupes else False
 
