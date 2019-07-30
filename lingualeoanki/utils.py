@@ -88,7 +88,7 @@ def send_to_download(word, thread):
     SLEEP_SECONDS = 5
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
-    sound_url = word.get('pron')
+    sound_url = word.get('pronunciation')
     if sound_url and is_valid_ascii(sound_url):
         exc_happened = None
         for i in list(range(NUM_RETRIES)):
@@ -101,21 +101,12 @@ def send_to_download(word, thread):
                 thread.sleep(SLEEP_SECONDS)
         if exc_happened:
             raise exc_happened
-    translations = word.get('trs')
-    if not translations:
-        """
-        There might be no translation for the word
-        """
-        # TODO: Find the example of word with no translation
-        #  and handle it according to structure
-        # print("Found a word with no translation: {}!".format(word.get('wd')))
-        return
-    pictures = translations[0]['pics']
-    if pictures and is_not_default_picture(pictures[0]):
+    pic_url = word.get('picture')
+    if pic_url and is_not_default_picture(pic_url):
         exc_happened = None
-        pic_url = pictures[0]
         if not is_valid_ascii(pic_url):
             raise urllib.error.URLError('Invalid picture url: ' + pic_url)
+        # TODO: Remove https check
         picture_url = pic_url if pic_url.startswith('https:') else 'https:' + pic_url
         for i in list(range(NUM_RETRIES)):
             exc_happened = None
@@ -130,27 +121,30 @@ def send_to_download(word, thread):
 
 
 def fill_note(word, note):
-    note['en'] = word.get('wd') if word.get('wd') else 'NO_WORD_VALUE'
+    note['en'] = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
     # print("Filling word {}".format(word['wd']))
-    # TODO: Allow user to collect more than one translation
-    #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
+    note['ru'] = word.get('combinedTranslation') if word.get('combinedTranslation') else 'ПЕРЕВОД_ОТСУТСТВУЕТ'
+    picture_name = word.get('picture').split('/')[-1] if word.get('picture') else ''
+    if is_valid_ascii(picture_name) and \
+            is_not_default_picture(picture_name):
+        picture_name = get_valid_name(picture_name)
+        note['picture_name'] = '<img src="%s" />' % picture_name
+
+    # TODO: Add checkbox for context
+    #  and get it differently, since with API 1.0.1 it is not possible
+    #  to get context at the time of getting list of words
+    '''
     # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
-    translations = word.get('trs')
+    translations = word.get('translations')
     if translations:  # apparently, there might be no translation
         translation = translations[0]
-        note['ru'] = translation.get('tr') if translation.get('tr') else 'ПЕРЕВОД_ОТСУТСТВУЕТ'
         if translation.get('ctx'):
             note['context'] = translation['ctx']
-        pictures = translation.get('pics')
-        if pictures:
-            picture_name = pictures[0].split('/')[-1]
-            if is_valid_ascii(picture_name) and \
-                    is_not_default_picture(picture_name):
-                picture_name = get_valid_name(picture_name)
-                note['picture_name'] = '<img src="%s" />' % picture_name
-    if word.get('scr'):
-        note['transcription'] = '[' + word['scr'] + ']'
-    sound_url = word.get('pron')
+    '''
+
+    if word.get('transcription'):
+        note['transcription'] = '[' + word['transcription'] + ']'
+    sound_url = word.get('pronunciation')
     if sound_url:
         sound_name = sound_url.split('/')[-1]
         sound_name = get_valid_name(sound_name)
@@ -166,7 +160,7 @@ def add_word(word, model):
     note = notes.Note(collection, model)
     note = fill_note(word, note)
     # TODO: Rewrite to use is_duplicate()
-    word_value = word.get('wd') if word.get('wd') else 'NO_WORD_VALUE'
+    word_value = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
     dupes = collection.findDupes("en", word_value)
     # a hack to support words with apostrophes
     note_dupes1 = collection.findNotes("en:'%s'" % word_value)
@@ -202,11 +196,12 @@ def is_duplicate(word):
     :return: bool
     """
     collection = mw.col
-    dupes = collection.findDupes("en", word['wd'])
+    word_value = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
+    dupes = collection.findDupes("en", word_value)
     # a hack to support words with apostrophes
     # TODO: Debug to find out if it is still required
-    note_dupes1 = collection.findNotes("en:'%s'" % word['wd'])
-    note_dupes2 = collection.findNotes('en:"%s"' % word['wd'])
+    note_dupes1 = collection.findNotes("en:'%s'" % word_value)
+    note_dupes2 = collection.findNotes('en:"%s"' % word_value)
     note_dupes = note_dupes1 + note_dupes2
     return True if dupes or note_dupes else False
 
@@ -217,6 +212,8 @@ def is_valid_ascii(url):
     After the LinguaLeo update some images
     have broken links with cyrillic characters
     """
+    if url == '':
+        return True
     try:
         url.encode('ascii')
     except:

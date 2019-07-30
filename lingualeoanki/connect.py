@@ -79,7 +79,8 @@ class Lingualeo(QObject):
             return None
         try:
             url = 'mobile-api.lingualeo.com/GetWordSets'
-            values = {'request': [{'type': 'user', 'perPage': 999, 'sortBy': 'created'}]}
+            values = {'apiVersion': '1.0.0',
+                      'request': [{'type': 'user', 'perPage': 999, 'sortBy': 'created'}]}
             all_wordsets = self.get_content_new(url, values)['data'][0]['items']
             wordsets = []
             # Add only non-empty dictionaries
@@ -112,8 +113,14 @@ class Lingualeo(QObject):
         if not self.get_connection():
             return None
         try:
-            words = self.get_words(status, wordsets)
+            words = []
+            if not wordsets:
+                words = self.get_words(status, None)
+            else:
+                for wordset in wordsets:
+                    words += self.get_words(status, wordset)
             self.save_cookies()
+            # print("Found {} words".format(len(words)))
         except (urllib.error.URLError, socket.error):
             self.msg = "Can't download words. Problem with internet connection."
         except ValueError:
@@ -128,45 +135,74 @@ class Lingualeo(QObject):
 
         return words
 
-    def get_words(self, status, wordsets):
+    def get_words(self, status, wordset):
         """
         Get words either from main ('my') vocabulary or from user's dictionaries (wordsets)
+        Response data consists of word groups that are separated by date.
+        Each word group has:
+        groupCount - number of words in the group,
+        groupName - name of the group, like 'new' or 'year_2' (stands for 2 years ago),
+        words - list of words (not more than PER_PAGE)
         :param status: progress status of the word: 'all', 'new', 'learning', learned'
-        :param wordsets: List of wordset ids, or None to download all words (from main dictionary)
+        :param wordset: A wordset, or None to download all words (from main dictionary)
         :return: list of words, where each word is a dict
         """
         url = 'mobile-api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
-        PER_PAGE = 30
-        values = {'perPage': PER_PAGE, 'page': 1, 'status': status}
-        pages = 0
+        PER_PAGE = 100
+        values = {'apiVersion': '1.0.1', 'api_call': 'GetWords',
+                  'dateGroup': 'start', 'mode': 'basic',
+                  'perPage': PER_PAGE, 'status': status}
+        # New API requires list of attributes
+        values.update(ATTRIBUTE_LIST)
+        # ID of the main (my) dictionary is 1
+        values['wordSetId'] = wordset.get('id') if wordset else 1
 
-        if wordsets:
-            wordset_ids = []
-            # Since words can repeat in the wordsets, we calculate upper bound
-            max_words = 0
-            for wordset in wordsets:
-                wordset_ids.append(wordset['id'])
-                max_words += wordset['cw'] if 'cw' in wordset else wordset['countWords']
-            values['wordSetIds'] = wordset_ids
-            pages = max_words // PER_PAGE + 1
+        words = []
+        date_group = 'start'
+        offset = {}
 
-        response = self.get_content_new(url, values)
-        words = response['data']
+        words_received = 0
+        total = 0
+        extra_date_group = date_group  # to get into the while loop
 
-        if not wordsets:
-            # Calculate total number of pages since each response contains PER_PAGE words only
-            pages = response['wordSet']['countWords'] // PER_PAGE + 1
-
-        # Continue getting the words starting from the second page
-        for page in range(2, pages + 1):
-            values['page'] = page
-            next_chunk = self.get_content_new(url, values)['data']
-            if next_chunk:
-                words += next_chunk
+        # Request the words until
+        while words_received > 0 or extra_date_group:
+            if words_received == 0 and extra_date_group:
+                values['dateGroup'] = extra_date_group
+                values['offset'] = {}
+                extra_date_group = None
             else:
-                # Empty page, there are no more words
-                return words
+                values['dateGroup'] = date_group
+                values['offset'] = offset
+            response = self.get_content_new(url, values)
+            word_groups = response.get('data')
+            if response.get('error') or not word_groups:
+                raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
+                                + response.get('error'))
+            words_received = 0
+            for word_group in word_groups:
+                word_chunk = word_group.get('words')
+                if word_chunk:
+                    words += word_chunk
+                    words_received += len(word_chunk)
+                    date_group = word_group.get('groupName')
+                    offset['wordId'] = word_group.get('words')[-1].get('id')
+                elif words_received > 0:
+                    ''' 
+                    If the next word_chunk is empty, and we completed the previous, 
+                    next response should be to the next group
+                    '''
+                    if words_received < PER_PAGE:
+                        date_group = word_group.get('groupName')
+                        extra_date_group = None
+                        offset = {}
+                    else:  # words_received == PER_PAGE
+                        '''We either need to continue with this group or try the next'''
+                        extra_date_group = word_group.get('groupName')
+                    break
+            total += words_received
+            # print('Received {} words. Total: {}.'.format(words_received, total))
         return words
 
     def save_cookies(self):
@@ -188,8 +224,7 @@ class Lingualeo(QObject):
         """
         A new API method to request content
         """
-        values = {'apiVersion': '1.0.0',
-                  'token': self.get_token()}
+        values = {'token': self.get_token()}
         values.update(more_values)
         full_url = self.url_prefix + url
         json_data = json.dumps(values)
@@ -274,10 +309,10 @@ class Download(QThread):
         for word in self.words:
             self.Word.emit(word)
             try:
-                # print('Downloading media for word: {}'.format(word.get('wd')))
+                # print('Downloading media for word: {}'.format(word.get('wordValue')))
                 utils.send_to_download(word, self)
             except (urllib.error.URLError, socket.error):
-                problem_words.append(word.get('wd'))
+                problem_words.append(word.get('wordValue'))
             counter += 1
             self.Counter.emit(counter)
         self.FinalCounter.emit(counter)
@@ -296,3 +331,29 @@ class Download(QThread):
             error_msg += problem_word + ', '
         error_msg += problem_words[-1] + '.'
         self.Error.emit(error_msg)
+
+
+ATTRIBUTE_LIST = {"attrList":
+                      {
+                          "id": "id",
+                          "wordValue": "wd",
+                          "origin": "wo",
+                          "wordType": "wt",
+                          "translations": "trs",
+                          "wordSets": "ws",
+                          "created": "cd",
+                          "learningStatus": "ls",
+                          "progress": "pi",
+                          "transcription": "scr",
+                          "pronunciation": "pron",
+                          "relatedWords": "rw",
+                          "association": "as",
+                          "trainings": "trainings",
+                          "listWordSets": "listWordSets",
+                          "combinedTranslation": "trc",
+                          "picture": "pic",
+                          "speechPartId": "pid",
+                          "wordLemmaId": "lid",
+                          "wordLemmaValue": "lwd"
+                      }
+}

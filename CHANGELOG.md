@@ -21,11 +21,18 @@ Section to track upcoming changes
 - Improve error messages by narrowing down the reason.
 
 ##### Import:
-- Import more than one translation (allow user to choose how many translations to import).
 - Add user dictionaries (wordsets) as tags.
 - Save problem words in json format and ask to retry downloading only them.
 - Update not only media, but also translation(s), context, tags.
 - Improve duplicate search to automatically update notes when any information was changed.
+
+## [2.1.5] - 2019-07-30
+### Added
+- Show combined translations (as in the web version).
+- Moved to a new API.
+
+### Removed
+- Currently, word context is not downloaded. (Will be back in the future versions)
 
 ## [2.1.4] - 2019-07-12
 ### Changed
@@ -127,11 +134,18 @@ Section to track upcoming changes
 - Уточнить сообщения об ошибках.
 
 ##### Загрузка слов:
-- Импортировать более одного перевода для слова (добавить соответствующую опцию в окне конфигурации).
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.1.5] - 2019-07-30
+### Добавлено
+- Импорт всех выбранных переводов для слова (так же как на сайте Lingualeo).
+- Из-за обновлений на сервере пришлось снова переехать на новый API.
+
+### Removed
+- На данный момент контекст слова не загружается. (Вернётся в следующих версиях)
 
 ## [2.1.4] - 2019-07-12
 ### Изменено
