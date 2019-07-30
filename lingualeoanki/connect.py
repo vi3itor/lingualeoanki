@@ -139,8 +139,6 @@ class Lingualeo(QObject):
         url = 'mobile-api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
         PER_PAGE = 30
-        values = {'perPage': PER_PAGE, 'page': 1, 'status': status}
-        pages = 0
 
         if wordsets:
             wordset_ids = []
@@ -165,6 +163,11 @@ class Lingualeo(QObject):
             next_chunk = self.get_content_new(url, values)['data']
             if next_chunk:
                 words += next_chunk
+        values = {'apiVersion': '1.0.1', 'api_call': 'GetWords',
+                  'dateGroup': 'start', 'mode': 'basic',
+                  'perPage': PER_PAGE, 'status': status}
+        # New API requires list of attributes
+        values.update(ATTRIBUTE_LIST)
             else:
                 # Empty page, there are no more words
                 return words
