@@ -137,6 +137,11 @@ class Lingualeo(QObject):
     def get_words(self, status, wordset):
         """
         Get words either from main ('my') vocabulary or from user's dictionaries (wordsets)
+        Response data consists of word groups that are separated by date.
+        Each word group has:
+        groupCount - number of words in the group,
+        groupName - name of the group, like 'new' or 'year_2' (stands for 2 years ago),
+        words - list of words (not more than PER_PAGE)
         :param status: progress status of the word: 'all', 'new', 'learning', learned'
         :param wordset: A wordset, or None to download all words (from main dictionary)
         :return: list of words, where each word is a dict
@@ -144,20 +149,6 @@ class Lingualeo(QObject):
         url = 'mobile-api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
         PER_PAGE = 30
-
-        response = self.get_content_new(url, values)
-        words = response['data']
-
-        if not wordsets:
-            # Calculate total number of pages since each response contains PER_PAGE words only
-            pages = response['wordSet']['countWords'] // PER_PAGE + 1
-
-        # Continue getting the words starting from the second page
-        for page in range(2, pages + 1):
-            values['page'] = page
-            next_chunk = self.get_content_new(url, values)['data']
-            if next_chunk:
-                words += next_chunk
         values = {'apiVersion': '1.0.1', 'api_call': 'GetWords',
                   'dateGroup': 'start', 'mode': 'basic',
                   'perPage': PER_PAGE, 'status': status}
@@ -165,9 +156,51 @@ class Lingualeo(QObject):
         values.update(ATTRIBUTE_LIST)
         # ID of the main (my) dictionary is 1
         values['wordSetId'] = wordset.get('id') if wordset else 1
+
+        words = []
+        date_group = 'start'
+        offset = {}
+
+        words_received = 0
+        total = 0
+        extra_date_group = date_group  # to get into the while loop
+
+        # Request the words until
+        while words_received > 0 or extra_date_group:
+            if words_received == 0 and extra_date_group:
+                values['dateGroup'] = extra_date_group
+                values['offset'] = {}
+                extra_date_group = None
             else:
-                # Empty page, there are no more words
-                return words
+                values['dateGroup'] = date_group
+                values['offset'] = offset
+            response = self.get_content_new(url, values)
+            word_groups = response.get('data')
+            if response.get('error') or not word_groups:
+                raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
+                                + response.get('error'))
+            words_received = 0
+            for word_group in word_groups:
+                word_chunk = word_group.get('words')
+                if word_chunk:
+                    words += word_chunk
+                    words_received += len(word_chunk)
+                    date_group = word_group.get('groupName')
+                    offset['wordId'] = word_group.get('words')[-1].get('id')
+                elif words_received > 0:
+                    ''' 
+                    If the next word_chunk is empty, and we completed the previous, 
+                    next response should be to the next group
+                    '''
+                    if words_received < PER_PAGE:
+                        date_group = word_group.get('groupName')
+                        extra_date_group = None
+                        offset = {}
+                    else:  # words_received == PER_PAGE
+                        '''We either need to continue with this group or try the next'''
+                        extra_date_group = word_group.get('groupName')
+                    break
+            total += words_received
         return words
 
     def save_cookies(self):
