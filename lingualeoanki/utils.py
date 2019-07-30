@@ -123,9 +123,6 @@ def send_to_download(word, thread):
 def fill_note(word, note):
     note['en'] = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
     # print("Filling word {}".format(word['wd']))
-    # TODO: Allow user to collect more than one translation
-    #  see: https://bitbucket.org/alon_kot/lingualeoanki/commits/8a430865d330b37ec688006e1026a39e05d2cc35#chg-lingualeo/utils.py
-    # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
     note['ru'] = word.get('combinedTranslation') if word.get('combinedTranslation') else 'ПЕРЕВОД_ОТСУТСТВУЕТ'
     picture_name = word.get('picture').split('/')[-1] if word.get('picture') else ''
     if is_valid_ascii(picture_name) and \
@@ -137,6 +134,7 @@ def fill_note(word, note):
     #  and get it differently, since with API 1.0.1 it is not possible
     #  to get context at the time of getting list of words
     '''
+    # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
     translations = word.get('translations')
     if translations:  # apparently, there might be no translation
         translation = translations[0]
@@ -216,7 +214,6 @@ def is_valid_ascii(url):
     """
     if url == '':
         return True
-
     try:
         url.encode('ascii')
     except:

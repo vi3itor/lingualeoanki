@@ -149,7 +149,7 @@ class Lingualeo(QObject):
         """
         url = 'mobile-api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
-        PER_PAGE = 30
+        PER_PAGE = 100
         values = {'apiVersion': '1.0.1', 'api_call': 'GetWords',
                   'dateGroup': 'start', 'mode': 'basic',
                   'perPage': PER_PAGE, 'status': status}
