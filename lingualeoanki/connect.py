@@ -113,7 +113,12 @@ class Lingualeo(QObject):
         if not self.get_connection():
             return None
         try:
-            words = self.get_words(status, wordsets)
+            words = []
+            if not wordsets:
+                words = self.get_words(status, None)
+            else:
+                for wordset in wordsets:
+                    words += self.get_words(status, wordset)
             self.save_cookies()
         except (urllib.error.URLError, socket.error):
             self.msg = "Can't download words. Problem with internet connection."
@@ -129,26 +134,16 @@ class Lingualeo(QObject):
 
         return words
 
-    def get_words(self, status, wordsets):
+    def get_words(self, status, wordset):
         """
         Get words either from main ('my') vocabulary or from user's dictionaries (wordsets)
         :param status: progress status of the word: 'all', 'new', 'learning', learned'
-        :param wordsets: List of wordset ids, or None to download all words (from main dictionary)
+        :param wordset: A wordset, or None to download all words (from main dictionary)
         :return: list of words, where each word is a dict
         """
         url = 'mobile-api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
         PER_PAGE = 30
-
-        if wordsets:
-            wordset_ids = []
-            # Since words can repeat in the wordsets, we calculate upper bound
-            max_words = 0
-            for wordset in wordsets:
-                wordset_ids.append(wordset['id'])
-                max_words += wordset['cw'] if 'cw' in wordset else wordset['countWords']
-            values['wordSetIds'] = wordset_ids
-            pages = max_words // PER_PAGE + 1
 
         response = self.get_content_new(url, values)
         words = response['data']
@@ -168,6 +163,8 @@ class Lingualeo(QObject):
                   'perPage': PER_PAGE, 'status': status}
         # New API requires list of attributes
         values.update(ATTRIBUTE_LIST)
+        # ID of the main (my) dictionary is 1
+        values['wordSetId'] = wordset.get('id') if wordset else 1
             else:
                 # Empty page, there are no more words
                 return words
