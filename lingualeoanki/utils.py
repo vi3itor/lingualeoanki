@@ -106,6 +106,7 @@ def send_to_download(word, thread):
         exc_happened = None
         if not is_valid_ascii(pic_url):
             raise urllib.error.URLError('Invalid picture url: ' + pic_url)
+        # TODO: Remove https check
         picture_url = pic_url if pic_url.startswith('https:') else 'https:' + pic_url
         for i in list(range(NUM_RETRIES)):
             exc_happened = None

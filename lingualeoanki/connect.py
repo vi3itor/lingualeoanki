@@ -120,6 +120,7 @@ class Lingualeo(QObject):
                 for wordset in wordsets:
                     words += self.get_words(status, wordset)
             self.save_cookies()
+            # print("Found {} words".format(len(words)))
         except (urllib.error.URLError, socket.error):
             self.msg = "Can't download words. Problem with internet connection."
         except ValueError:
@@ -201,6 +202,7 @@ class Lingualeo(QObject):
                         extra_date_group = word_group.get('groupName')
                     break
             total += words_received
+            # print('Received {} words. Total: {}.'.format(words_received, total))
         return words
 
     def save_cookies(self):
@@ -307,7 +309,7 @@ class Download(QThread):
         for word in self.words:
             self.Word.emit(word)
             try:
-                # print('Downloading media for word: {}'.format(word.get('wd')))
+                # print('Downloading media for word: {}'.format(word.get('wordValue')))
                 utils.send_to_download(word, self)
             except (urllib.error.URLError, socket.error):
                 problem_words.append(word.get('wordValue'))
