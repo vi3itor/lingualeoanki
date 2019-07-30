@@ -296,3 +296,29 @@ class Download(QThread):
             error_msg += problem_word + ', '
         error_msg += problem_words[-1] + '.'
         self.Error.emit(error_msg)
+
+
+ATTRIBUTE_LIST = {"attrList":
+                      {
+                          "id": "id",
+                          "wordValue": "wd",
+                          "origin": "wo",
+                          "wordType": "wt",
+                          "translations": "trs",
+                          "wordSets": "ws",
+                          "created": "cd",
+                          "learningStatus": "ls",
+                          "progress": "pi",
+                          "transcription": "scr",
+                          "pronunciation": "pron",
+                          "relatedWords": "rw",
+                          "association": "as",
+                          "trainings": "trainings",
+                          "listWordSets": "listWordSets",
+                          "combinedTranslation": "trc",
+                          "picture": "pic",
+                          "speechPartId": "pid",
+                          "wordLemmaId": "lid",
+                          "wordLemmaValue": "lwd"
+                      }
+}
