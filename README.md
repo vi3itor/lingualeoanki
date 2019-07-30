@@ -13,12 +13,13 @@ The add-on downloads your dictionary words from [LinguaLeo][3] - another great r
 [LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
 ### Notice on recent update of LinguaLeo 
-The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. Current version of add-on (2.1.4) is fully compatible with the update. If you find some problems with your words, translations or pictures, please check on [Lingualeo][3] first. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
+The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. As of July 30, 2019 they are still experimenting and changing API from time to time. Current version of add-on (2.1.5) is fully compatible with the update, except of downloading context for the word. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on [Lingualeo][3] first and write to the support. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
 
 ### New in version 2.1:
 #### Added
-- Updated to a new API because of LinguaLeo update on 30.04.2019.
+- Updated to a new API because of Lingualeo update. And again.
 - Added option (radiobutton) for downloading "New" words.
+- Show combined translations (as in the web version).
 
 #### Changed
 - Renamed "Studied" and "Unstudied" options to "Learned" and "Learning".
@@ -30,10 +31,11 @@ The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. Cu
 - Fixed import error when there is no translation for the word (or phrase).
 - Fixed import error for words without a transcription.
 - Fixed import error for words with broken media links.
-- Stop downloading a default picture for the translations without pictures.
+- Stop downloading a default picture for the words without pictures.
 
 #### Removed
 - Protocol setting in config, since LinguaLeo doesn't work with http anymore. 
+- Currently, word context is not downloaded. (Will be back in the future versions)
 
 ### New in version 2.0:
 #### Added
@@ -101,7 +103,7 @@ When finished press the "Exit" button.
 
 ### Additional
 
-To rate this add-on and leave feedback, go to [its page][9], log in to your AnkiWeb account in top right corner and click "Rate this." If you'd like to see a new feature or found a bug, please, don't leave a comment on the add-on's page, instead copy an error message and [create an issue on GitHub][10], or send me an email to 4yourquestions [at] gmail.com. 
+To rate this add-on and leave feedback, go to [its page][9], log in to your AnkiWeb account in the top right corner and click "Rate this." If you'd like to see a new feature or found a bug, please, don't leave a comment on the add-on's page, instead copy an error message and [create an issue on GitHub][10], or send me an email to 4yourquestions [at] gmail.com. 
 
 #### Features expected to appear in next releases:
 
@@ -116,8 +118,7 @@ To rate this add-on and leave feedback, go to [its page][9], log in to your Anki
    - show number of words in progress bar. 
 - Improve error messages by narrowing down the reason.
 
-##### Import :
-- Import more than one translation (allow user to choose how many translations to import).
+##### Import:
 - Add user dictionaries (wordsets) as tags.
 - Save problem words in json format and ask to retry downloading problem words only.
 - Update not only media, but also translation(s), context, tags.
@@ -154,12 +155,13 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [ЛингваЛео][3] имеет удобный интерфейс для добавления новых слов и неплохое [расширение для браузера][4] для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких [тренировок][5], Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.
 
 ### Внимание! Обновление Lingualeo 30.04.2019
-В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. В актуальной версия дополнения (2.1.4) полностью восстановлена его работа. Если вы заметили, что ваши слова, их переводы и картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3]. Если же проблема в аддоне - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
+В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. По состоянию на 30 июля 2019 команда Lingualeo по-прежнему продолжает экспериментировать и время от времени изменяет API. В актуальной версии дополнения (2.1.5) восстановлена его работа, за исключением загрузки контекста. Сайт Lingualeo по-прежнему работает нестабильно: не отображает все слова, показывает неверный контекст слов и т.п. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3] и напишите в поддержку. Если же проблема в дополнении - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
 
 ### Новое в версии 2.1:
 ####  Добавлено
-- Аддон переехал на новый API в связи с обновлением LinguaLeo от 30.04.2019.
+- Аддон переехал на новый API в связи с обновлением LinguaLeo. А затем ещё раз.
 - Добавлена опция "New" для загрузки новых слов (как в сервисе LinguaLeo).
+- Импорт всех выбранных переводов для слова (так же как на сайте Lingualeo).
 
 #### Изменено
 - Изменены названия опций "Studied" и "Unstudied" на "Learned" и "Learning" соответственно.
@@ -175,6 +177,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 
 #### Удалено
 - Настройка протокола соединения в конфигурационном файле, так как LinguaLeo больше не работает с http.
+- На данный момент контекст слова не загружается. (Вернётся в следующих версиях)
 
 ### Новое в версии 2.0:
 #### Добавлено
@@ -257,7 +260,6 @@ And to all users who gave valuable comments and feedback and helped to test on d
 - Уточнить сообщения об ошибках.
 
 ##### Загрузка слов:
-- Импортировать более одного перевода для слова (добавить соответствующую опцию в окне конфигурации).
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
@@ -301,8 +303,8 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [21]:	https://github.com/bikenik/alfred-lingualeo
 [22]:	#description
 [23]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
-[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-4.zip
-[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-4.zip
+[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-5.zip
+[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-5.zip
 [26]:   https://bitbucket.org/vkhaustov/lingualeoanki/
 [27]:   https://i.imgur.com/qSwZn5bl.png
 [28]:   #update
