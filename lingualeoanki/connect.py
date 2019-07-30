@@ -79,7 +79,8 @@ class Lingualeo(QObject):
             return None
         try:
             url = 'mobile-api.lingualeo.com/GetWordSets'
-            values = {'request': [{'type': 'user', 'perPage': 999, 'sortBy': 'created'}]}
+            values = {'apiVersion': '1.0.0',
+                      'request': [{'type': 'user', 'perPage': 999, 'sortBy': 'created'}]}
             all_wordsets = self.get_content_new(url, values)['data'][0]['items']
             wordsets = []
             # Add only non-empty dictionaries
@@ -188,8 +189,7 @@ class Lingualeo(QObject):
         """
         A new API method to request content
         """
-        values = {'apiVersion': '1.0.0',
-                  'token': self.get_token()}
+        values = {'token': self.get_token()}
         values.update(more_values)
         full_url = self.url_prefix + url
         json_data = json.dumps(values)
