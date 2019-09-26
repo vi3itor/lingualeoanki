@@ -16,14 +16,16 @@ def activate():
         addon_window.activateWindow()
         addon_window.raise_()
     else:
-        config = utils.get_config()
-        if config:
-            window = gui.PluginWindow()
-            setattr(mw, ADDON_NAME, window)
-            window.exec_()
-        else:
-            showInfo("Unable to load config. Make sure that config.json "
-                     "is present and not in use by other programs")
+        showInfo("LinguaLeo has changed the API (again). "
+                 "Please wait until I fix the add-on. Thank you!")
+        # config = utils.get_config()
+        # if config:
+        #     window = gui.PluginWindow()
+        #     setattr(mw, ADDON_NAME, window)
+        #     window.exec_()
+        # else:
+        #     showInfo("Unable to load config. Make sure that config.json "
+        #              "is present and not in use by other programs")
 
 
 # create a new menu item
