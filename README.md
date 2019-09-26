@@ -4,7 +4,7 @@
 
 [scroll down for description in Russian (пролистайте вниз для описания на русском языке)][1]
 
-####WARNING: LinguaLeo has changed the API (again). Please wait until I fix the add-on. Thank you!
+#### WARNING: LinguaLeo has changed the API (again). Please wait until I fix the add-on. Thank you!
 
 This is an add-on for [Anki][2] - powerful, intelligent flashcards, that makes remembering things easy via space repetition.
 
