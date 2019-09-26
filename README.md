@@ -4,6 +4,8 @@
 
 [scroll down for description in Russian (пролистайте вниз для описания на русском языке)][1]
 
+####WARNING: LinguaLeo has changed the API (again). Please wait until I fix the add-on. Thank you!
+
 This is an add-on for [Anki][2] - powerful, intelligent flashcards, that makes remembering things easy via space repetition.
 
 The add-on downloads your dictionary words from [LinguaLeo][3] - another great resource to learn English, and transforms them into Anki cards. Both 'English to Russian' and 'Russian to English' cards are created and they include pronunciation sound, image, transcription, and context.
@@ -143,6 +145,8 @@ And to all users who gave valuable comments and feedback and helped to test on d
 
 ##### Russian
 [scroll up for description in English][22]
+
+#### ВНИМАНИЕ: LinguaLeo снова изменили API. Я постараюсь исправить дополнение в течение нескольких дней. Спасибо!
 
 ### Описание
 
