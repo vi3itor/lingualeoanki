@@ -31,7 +31,6 @@ class Lingualeo(QObject):
                     # TODO: Handle corrupt cookies loading
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
-        config = utils.get_config()
         self.url_prefix = 'https://'
         self.msg = ''
         self.tried_ssl_fix = False
@@ -40,7 +39,7 @@ class Lingualeo(QObject):
         try:
             if not self.is_authorized():
                 status = self.auth()
-                if status['error_msg']:
+                if status.get('error_msg'):
                     self.msg = status['error_msg']
         except (urllib.error.URLError, socket.error) as e:
             # TODO: Find better (secure) fix
@@ -78,10 +77,15 @@ class Lingualeo(QObject):
         if not self.get_connection():
             return None
         try:
-            url = 'mobile-api.lingualeo.com/GetWordSets'
+            url = 'api.lingualeo.com/GetWordSets'
             values = {'apiVersion': '1.0.0',
                       'request': [{'type': 'user', 'perPage': 999, 'sortBy': 'created'}]}
             all_wordsets = self.get_content_new(url, values)['data'][0]['items']
+            response = self.get_content_new(url, values)
+            if response.get('error'):
+                raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
+                                + response.get('error').get('message'))
+            all_wordsets = response['data'][0]['items']
             wordsets = []
             # Add only non-empty dictionaries
             for wordset in all_wordsets:
@@ -147,14 +151,17 @@ class Lingualeo(QObject):
         :param wordset: A wordset, or None to download all words (from main dictionary)
         :return: list of words, where each word is a dict
         """
-        url = 'mobile-api.lingualeo.com/GetWords'
+        url = 'api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
-        PER_PAGE = 100
-        values = {'apiVersion': '1.0.1', 'api_call': 'GetWords',
+        PER_PAGE = 30
+        values = {'apiVersion': '1.0.1',
+                  'category': '',
                   'dateGroup': 'start', 'mode': 'basic',
-                  'perPage': PER_PAGE, 'status': status}
+                  'perPage': PER_PAGE,
+                  'search': '', 'status': status,
+                  'ctx': {'config': {'isCheckData': True, 'isLogging': True}}}
         # New API requires list of attributes
-        values.update(ATTRIBUTE_LIST)
+        values.update(WORDS_ATTRIBUTE_LIST)
         # ID of the main (my) dictionary is 1
         values['wordSetId'] = wordset.get('id') if wordset else 1
 
@@ -229,14 +236,16 @@ class Lingualeo(QObject):
         full_url = self.url_prefix + url
         json_data = json.dumps(values)
         data = json_data.encode('utf-8')
-        req = urllib.request.Request(full_url)
-        req.add_header('Content-Type', 'text/plain')
         if self.tried_ssl_fix:
             # Have to do it on MacOS for now
             response = urllib.request.urlopen(req, data=data, context=ssl._create_unverified_context())
         else:
             # Default behavior
             response = urllib.request.urlopen(req, data=data)
+        self.opener.addheaders = [('Content-Type', 'application/json')]
+        self.opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36')]
+        self.opener.addheaders = [('Sec-Fetch-Mode', 'cors')]
+        response = self.opener.open(full_url, data=data)
         return json.loads(response.read())
 
     """
@@ -273,7 +282,7 @@ class Lingualeo(QObject):
             data = url_values.encode('utf-8')
         else:
             data = None
-        full_url = self.url_prefix + url  # + '?' + url_values if url_values else self.url_prefix + url
+        full_url = self.url_prefix + url
         req = self.opener.open(full_url, data=data)
         return json.loads(req.read())
 
@@ -333,27 +342,25 @@ class Download(QThread):
         self.Error.emit(error_msg)
 
 
-ATTRIBUTE_LIST = {"attrList":
-                      {
-                          "id": "id",
-                          "wordValue": "wd",
-                          "origin": "wo",
-                          "wordType": "wt",
-                          "translations": "trs",
-                          "wordSets": "ws",
-                          "created": "cd",
-                          "learningStatus": "ls",
-                          "progress": "pi",
-                          "transcription": "scr",
-                          "pronunciation": "pron",
-                          "relatedWords": "rw",
-                          "association": "as",
-                          "trainings": "trainings",
-                          "listWordSets": "listWordSets",
-                          "combinedTranslation": "trc",
-                          "picture": "pic",
-                          "speechPartId": "pid",
-                          "wordLemmaId": "lid",
-                          "wordLemmaValue": "lwd"
-                      }
+WORDS_ATTRIBUTE_LIST = {"attrList":{"id": "id", "wordValue": "wd", "origin": "wo", "wordType": "wt",
+                                        "translations": "trs", "wordSets": "ws", "created": "cd",
+                                        "learningStatus": "ls", "progress": "pi", "transcription": "scr",
+                                        "pronunciation": "pron", "relatedWords": "rw", "association": "as",
+                                        "trainings": "trainings", "listWordSets": "listWordSets",
+                                        "combinedTranslation": "trc", "picture": "pic", "speechPartId": "pid",
+                                        "wordLemmaId": "lid", "wordLemmaValue": "lwd"}
+
+}
+
+WORDSETS_ATTRIBUTE_LIST = {
+                                "type": "type",
+                                "id": "id",
+                                "name": "name",
+                                "countWords": "cw",
+                                "countWordsLearned": "cl",
+                                "wordSetId": "wordSetId",
+                                "picture": "pic",
+                                "category": "cat",
+                                "status": "st",
+                                "source": "src"
 }
