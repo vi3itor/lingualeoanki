@@ -49,9 +49,6 @@ class Lingualeo(QObject):
             """
             if 'SSL' in str(e.args) and not self.tried_ssl_fix:
                 # Problem with https connection, trying ssl fix
-                # TODO: check if necessary to create empty cookies
-                # self.cj = http_cookiejar.MozillaCookieJar()
-
                 https_handler = urllib.request.HTTPSHandler(context=ssl._create_unverified_context())
                 self.opener = urllib.request.build_opener(https_handler, urllib.request.HTTPCookieProcessor(self.cj))
                 self.tried_ssl_fix = True
@@ -154,16 +151,21 @@ class Lingualeo(QObject):
         url = 'api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
         PER_PAGE = 30
-        values = {'apiVersion': '1.0.1',
-                  'category': '',
-                  'dateGroup': 'start', 'mode': 'basic',
-                  'perPage': PER_PAGE,
-                  'search': '', 'status': status,
-                  'ctx': {'config': {'isCheckData': True, 'isLogging': True}}}
-        # New API requires list of attributes
-        values.update(WORDS_ATTRIBUTE_LIST)
-        # ID of the main (my) dictionary is 1
-        values['wordSetId'] = wordset.get('id') if wordset else 1
+        # values = {'apiVersion': '1.0.1',
+        #          'category': '',
+        #          'dateGroup': 'start', 'mode': 'basic',
+        #          'perPage': PER_PAGE,
+        #          'search': '', 'status': status,
+        #         'ctx': {'config': {'isCheckData': True, 'isLogging': True}}}
+        values = {"apiVersion": "1.0.1", "attrList": WORDS_ATTRIBUTE_LIST,
+                  "category": "", "dateGroup": "start", "mode": "basic", "perPage": PER_PAGE,
+                  "status": status, "wordSetId": wordset.get('id') if wordset else 1,  # ID of the main dictionary is 1
+                  "offset": None, "search": "", "training": None,
+                  "ctx": {"config": {"isCheckData": True, "isLogging": True}}
+                  }
+
+        headers = [('Content-Type', 'application/json'), ('Origin', 'https://lingualeo.com'),
+                   ('Referer', 'https://lingualeo.com/ru/dictionary/vocabulary/my')]
 
         words = []
         date_group = 'start'
@@ -182,7 +184,8 @@ class Lingualeo(QObject):
             else:
                 values['dateGroup'] = date_group
                 values['offset'] = offset
-            response = self.get_content_new(url, values)
+            json_data = json.dumps(values)
+            response = self.get_content_new(url, json_data, headers)
             word_groups = response.get('data')
             if response.get('error') or not word_groups:
                 raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
@@ -216,35 +219,22 @@ class Lingualeo(QObject):
         if hasattr(self, 'cookies_path'):
             self.cj.save(self.cookies_path)
 
-    def get_token(self):
-        if hasattr(self, 'token'):
-            return self.token
-        for cookie in self.cj:
-            if cookie.name == 'remember':
-                self.token = cookie.value
-                return self.token
-
     # Low level methods
     #########################
 
-    def get_content_new(self, url, more_values):
+    def get_content_new(self, url, data, headers):
         """
         A new API method to request content
         """
-        values = {'token': self.get_token()}
-        values.update(more_values)
         full_url = self.url_prefix + url
-        json_data = json.dumps(values)
-        data = json_data.encode('utf-8')
-        if self.tried_ssl_fix:
-            # Have to do it on MacOS for now
-            response = urllib.request.urlopen(req, data=data, context=ssl._create_unverified_context())
-        else:
-            # Default behavior
-            response = urllib.request.urlopen(req, data=data)
-        self.opener.addheaders = [('Content-Type', 'application/json')]
-        self.opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36')]
-        self.opener.addheaders = [('Sec-Fetch-Mode', 'cors')]
+        data = data.encode("utf-8")
+
+        self.opener.addheaders = headers
+        self.opener.addheaders.append(('User-Agent', 'Anki add-on'))
+        self.opener.addheaders.append(('Host', 'lingualeo.com'))
+        self.opener.addheaders.append(('Connection', 'keep-alive'))
+        # self.opener.addheaders.append(('Sec-Fetch-Mode', 'cors'))
+
         response = self.opener.open(full_url, data=data)
         return json.loads(response.read())
 
@@ -264,11 +254,12 @@ class Lingualeo(QObject):
     """
 
     def auth(self):
-        url = 'api.lingualeo.com/api/login'
+        url = 'lingualeo.com/ru/uauth/dispatch'
         values = {'email': self.email, 'password': self.password}
-        content = self.get_content(url, values)
+        data = urllib.parse.urlencode(values)
+        headers = [('Content-Type', 'application/x-www-form-urlencoded')]
+        content = self.get_content_new(url, data, headers)
         self.save_cookies()
-        self.get_token()
         return content
 
     def is_authorized(self):
@@ -342,25 +333,15 @@ class Download(QThread):
         self.Error.emit(error_msg)
 
 
-WORDS_ATTRIBUTE_LIST = {"attrList":{"id": "id", "wordValue": "wd", "origin": "wo", "wordType": "wt",
-                                        "translations": "trs", "wordSets": "ws", "created": "cd",
-                                        "learningStatus": "ls", "progress": "pi", "transcription": "scr",
-                                        "pronunciation": "pron", "relatedWords": "rw", "association": "as",
-                                        "trainings": "trainings", "listWordSets": "listWordSets",
-                                        "combinedTranslation": "trc", "picture": "pic", "speechPartId": "pid",
-                                        "wordLemmaId": "lid", "wordLemmaValue": "lwd"}
+# New API requires list of attributes
+WORDS_ATTRIBUTE_LIST = {"id": "id", "wordValue": "wd", "origin": "wo", "wordType": "wt",
+                        "translations": "trs", "wordSets": "ws", "created": "cd",
+                        "learningStatus": "ls", "progress": "pi", "transcription": "scr",
+                        "pronunciation": "pron", "relatedWords": "rw", "association": "as",
+                        "trainings": "trainings", "listWordSets": "listWordSets",
+                        "combinedTranslation": "trc", "picture": "pic", "speechPartId": "pid",
+                        "wordLemmaId": "lid", "wordLemmaValue": "lwd"}
 
-}
-
-WORDSETS_ATTRIBUTE_LIST = {
-                                "type": "type",
-                                "id": "id",
-                                "name": "name",
-                                "countWords": "cw",
-                                "countWordsLearned": "cl",
-                                "wordSetId": "wordSetId",
-                                "picture": "pic",
-                                "category": "cat",
-                                "status": "st",
-                                "source": "src"
-}
+WORDSETS_ATTRIBUTE_LIST = {"type": "type", "id": "id", "name": "name", "countWords": "cw",
+                           "countWordsLearned": "cl", "wordSetId": "wordSetId", "picture": "pic",
+                           "category": "cat", "status": "st", "source": "src"}
