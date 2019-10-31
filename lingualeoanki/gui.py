@@ -56,7 +56,7 @@ class PluginWindow(QDialog):
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
         self.exitButton.clicked.connect(self.close)
-        self.rbutton_all = QRadioButton("All")
+        self.rbutton_all = QRadioButton("Any")
         self.rbutton_new = QRadioButton("New")
         self.rbutton_learning = QRadioButton("Learning")
         self.rbutton_learned = QRadioButton("Learned")
