@@ -144,28 +144,21 @@ class Lingualeo(QObject):
         groupCount - number of words in the group,
         groupName - name of the group, like 'new' or 'year_2' (stands for 2 years ago),
         words - list of words (not more than PER_PAGE)
-        :param status: progress status of the word: 'all', 'new', 'learning', learned'
+        :param status: progress status of the word: 'all', 'new', 'learning', 'learned'
         :param wordset: A wordset, or None to download all words (from main dictionary)
         :return: list of words, where each word is a dict
         """
         url = 'api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
         PER_PAGE = 30
-        # values = {'apiVersion': '1.0.1',
-        #          'category': '',
-        #          'dateGroup': 'start', 'mode': 'basic',
-        #          'perPage': PER_PAGE,
-        #          'search': '', 'status': status,
-        #         'ctx': {'config': {'isCheckData': True, 'isLogging': True}}}
         values = {"apiVersion": "1.0.1", "attrList": WORDS_ATTRIBUTE_LIST,
-                  "category": "", "dateGroup": "start", "mode": "basic", "perPage": PER_PAGE,
-                  "status": status, "wordSetId": wordset.get('id') if wordset else 1,  # ID of the main dictionary is 1
+                  "category": "", "dateGroup": "start", "mode": "basic", "perPage": PER_PAGE, "status": status,
+                  "wordSetId": wordset.get('id') if wordset else 1,  # ID of the main dictionary is 1
                   "offset": None, "search": "", "training": None,
                   "ctx": {"config": {"isCheckData": True, "isLogging": True}}
                   }
 
-        headers = [('Content-Type', 'application/json'), ('Origin', 'https://lingualeo.com'),
-                   ('Referer', 'https://lingualeo.com/ru/dictionary/vocabulary/my')]
+        headers = {'Content-Type': 'application/json'}
 
         words = []
         date_group = 'start'
@@ -179,7 +172,6 @@ class Lingualeo(QObject):
         while words_received > 0 or extra_date_group:
             if words_received == 0 and extra_date_group:
                 values['dateGroup'] = extra_date_group
-                values['offset'] = {}
                 extra_date_group = None
             else:
                 values['dateGroup'] = date_group
@@ -229,13 +221,12 @@ class Lingualeo(QObject):
         full_url = self.url_prefix + url
         data = data.encode("utf-8")
 
-        self.opener.addheaders = headers
-        self.opener.addheaders.append(('User-Agent', 'Anki add-on'))
-        self.opener.addheaders.append(('Host', 'lingualeo.com'))
-        self.opener.addheaders.append(('Connection', 'keep-alive'))
-        # self.opener.addheaders.append(('Sec-Fetch-Mode', 'cors'))
+        req = urllib.request.Request(full_url, data, headers)
+        req.add_header('User-Agent', 'Anki-Add-on')
+        # req.add_header('Host', 'lingualeo.com')
+        req.add_header('Connection', 'keep-alive')
 
-        response = self.opener.open(full_url, data=data)
+        response = self.opener.open(req)
         return json.loads(response.read())
 
     """
@@ -257,7 +248,7 @@ class Lingualeo(QObject):
         url = 'lingualeo.com/ru/uauth/dispatch'
         values = {'email': self.email, 'password': self.password}
         data = urllib.parse.urlencode(values)
-        headers = [('Content-Type', 'application/x-www-form-urlencoded')]
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         content = self.get_content_new(url, data, headers)
         self.save_cookies()
         return content
@@ -274,8 +265,8 @@ class Lingualeo(QObject):
         else:
             data = None
         full_url = self.url_prefix + url
-        req = self.opener.open(full_url, data=data)
-        return json.loads(req.read())
+        response = self.opener.open(full_url, data=data)
+        return json.loads(response.read())
 
     # TODO: Add processing of http status codes in exceptions,
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
