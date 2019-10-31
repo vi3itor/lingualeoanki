@@ -76,23 +76,21 @@ class Lingualeo(QObject):
         try:
             url = 'api.lingualeo.com/GetWordSets'
             values = {'apiVersion': '1.0.0',
-                      'request': [{'type': 'user', 'perPage': 999, 'sortBy': 'created'}]}
-            all_wordsets = self.get_content_new(url, values)['data'][0]['items']
-            response = self.get_content_new(url, values)
-            if response.get('error'):
+                      'request': [{'subOp': 'myAll', 'type': 'user', 'perPage': 999,
+                                   'attrList': WORDSETS_ATTRIBUTE_LIST, 'sortBy': 'created'}],
+                      "ctx": {"config": {"isCheckData": True, "isLogging": True}}
+                      }
+            headers = {'Content-Type': 'application/json'}
+            json_data = json.dumps(values)
+            response = self.get_content(url, json_data, headers)
+            if response.get('error') or not response.get('data'):
                 raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
                                 + response.get('error').get('message'))
             all_wordsets = response['data'][0]['items']
             wordsets = []
             # Add only non-empty dictionaries
             for wordset in all_wordsets:
-                """
-                Apparently, first dictionary has attribute 'countWords', 
-                while others has attribute 'cw'
-                """
-                if 'cw' in wordset and wordset['cw'] != 0:
-                    wordsets.append(wordset.copy())
-                elif 'countWords' in wordset and wordset['countWords'] != 0:
+                if wordset.get('countWords') and wordset['countWords'] != 0:
                     wordsets.append(wordset.copy())
             self.save_cookies()
             if not wordsets:
@@ -113,8 +111,8 @@ class Lingualeo(QObject):
     def get_words_to_add(self, status, wordsets=None):
         if not self.get_connection():
             return None
+        words = []
         try:
-            words = []
             if not wordsets:
                 words = self.get_words(status, None)
             else:
@@ -150,7 +148,7 @@ class Lingualeo(QObject):
         """
         url = 'api.lingualeo.com/GetWords'
         # TODO: Move parameter to config?
-        PER_PAGE = 30
+        PER_PAGE = 100
         values = {"apiVersion": "1.0.1", "attrList": WORDS_ATTRIBUTE_LIST,
                   "category": "", "dateGroup": "start", "mode": "basic", "perPage": PER_PAGE, "status": status,
                   "wordSetId": wordset.get('id') if wordset else 1,  # ID of the main dictionary is 1
@@ -168,6 +166,7 @@ class Lingualeo(QObject):
         total = 0
         extra_date_group = date_group  # to get into the while loop
 
+        # TODO: Refactor while loop below?
         # Request the words until
         while words_received > 0 or extra_date_group:
             if words_received == 0 and extra_date_group:
@@ -177,7 +176,7 @@ class Lingualeo(QObject):
                 values['dateGroup'] = date_group
                 values['offset'] = offset
             json_data = json.dumps(values)
-            response = self.get_content_new(url, json_data, headers)
+            response = self.get_content(url, json_data, headers)
             word_groups = response.get('data')
             if response.get('error') or not word_groups:
                 raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
@@ -214,17 +213,36 @@ class Lingualeo(QObject):
     # Low level methods
     #########################
 
-    def get_content_new(self, url, data, headers):
+    def auth(self):
+        url = 'lingualeo.com/ru/uauth/dispatch'
+        values = {'email': self.email, 'password': self.password}
+        data = urllib.parse.urlencode(values)
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        content = self.get_content(url, data, headers)
+        self.save_cookies()
+        return content
+
+    def is_authorized(self):
+        url = 'api.lingualeo.com/api/isauthorized'
+        full_url = self.url_prefix + url
+        response = self.opener.open(full_url)
+        status = json.loads(response.read()).get('is_authorized')
+        return status
+
+    def get_content(self, url, data, headers):
         """
-        A new API method to request content
+        A method to request content using new API
+        :param url:
+        :param data: either json or urlencoded data
+        :param headers: dic
+        :return: json
         """
         full_url = self.url_prefix + url
         data = data.encode("utf-8")
 
+        # We have to create a request object, because urllibopener won't change default headers
         req = urllib.request.Request(full_url, data, headers)
-        req.add_header('User-Agent', 'Anki-Add-on')
-        # req.add_header('Host', 'lingualeo.com')
-        req.add_header('Connection', 'keep-alive')
+        req.add_header('User-Agent', 'Anki Add-on')
 
         response = self.opener.open(req)
         return json.loads(response.read())
@@ -239,34 +257,6 @@ class Lingualeo(QObject):
         # print(r.status_code)
         return r.json()
     """
-
-    """
-    OLD API Methods. Used for authorization
-    """
-
-    def auth(self):
-        url = 'lingualeo.com/ru/uauth/dispatch'
-        values = {'email': self.email, 'password': self.password}
-        data = urllib.parse.urlencode(values)
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        content = self.get_content_new(url, data, headers)
-        self.save_cookies()
-        return content
-
-    def is_authorized(self):
-        url = 'api.lingualeo.com/api/isauthorized'
-        status = self.get_content(url, None)['is_authorized']
-        return status
-
-    def get_content(self, url, values):
-        if values:
-            url_values = urllib.parse.urlencode(values)
-            data = url_values.encode('utf-8')
-        else:
-            data = None
-        full_url = self.url_prefix + url
-        response = self.opener.open(full_url, data=data)
-        return json.loads(response.read())
 
     # TODO: Add processing of http status codes in exceptions,
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
