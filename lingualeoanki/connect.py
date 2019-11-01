@@ -78,8 +78,7 @@ class Lingualeo(QObject):
             values = {'apiVersion': '1.0.0',
                       'request': [{'subOp': 'myAll', 'type': 'user', 'perPage': 999,
                                    'attrList': WORDSETS_ATTRIBUTE_LIST, 'sortBy': 'created'}],
-                      "ctx": {"config": {"isCheckData": True, "isLogging": True}}
-                      }
+                      'ctx': {'config': {'isCheckData': True, 'isLogging': True}}}
             headers = {'Content-Type': 'application/json'}
             json_data = json.dumps(values)
             response = self.get_content(url, json_data, headers)
@@ -122,7 +121,6 @@ class Lingualeo(QObject):
                         if is_word_unique(word, words):
                             words.append(word)
             self.save_cookies()
-            # print("Found {} words".format(len(words)))
         except (urllib.error.URLError, socket.error):
             self.msg = "Can't download words. Problem with internet connection."
         except ValueError:
@@ -150,23 +148,19 @@ class Lingualeo(QObject):
         :return: list of words, where each word is a dict
         """
         url = 'api.lingualeo.com/GetWords'
+        headers = {'Content-Type': 'application/json'}
         # TODO: Move parameter to config?
         PER_PAGE = 100
-        values = {"apiVersion": "1.0.1", "attrList": WORDS_ATTRIBUTE_LIST,
-                  "category": "", "dateGroup": "start", "mode": "basic", "perPage": PER_PAGE, "status": status,
-                  "wordSetId": wordset.get('id') if wordset else 1,  # ID of the main dictionary is 1
-                  "offset": None, "search": "", "training": None,
-                  "ctx": {"config": {"isCheckData": True, "isLogging": True}}
-                  }
-
-        headers = {'Content-Type': 'application/json'}
-
-        words = []
         date_group = 'start'
         offset = {}
+        values = {"apiVersion": "1.0.1", "attrList": WORDS_ATTRIBUTE_LIST,
+                  "category": "", "dateGroup": date_group, "mode": "basic", "perPage": PER_PAGE, "status": status,
+                  "wordSetId": wordset.get('id') if wordset else 1,  # ID of the main dictionary is 1
+                  "offset": offset, "search": "", "training": None,
+                  "ctx": {"config": {"isCheckData": True, "isLogging": True}}}
 
+        words = []
         words_received = 0
-        total = 0
         extra_date_group = date_group  # to get into the while loop
 
         # TODO: Refactor while loop below?
@@ -205,8 +199,6 @@ class Lingualeo(QObject):
                         '''We either need to continue with this group or try the next'''
                         extra_date_group = word_group.get('groupName')
                     break
-            total += words_received
-            # print('Received {} words. Total: {}.'.format(words_received, total))
         return words
 
     def save_cookies(self):
@@ -260,7 +252,6 @@ class Lingualeo(QObject):
         # print(r.status_code)
         return r.json()
     """
-
     # TODO: Add processing of http status codes in exceptions,
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
 
