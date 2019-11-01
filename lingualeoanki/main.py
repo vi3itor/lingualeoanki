@@ -16,20 +16,18 @@ def activate():
         addon_window.activateWindow()
         addon_window.raise_()
     else:
-        showInfo("LinguaLeo has changed the API (again). "
-                 "Please wait until I fix the add-on. Thank you!")
-        # config = utils.get_config()
-        # if config:
-        #     window = gui.PluginWindow()
-        #     setattr(mw, ADDON_NAME, window)
-        #     window.exec_()
-        # else:
-        #     showInfo("Unable to load config. Make sure that config.json "
-        #              "is present and not in use by other programs")
+        config = utils.get_config()
+        if config:
+            window = gui.PluginWindow()
+            setattr(mw, ADDON_NAME, window)
+            window.exec_()
+        else:
+            showInfo("Unable to load config. Make sure that config.json "
+                     "is present and not in use by other applications")
 
 
 # create a new menu item
-action = QAction("Import From LinguaLeo", mw)
+action = QAction("Import from LinguaLeo", mw)
 # set it to call a function when it's clicked
 action.triggered.connect(activate)
 # and add it to the tools menu
