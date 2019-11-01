@@ -10,6 +10,7 @@ from . import connect
 from . import utils
 from . import styles
 from ._name import ADDON_NAME
+from ._version import VERSION
 
 
 # TODO: Make Russian localization
@@ -24,7 +25,9 @@ class PluginWindow(QDialog):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('Import from LinguaLeo')
+        message = utils.get_version_update_notification(VERSION)
+        title = 'Import from LinguaLeo (version {})'.format(VERSION) if not message else message
+        self.setWindowTitle(title)
 
         # Window Icon
         if pm.system() == 'Windows':

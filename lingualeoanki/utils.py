@@ -306,3 +306,22 @@ def update_config(config):
         except:
             # TODO: Improve error handling
             pass
+
+
+def get_version_update_notification(version_in_memory):
+    """
+    When a user updates add-on using Anki's built-in add-on manager,
+    they need to restart Anki for changes to take effect.
+    Loads add-on version from the file and compares with one in the memory.
+    If they differ, notify user to restart Anki.
+    :return: str with notification message or None
+    """
+    version_prefix = 'VERSION = '
+    version_file = os.path.join(get_addon_dir(), '_version.py')
+    with open(version_file, 'r') as f:
+        for line in f:
+            if line.startswith(version_prefix):
+                version_in_file = line.split('\'')[-2]
+                if version_in_file != version_in_memory:
+                    return 'Restart Anki to update Add-on'
+    return None
