@@ -117,7 +117,10 @@ class Lingualeo(QObject):
                 words = self.get_words(status, None)
             else:
                 for wordset in wordsets:
-                    words += self.get_words(status, wordset)
+                    received_words = self.get_words(status, wordset)
+                    for word in received_words:
+                        if is_word_unique(word, words):
+                            words.append(word)
             self.save_cookies()
             # print("Found {} words".format(len(words)))
         except (urllib.error.URLError, socket.error):
@@ -260,6 +263,20 @@ class Lingualeo(QObject):
 
     # TODO: Add processing of http status codes in exceptions,
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
+
+
+def is_word_unique(check_word, words):
+    """
+    Helper function to test if a check_word doesn't appear in the list of words.
+    Used for filtering out repeating words while downloading from multiple wordsets.
+    :param check_word: dict
+    :param words: list of dict
+    :return: bool
+    """
+    for word in words:
+        if word['id'] == check_word['id']:
+            return False
+    return True
 
 
 class Download(QThread):
