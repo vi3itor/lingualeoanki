@@ -31,6 +31,7 @@ class Lingualeo(QObject):
                     # TODO: Handle corrupt cookies loading
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+        self.use_old_api = True
         self.url_prefix = 'https://'
         self.msg = ''
         self.tried_ssl_fix = False
@@ -112,7 +113,10 @@ class Lingualeo(QObject):
             return None
         words = []
         try:
-            if not wordsets:
+            if self.use_old_api:
+                wordset_ids = [wordset.get('id') for wordset in wordsets] if wordsets else [1]
+                words = self.get_words_old_api(status, wordset_ids)
+            elif not wordsets:  # for New API
                 words = self.get_words(status, None)
             else:
                 for wordset in wordsets:
@@ -158,6 +162,7 @@ class Lingualeo(QObject):
                   "wordSetId": wordset.get('id') if wordset else 1,  # ID of the main dictionary is 1
                   "offset": offset, "search": "", "training": None,
                   "ctx": {"config": {"isCheckData": True, "isLogging": True}}}
+        # TODO: Remove ctx parameter from values?
 
         words = []
         words_received = 0
