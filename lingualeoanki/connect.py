@@ -201,6 +201,33 @@ class Lingualeo(QObject):
                     break
         return words
 
+    def get_words_old_api(self, status, wordset_ids):
+        """
+        This temporary function is to support old API until LinguaLeo fixes all issues with new API:
+        currently a lot of words aren't seen in the Web interface (and can't be downloaded with call to new API)
+        :param status: progress status of the word: 'all', 'new', 'learning', 'learned'
+        :param wordset_ids: list of ids for wordsets ([1] to download all words from main dictionary)
+        :return: list of words, where each word is a dict
+        """
+        url = 'api.lingualeo.com/GetWords'
+        headers = {'Content-Type': 'application/json'}
+        PER_PAGE = 100
+
+        values = {"apiVersion": "1.0.0", "attrList": WORDS_ATTRIBUTE_LIST,
+                  "category": "", "mode": "basic", "perPage": PER_PAGE, "status": status,
+                  "wordSetIds": wordset_ids, "offset": None, "search": "", "training": None,
+                  "ctx": {"config": {"isCheckData": True, "isLogging": True}}}
+
+        words = []
+        next_chunk = self.get_content(url, json.dumps(values), headers).get('data')
+        # Continue getting the words until list is not empty
+        while next_chunk:
+            words += next_chunk
+            values['offset'] = {'wordId': next_chunk[-1].get('id')}
+            next_chunk = self.get_content(url, json.dumps(values), headers).get('data')
+
+        return words
+
     def save_cookies(self):
         if hasattr(self, 'cookies_path'):
             self.cj.save(self.cookies_path)
