@@ -12,7 +12,7 @@ from . import utils
 class Lingualeo(QObject):
     Error = pyqtSignal(str)
 
-    def __init__(self, email, password, cookies_path=None, parent=None):
+    def __init__(self, email, password, cookies_path=None, old_api=False, parent=None):
         QObject.__init__(self, parent)
         self.email = email
         self.password = password
@@ -31,7 +31,7 @@ class Lingualeo(QObject):
                     # TODO: Handle corrupt cookies loading
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
-        self.use_old_api = True
+        self.use_old_api = old_api
         config = utils.get_config()
         self.WORDS_PER_REQUEST = config['wordsPerRequest'] if config else 999
         self.url_prefix = 'https://'
@@ -130,12 +130,13 @@ class Lingualeo(QObject):
 
             # Until LinguaLeo fixes their problems,
             # we have to manually filter out repeating words
-            if not wordsets:
+            if not wordsets or (wordsets and self.use_old_api):
                 unique_words = []
                 for word in words:
                     if is_word_unique(word, unique_words):
                         unique_words.append(word)
                 words = unique_words
+                # TODO: Notify user if len(unique_words) is less then number of words in the main wordset
                 # print(str(len(unique_words)) + " unique words")
 
             self.save_cookies()
