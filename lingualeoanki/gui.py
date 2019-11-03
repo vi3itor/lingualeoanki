@@ -68,6 +68,11 @@ class PluginWindow(QDialog):
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
 
+        self.api_label = QLabel('Choose API:')
+        self.api_rbutton_new = QRadioButton('New (as on website, no context yet)')
+        self.api_rbutton_old = QRadioButton('Old (with context)')
+        self.api_rbutton_new.setChecked(True)
+
         # TODO: Implement GUI element to ask what style cards to create:
         #  with typing correct answer or without (or use config for that purpose)
 
@@ -87,6 +92,14 @@ class PluginWindow(QDialog):
         login_buttons.addWidget(self.loginButton)
         login_buttons.addWidget(self.logoutButton)
         login_buttons.addStretch()
+        # Horizontal layout for API
+        api_layout = QHBoxLayout()
+        api_layout.addStretch()
+        api_layout.addWidget(self.api_label)
+        api_layout.addWidget(self.api_rbutton_new)
+        api_layout.addWidget(self.api_rbutton_old)
+        api_layout.addStretch()
+
         # Horizontal layout for radio buttons and update checkbox
         options_layout = QHBoxLayout()
         options_layout.addStretch()
@@ -99,6 +112,7 @@ class PluginWindow(QDialog):
         options_layout.addStretch()
         # Form layout for option buttons and progress bar
         progress_layout = QFormLayout()
+        progress_layout.addRow(api_layout)
         progress_layout.addRow(options_layout)
         progress_layout.addRow(self.progressLabel, self.progressBar)
         # Horizontal layout for import and exit buttons
@@ -259,7 +273,8 @@ class PluginWindow(QDialog):
         # TODO: Run it inside the other thread to handle big dictionaries
         self.allow_to_close(False)
         status = self.get_progress_status()
-        words = self.lingualeo.get_words_to_add(status, wordsets)
+        use_old_api = self.api_rbutton_old.isChecked()
+        words = self.lingualeo.get_words_to_add(status, wordsets, use_old_api)
         filtered = self.filter_words(words)
         if filtered:
             self.start_download_thread(filtered)
@@ -364,6 +379,8 @@ class PluginWindow(QDialog):
         self.rbutton_learning.setEnabled(mode)
         self.rbutton_learned.setEnabled(mode)
         self.checkBoxUpdateNotes.setEnabled(mode)
+        self.api_rbutton_new.setEnabled(mode)
+        self.api_rbutton_old.setEnabled(mode)
         self.update_window()
 
     def set_login_form_enabled(self, mode):

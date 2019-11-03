@@ -12,7 +12,7 @@ from . import utils
 class Lingualeo(QObject):
     Error = pyqtSignal(str)
 
-    def __init__(self, email, password, cookies_path=None, old_api=False, parent=None):
+    def __init__(self, email, password, cookies_path=None, parent=None):
         QObject.__init__(self, parent)
         self.email = email
         self.password = password
@@ -31,7 +31,6 @@ class Lingualeo(QObject):
                     # TODO: Handle corrupt cookies loading
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
-        self.use_old_api = old_api
         config = utils.get_config()
         self.WORDS_PER_REQUEST = config['wordsPerRequest'] if config else 999
         self.url_prefix = 'https://'
@@ -109,12 +108,12 @@ class Lingualeo(QObject):
             return None
         return wordsets
 
-    def get_words_to_add(self, status, wordsets=None):
+    def get_words_to_add(self, status, wordsets=None, use_old_api=False):
         if not self.get_connection():
             return None
         words = []
         try:
-            if self.use_old_api:
+            if use_old_api:
                 wordset_ids = [wordset.get('id') for wordset in wordsets] if wordsets else [1]
                 words = self.get_words_old_api(status, wordset_ids)
                 # print("Old API: " + str(len(words)) + " words retrieved")
@@ -127,10 +126,11 @@ class Lingualeo(QObject):
                     for word in received_words:
                         if is_word_unique(word, words):
                             words.append(word)
+                # print("New API: " + str(len(words)) + " words retrieved")
 
             # Until LinguaLeo fixes their problems,
             # we have to manually filter out repeating words
-            if not wordsets or (wordsets and self.use_old_api):
+            if not wordsets or (wordsets and use_old_api):
                 unique_words = []
                 for word in words:
                     if is_word_unique(word, unique_words):
@@ -221,7 +221,8 @@ class Lingualeo(QObject):
     def get_words_old_api(self, status, wordset_ids):
         """
         This temporary function is to support old API until LinguaLeo fixes all issues with new API:
-        currently a lot of words aren't seen in the Web interface (and can't be downloaded with call to new API)
+        currently some words aren't seen in the Web interface (and can't be downloaded with call to new API)
+        and it's not possible yet to get context for the words at once using new API.
         :param status: progress status of the word: 'all', 'new', 'learning', 'learned'
         :param wordset_ids: list of ids for wordsets ([1] to download all words from main dictionary)
         :return: list of words, where each word is a dict
