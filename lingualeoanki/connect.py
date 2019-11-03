@@ -83,8 +83,7 @@ class Lingualeo(QObject):
                                    'attrList': WORDSETS_ATTRIBUTE_LIST, 'sortBy': 'created'}],
                       'ctx': {'config': {'isCheckData': True, 'isLogging': True}}}
             headers = {'Content-Type': 'application/json'}
-            json_data = json.dumps(values)
-            response = self.get_content(url, json_data, headers)
+            response = self.get_content(url, json.dumps(values), headers)
             if response.get('error') or not response.get('data'):
                 raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
                                 + response.get('error').get('message'))
@@ -177,8 +176,7 @@ class Lingualeo(QObject):
             else:
                 values['dateGroup'] = date_group
                 values['offset'] = offset
-            json_data = json.dumps(values)
-            response = self.get_content(url, json_data, headers)
+            response = self.get_content(url, json.dumps(values), headers)
             word_groups = response.get('data')
             if response.get('error') or not word_groups:
                 raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
@@ -294,6 +292,7 @@ def is_word_unique(check_word, words):
     :param words: list of dict
     :return: bool
     """
+    # TODO: Improve algorithm for finding unique words
     for word in words:
         if word['id'] == check_word['id']:
             return False
@@ -328,7 +327,7 @@ class Download(QThread):
         for word in self.words:
             self.Word.emit(word)
             try:
-                # print('Downloading media for word: {}'.format(word.get('wordValue')))
+                # TODO: Speed-up loading media by using multi-threading
                 utils.send_to_download(word, self)
             except (urllib.error.URLError, socket.error):
                 problem_words.append(word.get('wordValue'))
