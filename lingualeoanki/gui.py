@@ -318,7 +318,8 @@ class PluginWindow(QDialog):
         Note is an SQLite object in Anki so you need
         to fill it out inside the main thread
         """
-        utils.add_word(word, self.model)
+        is_old_api = True
+        utils.add_word(word, self.model, True)
 
     def setFinalCount(self, counter):
         self.wordsFinalCount = counter

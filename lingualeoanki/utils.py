@@ -120,12 +120,21 @@ def send_to_download(word, thread):
             raise exc_happened
 
 
-def fill_note(word, note):
+def fill_note(word, note, is_old_api):
     note['en'] = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
     # print("Filling word {}".format(word['wd']))
     note['ru'] = word.get('combinedTranslation') if word.get('combinedTranslation') else 'ПЕРЕВОД_ОТСУТСТВУЕТ'
     picture_name = word.get('picture').split('/')[-1] if word.get('picture') else ''
-    if is_valid_ascii(picture_name) and \
+    if is_old_api:
+        # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
+        translations = word.get('translations')
+        if translations:  # apparently, there might be no translation
+            translation = translations[0]
+            if translation.get('ctx'):
+                note['context'] = translation['ctx']
+            if translation.get('pic'):
+                picture_name = translation['pic'].split('/')[-1]
+    if picture_name and is_valid_ascii(picture_name) and \
             is_not_default_picture(picture_name):
         picture_name = get_valid_name(picture_name)
         note['picture_name'] = '<img src="%s" />' % picture_name
@@ -133,14 +142,6 @@ def fill_note(word, note):
     # TODO: Add checkbox for context
     #  and get it differently, since with API 1.0.1 it is not possible
     #  to get context at the time of getting list of words
-    '''
-    # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
-    translations = word.get('translations')
-    if translations:  # apparently, there might be no translation
-        translation = translations[0]
-        if translation.get('ctx'):
-            note['context'] = translation['ctx']
-    '''
 
     if word.get('transcription'):
         note['transcription'] = '[' + word['transcription'] + ']'
@@ -153,12 +154,12 @@ def fill_note(word, note):
     return note
 
 
-def add_word(word, model):
+def add_word(word, model, is_old_api):
     # TODO: Use picture_name and sound_name to check
     #  if update is needed and don't download media if not
     collection = mw.col
     note = notes.Note(collection, model)
-    note = fill_note(word, note)
+    note = fill_note(word, note, is_old_api)
     # TODO: Rewrite to use is_duplicate()
     word_value = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
     dupes = collection.findDupes("en", word_value)
