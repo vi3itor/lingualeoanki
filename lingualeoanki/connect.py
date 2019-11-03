@@ -76,19 +76,19 @@ class Lingualeo(QObject):
         """
         if not self.get_connection():
             return None
+        wordsets = []
+        url = 'api.lingualeo.com/GetWordSets'
+        values = {'apiVersion': '1.0.0',
+                  'request': [{'subOp': 'myAll', 'type': 'user', 'perPage': 999,
+                               'attrList': WORDSETS_ATTRIBUTE_LIST, 'sortBy': 'created'}],
+                  'ctx': {'config': {'isCheckData': True, 'isLogging': True}}}
+        headers = {'Content-Type': 'application/json'}
         try:
-            url = 'api.lingualeo.com/GetWordSets'
-            values = {'apiVersion': '1.0.0',
-                      'request': [{'subOp': 'myAll', 'type': 'user', 'perPage': 999,
-                                   'attrList': WORDSETS_ATTRIBUTE_LIST, 'sortBy': 'created'}],
-                      'ctx': {'config': {'isCheckData': True, 'isLogging': True}}}
-            headers = {'Content-Type': 'application/json'}
             response = self.get_content(url, json.dumps(values), headers)
             if response.get('error') or not response.get('data'):
                 raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
                                 + response.get('error').get('message'))
             all_wordsets = response['data'][0]['items']
-            wordsets = []
             # Add only non-empty dictionaries
             for wordset in all_wordsets:
                 if wordset.get('countWords') and wordset['countWords'] != 0:
