@@ -32,6 +32,8 @@ class Lingualeo(QObject):
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
         self.use_old_api = True
+        # TODO: Move parameter to config?
+        self.WORDS_PER_REQUEST = 1500
         self.url_prefix = 'https://'
         self.msg = ''
         self.tried_ssl_fix = False
@@ -146,21 +148,19 @@ class Lingualeo(QObject):
         Each word group has:
         groupCount - number of words in the group,
         groupName - name of the group, like 'new' or 'year_2' (stands for 2 years ago),
-        words - list of words (not more than PER_PAGE)
+        words - list of words (not more than self.WORDS_PER_REQUEST)
         :param status: progress status of the word: 'all', 'new', 'learning', 'learned'
         :param wordset: A wordset, or None to download all words (from main dictionary)
         :return: list of words, where each word is a dict
         """
         url = 'api.lingualeo.com/GetWords'
         headers = {'Content-Type': 'application/json'}
-        # TODO: Move parameter to config?
-        PER_PAGE = 100
         date_group = 'start'
         offset = {}
         values = {"apiVersion": "1.0.1", "attrList": WORDS_ATTRIBUTE_LIST,
-                  "category": "", "dateGroup": date_group, "mode": "basic", "perPage": PER_PAGE, "status": status,
+                  "category": "", "dateGroup": date_group, "mode": "basic", "perPage": self.WORDS_PER_REQUEST,
+                  "status": status, "offset": offset, "search": "", "training": None,
                   "wordSetId": wordset.get('id') if wordset else 1,  # ID of the main dictionary is 1
-                  "offset": offset, "search": "", "training": None,
                   "ctx": {"config": {"isCheckData": True, "isLogging": True}}}
         # TODO: Remove ctx parameter from values?
 
@@ -196,11 +196,11 @@ class Lingualeo(QObject):
                     If the next word_chunk is empty, and we completed the previous, 
                     next response should be to the next group
                     '''
-                    if words_received < PER_PAGE:
+                    if words_received < self.WORDS_PER_REQUEST:
                         date_group = word_group.get('groupName')
                         extra_date_group = None
                         offset = {}
-                    else:  # words_received == PER_PAGE
+                    else:  # words_received == self.WORDS_PER_REQUEST
                         '''We either need to continue with this group or try the next'''
                         extra_date_group = word_group.get('groupName')
                     break
@@ -216,10 +216,8 @@ class Lingualeo(QObject):
         """
         url = 'api.lingualeo.com/GetWords'
         headers = {'Content-Type': 'application/json'}
-        PER_PAGE = 100
-
         values = {"apiVersion": "1.0.0", "attrList": WORDS_ATTRIBUTE_LIST,
-                  "category": "", "mode": "basic", "perPage": PER_PAGE, "status": status,
+                  "category": "", "mode": "basic", "perPage": self.WORDS_PER_REQUEST, "status": status,
                   "wordSetIds": wordset_ids, "offset": None, "search": "", "training": None,
                   "ctx": {"config": {"isCheckData": True, "isLogging": True}}}
 
