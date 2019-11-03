@@ -117,14 +117,27 @@ class Lingualeo(QObject):
             if self.use_old_api:
                 wordset_ids = [wordset.get('id') for wordset in wordsets] if wordsets else [1]
                 words = self.get_words_old_api(status, wordset_ids)
+                # print("Old API: " + str(len(words)) + " words retrieved")
             elif not wordsets:  # for New API
                 words = self.get_words(status, None)
+                # print("New API: " + str(len(words)) + " words retrieved")
             else:
                 for wordset in wordsets:
                     received_words = self.get_words(status, wordset)
                     for word in received_words:
                         if is_word_unique(word, words):
                             words.append(word)
+
+            # Until LinguaLeo fixes their problems,
+            # we have to manually filter out repeating words
+            if not wordsets:
+                unique_words = []
+                for word in words:
+                    if is_word_unique(word, unique_words):
+                        unique_words.append(word)
+                words = unique_words
+                # print(str(len(unique_words)) + " unique words")
+
             self.save_cookies()
         except (urllib.error.URLError, socket.error):
             self.msg = "Can't download words. Problem with internet connection."
