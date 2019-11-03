@@ -102,6 +102,14 @@ def send_to_download(word, thread):
         if exc_happened:
             raise exc_happened
     pic_url = word.get('picture')
+    # TODO: Remove or refactor the following code that supports old API
+    translations = word.get('translations')
+    if translations:  # apparently, there might be no translation
+        translation = translations[0]
+        if translation.get('pic'):
+            pic_url = translation['pic']
+    # End of temporary code
+
     if pic_url and is_not_default_picture(pic_url):
         exc_happened = None
         if not is_valid_ascii(pic_url):
