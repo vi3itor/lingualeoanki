@@ -32,8 +32,8 @@ class Lingualeo(QObject):
                     self.cj = http_cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
         self.use_old_api = True
-        # TODO: Move parameter to config?
-        self.WORDS_PER_REQUEST = 1500
+        config = utils.get_config()
+        self.WORDS_PER_REQUEST = config['wordsPerRequest'] if config else 999
         self.url_prefix = 'https://'
         self.msg = ''
         self.tried_ssl_fix = False
