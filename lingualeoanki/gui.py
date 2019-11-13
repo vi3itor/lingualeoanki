@@ -121,11 +121,19 @@ class PluginWindow(QDialog):
         options_layout.addSpacing(15)
         options_layout.addWidget(self.checkBoxUpdateNotes)
         options_layout.addStretch()
+
+        # Progress label and progress bar layout
+        progress_layout = QHBoxLayout()
+        progress_layout.addStretch()
+        progress_layout.addWidget(self.progressLabel)
+        progress_layout.addWidget(self.progressBar)
+        progress_layout.addStretch()
+
         # Form layout for option buttons and progress bar
-        progress_layout = QFormLayout()
-        progress_layout.addRow(api_layout)
-        progress_layout.addRow(options_layout)
-        progress_layout.addRow(self.progressLabel, self.progressBar)
+        downloading_layout = QFormLayout()
+        downloading_layout.addRow(api_layout)
+        downloading_layout.addRow(options_layout)
+        downloading_layout.addRow(progress_layout)
         # Horizontal layout for import and exit buttons
         imp_btn_layout = QHBoxLayout()
         imp_btn_layout.addStretch()
@@ -139,7 +147,7 @@ class PluginWindow(QDialog):
         main_layout.addLayout(login_form)
         main_layout.addLayout(login_checkboxes)
         main_layout.addLayout(login_buttons)
-        main_layout.addLayout(progress_layout)
+        main_layout.addLayout(downloading_layout)
         main_layout.addLayout(imp_btn_layout)
         # Set main layout
         self.setLayout(main_layout)
