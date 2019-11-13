@@ -163,7 +163,7 @@ class Lingualeo(QObject):
         words_received = 0
         extra_date_group = date_group  # to get into the while loop
 
-        # TODO: Refactor while loop below?
+        # TODO: Refactor while loop (e.g. request words from each group until it is not empty)
         # Request the words until
         while words_received > 0 or extra_date_group:
             if words_received == 0 and extra_date_group:
@@ -204,7 +204,7 @@ class Lingualeo(QObject):
         """
         This temporary function is to support old API until LinguaLeo fixes all issues with new API:
         currently some words aren't seen in the Web interface (and can't be downloaded with call to new API)
-        and it's not possible yet to get context for the words at once using new API.
+        and it's not possible to get context for the words at once using new API yet.
         :param status: progress status of the word: 'all', 'new', 'learning', 'learned'
         :param wordset_id: id of only one wordset represented as list (e.g., [1] to download from main dictionary)
         :return: list of words, where each word is a dict
@@ -335,7 +335,7 @@ class Download(QThread):
         for word in self.words:
             self.Word.emit(word)
             try:
-                # TODO: Speed-up loading media by using multi-threading
+                # TODO: Speed-up loading of media by using multi-threading
                 utils.send_to_download(word, self)
             except (urllib.error.URLError, socket.error):
                 problem_words.append(word.get('wordValue'))
