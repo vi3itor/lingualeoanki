@@ -59,19 +59,30 @@ class PluginWindow(QDialog):
         self.importAllButton.clicked.connect(self.importAllButtonClicked)
         self.importByDictionaryButton.clicked.connect(self.wordsetButtonClicked)
         self.exitButton.clicked.connect(self.close)
+
+        # Word status radio buttons
+        self.status_button_group = QButtonGroup()
         self.rbutton_all = QRadioButton("Any")
         self.rbutton_new = QRadioButton("New")
         self.rbutton_learning = QRadioButton("Learning")
         self.rbutton_learned = QRadioButton("Learned")
         self.rbutton_all.setChecked(True)
+        self.status_button_group.addButton(self.rbutton_all, 0)
+        self.status_button_group.addButton(self.rbutton_new, 1)
+        self.status_button_group.addButton(self.rbutton_learning, 2)
+        self.status_button_group.addButton(self.rbutton_learned, 3)
+
         self.checkBoxUpdateNotes = QCheckBox('Update existing notes')
         self.progressLabel = QLabel('Downloading Progress:')
         self.progressBar = QProgressBar()
 
         self.api_label = QLabel('Choose API:')
-        self.api_rbutton_new = QRadioButton('New (as on website, no context yet)')
+        self.api_button_group = QButtonGroup()
+        self.api_rbutton_new = QRadioButton('New (no context yet)')
         self.api_rbutton_old = QRadioButton('Old (with context)')
         self.api_rbutton_new.setChecked(True)
+        self.api_button_group.addButton(self.api_rbutton_new, 0)
+        self.api_button_group.addButton(self.api_rbutton_old, 1)
 
         # TODO: Implement GUI element to ask what style cards to create:
         #  with typing correct answer or without (or use config for that purpose)
@@ -333,8 +344,7 @@ class PluginWindow(QDialog):
         Note is an SQLite object in Anki so you need
         to fill it out inside the main thread
         """
-        is_old_api = True
-        utils.add_word(word, self.model, True)
+        utils.add_word(word, self.model, self.api_rbutton_old.isChecked())
 
     def setFinalCount(self, counter):
         self.wordsFinalCount = counter
