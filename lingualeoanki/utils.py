@@ -4,6 +4,8 @@ import json
 from .six.moves import urllib
 import socket
 import ssl
+import locale
+import sys
 
 from aqt import mw
 from anki import notes
@@ -334,3 +336,12 @@ def get_version_update_notification(version_in_memory):
                 if version_in_file != version_in_memory:
                     return 'Restart Anki to update Add-on'
     return None
+
+
+def get_icon_path(icon_file):
+    icon_path = os.path.join(get_addon_dir(), icon_file)
+    # Check Python version for Anki 2.0 support
+    if sys.version_info[0] < 3:
+        loc = locale.getdefaultlocale()[1]
+        icon_path = icon_path.decode(loc)
+    return icon_path

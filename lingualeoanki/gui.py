@@ -1,5 +1,3 @@
-import locale
-import sys
 import platform as pm
 
 from aqt import mw
@@ -28,15 +26,8 @@ class PluginWindow(QDialog):
         message = utils.get_version_update_notification(VERSION)
         title = 'Import from LinguaLeo (version {})'.format(VERSION) if not message else message
         self.setWindowTitle(title)
-
-        # Window Icon
         if pm.system() == 'Windows':
-            path = os.path.join(utils.get_addon_dir(), 'favicon.ico')
-            # Check Python version for Anki 2.0 support
-            if sys.version_info[0] < 3:
-                loc = locale.getdefaultlocale()[1]
-                path = path.decode(loc)
-            self.setWindowIcon(QIcon(path))
+            self.setWindowIcon(QIcon(utils.get_icon_path('favicon.ico')))
 
         # Login section widgets
         loginLabel = QLabel('Your LinguaLeo login:')
@@ -436,6 +427,9 @@ class WordsetsWindow(QDialog):
 
     def initUI(self):
         self.setWindowTitle('Choose dictionaries to import')
+        if pm.system() == 'Windows':
+            self.setWindowIcon(QIcon(utils.get_icon_path('dict.ico')))
+
         # Buttons and fields
         self.importButton = QPushButton("Import", self)
         self.cancelButton = QPushButton("Cancel", self)
