@@ -105,7 +105,6 @@ class PluginWindow(QDialog):
         login_buttons.addStretch()
         # Horizontal layout for API
         api_layout = QHBoxLayout()
-        api_layout.addStretch()
         api_layout.addWidget(self.api_label)
         api_layout.addWidget(self.api_rbutton_new)
         api_layout.addWidget(self.api_rbutton_old)
@@ -113,7 +112,6 @@ class PluginWindow(QDialog):
 
         # Horizontal layout for radio buttons and update checkbox
         options_layout = QHBoxLayout()
-        options_layout.addStretch()
         options_layout.addWidget(self.rbutton_all)
         options_layout.addWidget(self.rbutton_new)
         options_layout.addWidget(self.rbutton_learning)
@@ -124,10 +122,8 @@ class PluginWindow(QDialog):
 
         # Progress label and progress bar layout
         progress_layout = QHBoxLayout()
-        progress_layout.addStretch()
         progress_layout.addWidget(self.progressLabel)
         progress_layout.addWidget(self.progressBar)
-        progress_layout.addStretch()
 
         # Form layout for option buttons and progress bar
         downloading_layout = QFormLayout()
