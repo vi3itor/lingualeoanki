@@ -268,6 +268,7 @@ class PluginWindow(QDialog):
         self.set_download_form_enabled(True)
         self.logoutButton.setEnabled(True)
         self.progressLabel.hide()
+        self.progressLabel.setText('Downloading Progress:')
         self.progressBar.hide()
         self.allow_to_close(True)
         mw.reset()
@@ -327,6 +328,7 @@ class PluginWindow(QDialog):
         # Activate progress bar
         self.progressBar.setValue(0)
         self.progressBar.show()
+        self.progressLabel.setText('Downloading {} words...'.format(len(words)))
         self.progressLabel.show()
         self.logoutButton.setEnabled(False)
         # TODO: Show numbers in progress bar
@@ -337,6 +339,7 @@ class PluginWindow(QDialog):
         # Start downloading
         self.threadclass = connect.Download(words)
         self.threadclass.start()
+        # TODO: Remove unnecessary signal? We can set maximum before starting the thread
         self.threadclass.Length.connect(self.progressBar.setMaximum)
         self.threadclass.Word.connect(self.addWord)
         self.threadclass.Counter.connect(self.progressBar.setValue)
