@@ -79,55 +79,47 @@ def download_media_file(url):
     url = url.replace('\n', '')
     # TODO: find a better way for unsecure connection
     resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT, context=ssl._create_unverified_context())
-    media_file = resp.read()
-    with open(abs_path, "wb") as binfile:
-        binfile.write(media_file)
+    content = resp.read()
+    with open(abs_path, "wb") as media_file:
+        media_file.write(content)
 
 
 def send_to_download(word, thread):
-    # TODO: Move to config following settings and DOWNLOAD_TIMEOUT
-    NUM_RETRIES = 3
-    SLEEP_SECONDS = 5
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
     sound_url = word.get('pronunciation')
     if sound_url and is_valid_ascii(sound_url):
-        exc_happened = None
-        for i in list(range(NUM_RETRIES)):
-            exc_happened = None
-            try:
-                download_media_file(sound_url)
-                break
-            except (urllib.error.URLError, socket.error) as e:
-                exc_happened = e
-                thread.sleep(SLEEP_SECONDS)
-        if exc_happened:
-            raise exc_happened
+        try_downloading_media(sound_url, thread)
     pic_url = word.get('picture')
     # TODO: Remove or refactor the following code that supports old API
     translations = word.get('translations')
-    if translations:  # apparently, there might be no translation
+    if translations:
         translation = translations[0]
         if translation.get('pic'):
             pic_url = translation['pic']
     # End of temporary code
 
     if pic_url and is_not_default_picture(pic_url):
-        exc_happened = None
         if not is_valid_ascii(pic_url):
             raise urllib.error.URLError('Invalid picture url: ' + pic_url)
-        # TODO: Remove https check
-        picture_url = pic_url if pic_url.startswith('https:') else 'https:' + pic_url
-        for i in list(range(NUM_RETRIES)):
-            exc_happened = None
-            try:
-                download_media_file(picture_url)
-                break
-            except (urllib.error.URLError, socket.error) as e:
-                exc_happened = e
-                thread.sleep(SLEEP_SECONDS)
-        if exc_happened:
-            raise exc_happened
+        try_downloading_media(pic_url, thread)
+
+
+def try_downloading_media(url, thread):
+    # TODO: Move to config following settings and DOWNLOAD_TIMEOUT
+    NUM_RETRIES = 3
+    SLEEP_SECONDS = 5
+    exc_happened = None
+    for i in list(range(NUM_RETRIES)):
+        exc_happened = None
+        try:
+            download_media_file(url)
+            break
+        except (urllib.error.URLError, socket.error) as e:
+            exc_happened = e
+            thread.sleep(SLEEP_SECONDS)
+    if exc_happened:
+        raise exc_happened
 
 
 def fill_note(word, note, is_old_api):
