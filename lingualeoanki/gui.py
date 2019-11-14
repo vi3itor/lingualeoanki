@@ -314,11 +314,11 @@ class PluginWindow(QDialog):
     def start_download_thread(self, words):
         # Activate progress bar
         self.progressBar.setValue(0)
+        self.progressBar.setMaximum(len(words))
         self.progressBar.show()
         self.progressLabel.setText('Downloading {} words...'.format(len(words)))
         self.progressLabel.show()
         self.logoutButton.setEnabled(False)
-        # TODO: Show numbers in progress bar
 
         # Set Anki Model
         self.set_model()
@@ -326,8 +326,6 @@ class PluginWindow(QDialog):
         # Start downloading
         self.threadclass = connect.Download(words)
         self.threadclass.start()
-        # TODO: Remove unnecessary signal? We can set maximum before starting the thread
-        self.threadclass.Length.connect(self.progressBar.setMaximum)
         self.threadclass.Word.connect(self.addWord)
         self.threadclass.Counter.connect(self.progressBar.setValue)
         self.threadclass.FinalCounter.connect(self.setFinalCount)

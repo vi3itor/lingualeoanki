@@ -308,7 +308,6 @@ def is_word_unique(check_word, words):
 
 
 class Download(QThread):
-    Length = pyqtSignal(int)
     Counter = pyqtSignal(int)
     FinalCounter = pyqtSignal(int)
     Word = pyqtSignal(dict)
@@ -319,7 +318,6 @@ class Download(QThread):
         self.words = words
 
     def run(self):
-        self.Length.emit(len(self.words))
         self.add_separately()
 
     def add_separately(self):
