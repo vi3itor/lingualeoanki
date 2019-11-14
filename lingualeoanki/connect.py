@@ -307,19 +307,17 @@ def is_word_unique(check_word, words):
     return True
 
 
-class Download(QThread):
+class Download(QObject):
     Counter = pyqtSignal(int)
     FinalCounter = pyqtSignal(int)
     Word = pyqtSignal(dict)
     Error = pyqtSignal(str)
 
     def __init__(self, words, parent=None):
-        QThread.__init__(self, parent)
+        QObject.__init__(self, parent)
         self.words = words
 
-    def run(self):
-        self.add_separately()
-
+    @pyqtSlot()
     def add_separately(self):
         """
         Divides downloading and filling note to different threads
@@ -334,18 +332,17 @@ class Download(QThread):
             self.Word.emit(word)
             try:
                 # TODO: Speed-up loading of media by using multi-threading
-                utils.send_to_download(word, self)
+                utils.send_to_download(word)
             except (urllib.error.URLError, socket.error):
                 problem_words.append(word.get('wordValue'))
             counter += 1
             self.Counter.emit(counter)
-        self.FinalCounter.emit(counter)
-
         # TODO: save problem words in json format to user_files folder
         #  and ask user to retry downloading problem words
 
         if problem_words:
             self.problem_words_msg(problem_words)
+        self.FinalCounter.emit(counter)
 
     def problem_words_msg(self, problem_words):
         error_msg = ("We weren't able to download media for these "

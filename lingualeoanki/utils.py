@@ -84,12 +84,12 @@ def download_media_file(url):
         media_file.write(content)
 
 
-def send_to_download(word, thread):
+def send_to_download(word):
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
     sound_url = word.get('pronunciation')
     if sound_url and is_valid_ascii(sound_url):
-        try_downloading_media(sound_url, thread)
+        try_downloading_media(sound_url)
     pic_url = word.get('picture')
     # TODO: Remove or refactor the following code that supports old API
     translations = word.get('translations')
@@ -102,13 +102,12 @@ def send_to_download(word, thread):
     if pic_url and is_not_default_picture(pic_url):
         if not is_valid_ascii(pic_url):
             raise urllib.error.URLError('Invalid picture url: ' + pic_url)
-        try_downloading_media(pic_url, thread)
+        try_downloading_media(pic_url)
 
 
-def try_downloading_media(url, thread):
-    # TODO: Move to config following settings and DOWNLOAD_TIMEOUT
+def try_downloading_media(url):
+    # TODO: Move to config (and also DOWNLOAD_TIMEOUT)
     NUM_RETRIES = 3
-    SLEEP_SECONDS = 5
     exc_happened = None
     for i in list(range(NUM_RETRIES)):
         exc_happened = None
@@ -117,7 +116,7 @@ def try_downloading_media(url, thread):
             break
         except (urllib.error.URLError, socket.error) as e:
             exc_happened = e
-            thread.sleep(SLEEP_SECONDS)
+            # TODO: implement sleeping thread
     if exc_happened:
         raise exc_happened
 

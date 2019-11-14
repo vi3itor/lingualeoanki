@@ -248,14 +248,15 @@ class PluginWindow(QDialog):
             utils.clean_cookies()
         mw.reset()
 
-    def downloadFinished(self):
-        if hasattr(self, 'wordsFinalCount'):
-            showInfo("%d words from LinguaLeo have been processed" % self.wordsFinalCount)
-            delattr(self, 'wordsFinalCount')
+    def downloadFinished(self, final_count):
+        showInfo("%d words from LinguaLeo have been processed" % final_count)
+        # Terminate thread and wait for termination
+        self.threadclass.terminate()
+        self.threadclass.wait()
+
         self.set_download_form_enabled(True)
         self.logoutButton.setEnabled(True)
         self.progressLabel.hide()
-        self.progressLabel.setText('Downloading Progress:')
         self.progressBar.hide()
         self.allow_to_close(True)
         mw.reset()
@@ -321,19 +322,19 @@ class PluginWindow(QDialog):
         self.logoutButton.setEnabled(False)
 
         # Set Anki Model
-        self.set_model()
+        self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
 
         # Start downloading
-        self.threadclass = connect.Download(words)
+        self.threadclass = QThread()
+        downloader = connect.Download(words)
+        downloader.moveToThread(self.threadclass)
+        downloader.Word.connect(self.addWord)
+        downloader.Counter.connect(self.progressBar.setValue)
+        downloader.FinalCounter.connect(self.downloadFinished)
+        downloader.Error.connect(self.showErrorMessage)
+        self.threadclass.started.connect(downloader.add_separately)
+        self.threadclass.downloader = downloader
         self.threadclass.start()
-        self.threadclass.Word.connect(self.addWord)
-        self.threadclass.Counter.connect(self.progressBar.setValue)
-        self.threadclass.FinalCounter.connect(self.setFinalCount)
-        self.threadclass.Error.connect(self.showErrorMessage)
-        self.threadclass.finished.connect(self.downloadFinished)
-
-    def set_model(self):
-        self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
 
     def addWord(self, word):
         """
@@ -341,9 +342,6 @@ class PluginWindow(QDialog):
         to fill it out inside the main thread
         """
         utils.add_word(word, self.model, self.api_rbutton_old.isChecked())
-
-    def setFinalCount(self, counter):
-        self.wordsFinalCount = counter
 
 # UI helpers
 #####################################
