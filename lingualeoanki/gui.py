@@ -20,9 +20,7 @@ class PluginWindow(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.config = utils.get_config()
-        self.initUI()
-
-    def initUI(self):
+        # Initialize UI
         message = utils.get_version_update_notification(VERSION)
         title = 'Import from LinguaLeo (version {})'.format(VERSION) if not message else message
         self.setWindowTitle(title)
@@ -64,7 +62,7 @@ class PluginWindow(QDialog):
         self.status_button_group.addButton(self.rbutton_learned, 3)
 
         self.checkBoxUpdateNotes = QCheckBox('Update existing notes')
-        self.progressLabel = QLabel('Downloading Progress:')
+        self.progressLabel = QLabel('')
         self.progressBar = QProgressBar()
 
         self.api_label = QLabel('Choose API:')
