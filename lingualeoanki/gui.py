@@ -198,9 +198,6 @@ class PluginWindow(QDialog):
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
 
-        self.lingualeo_thread.terminate()
-        self.lingualeo_thread.wait()
-
         utils.clean_cookies()
         self.config['stayLoggedIn'] = False
         utils.update_config(self.config)
@@ -238,13 +235,19 @@ class PluginWindow(QDialog):
         """
         Override close event to safely close add-on window
         """
-        # TODO: Check if self.lingualeo_thread is busy and terminate the thread
+        if hasattr(self, 'lingualeo_thread'):
+            # TODO: Check if self.lingualeo_thread is busy and ask user before quiting
+            self.lingualeo_thread.terminate()
+            self.lingualeo_thread.wait()
+
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
             qm = QMessageBox()
             answer = qm.question(self, '', "Are you sure you want to stop downloading?",
                                  qm.Yes | qm.Cancel, qm.Cancel)
             if answer == qm.Yes and not self.threadclass.isFinished():
+                # TODO: Try using quit() instead?
                 self.threadclass.terminate()
+                self.threadclass.wait()
             elif answer == qm.Cancel:
                 event.ignore()
                 return
@@ -259,19 +262,28 @@ class PluginWindow(QDialog):
 
 # Functions for connecting to LinguaLeo and downloading words
 ###########################################################
-    def create_lingualeo_thread(self, login, password, cookies_path=None):
+    def create_lingualeo_object(self, login, password, cookies_path=None):
         """
         Creates lingualeo object and moves it to the designated thread
+        or disconnects existing object and creates a new one
         """
-        # TODO: Don't recreate object when password and/or login changed?
-        self.lingualeo_thread = QThread()
+        if not hasattr(self, 'lingualeo_thread'):
+            self.lingualeo_thread = QThread()
+            self.lingualeo_thread.start()
+        else:
+            # Disconnect signals from slots
+            self.lingualeo_thread.lingualeo.Error.disconnect(self.showErrorMessage)
+            self.Authorize.disconnect(self.lingualeo_thread.lingualeo.authorize)
+            self.lingualeo_thread.lingualeo.AuthorizationStatus.disconnect(self.process_authorization)
+            # Delete previous LinguaLeo object
+            # TODO: Investigate if it should be done differently
+            self.lingualeo_thread.lingualeo.deleteLater()
         lingualeo = connect.Lingualeo(login, password, cookies_path)
         lingualeo.moveToThread(self.lingualeo_thread)
         lingualeo.Error.connect(self.showErrorMessage)
         self.Authorize.connect(lingualeo.authorize)
         lingualeo.AuthorizationStatus.connect(self.process_authorization)
         self.lingualeo_thread.lingualeo = lingualeo
-        self.lingualeo_thread.start()
 
     @pyqtSlot(bool)
     def process_authorization(self, status):
