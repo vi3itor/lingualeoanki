@@ -11,6 +11,7 @@ from . import utils
 
 class Lingualeo(QObject):
     Error = pyqtSignal(str)
+    AuthorizationStatus = pyqtSignal(bool)
 
     def __init__(self, email, password, cookies_path=None, parent=None):
         QObject.__init__(self, parent)
@@ -36,6 +37,10 @@ class Lingualeo(QObject):
         self.url_prefix = 'https://'
         self.msg = ''
         self.tried_ssl_fix = False
+
+    @pyqtSlot()
+    def authorize(self):
+        self.AuthorizationStatus.emit(self.get_connection())
 
     def get_connection(self):
         try:

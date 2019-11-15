@@ -17,6 +17,8 @@ from ._version import VERSION
 # TODO: Implement "Loading..." window to show user that list of words or list of dictionaries is being downloaded
 
 class PluginWindow(QDialog):
+    Authorize = pyqtSignal()
+
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.config = utils.get_config()
@@ -140,7 +142,6 @@ class PluginWindow(QDialog):
         # Disable buttons and hide progress bar
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
-        self.progressLabel.hide()
         self.progressBar.hide()
 
         self.loginField.setText(self.config['email'])
@@ -152,12 +153,14 @@ class PluginWindow(QDialog):
         if self.config['stayLoggedIn']:
             self.passField.clearFocus()
             cookies_path = utils.get_cookies_path()
-            self.authorize(self.loginField.text(), self.passField.text(), cookies_path)
+            self.create_lingualeo_thread(self.loginField.text(), self.passField.text(), cookies_path)
+            self.Authorize.emit()
+            # Disable login button and fields
+            self.set_login_form_enabled(False)
         elif not self.config['rememberPassword']:
             # Have to set focus for typing after creating all widgets
             self.passField.setFocus()
-
-        self.allow_to_close(True)
+            self.allow_to_close(True)
 
 # Button clicks handlers and overridden events
 ###################################################
@@ -176,21 +179,28 @@ class PluginWindow(QDialog):
             self.config['password'] = ''
             self.config['rememberPassword'] = False
 
+        cookies_path = None
         if self.checkBoxStayLoggedIn.checkState():
             self.config['stayLoggedIn'] = True
             cookies_path = utils.get_cookies_path()
-            self.authorize(login, password, cookies_path)
         else:
             self.config['stayLoggedIn'] = False
-            self.authorize(login, password)
-        utils.update_config(self.config)
 
-        self.allow_to_close(True)
+        self.create_lingualeo_thread(login, password, cookies_path)
+        self.Authorize.emit()
+        self.showProgressBarBusy(True, 'Connecting to LinguaLeo...')
+        # Disable login button and fields
+        self.set_login_form_enabled(False)
+        utils.update_config(self.config)
 
     def logoutButtonClicked(self):
         # Disable logout and other buttons
         self.logoutButton.setEnabled(False)
         self.set_download_form_enabled(False)
+
+        self.lingualeo_thread.terminate()
+        self.lingualeo_thread.wait()
+
         utils.clean_cookies()
         self.config['stayLoggedIn'] = False
         utils.update_config(self.config)
@@ -228,6 +238,7 @@ class PluginWindow(QDialog):
         """
         Override close event to safely close add-on window
         """
+        # TODO: Check if self.lingualeo_thread is busy and terminate the thread
         if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
             qm = QMessageBox()
             answer = qm.question(self, '', "Are you sure you want to stop downloading?",
@@ -246,34 +257,31 @@ class PluginWindow(QDialog):
             utils.clean_cookies()
         mw.reset()
 
-    def downloadFinished(self, final_count):
-        showInfo("%d words from LinguaLeo have been processed" % final_count)
-        # Terminate thread and wait for termination
-        self.threadclass.terminate()
-        self.threadclass.wait()
-
-        self.set_download_form_enabled(True)
-        self.logoutButton.setEnabled(True)
-        self.progressLabel.hide()
-        self.progressBar.hide()
-        self.allow_to_close(True)
-        mw.reset()
-
 # Functions for connecting to LinguaLeo and downloading words
 ###########################################################
+    def create_lingualeo_thread(self, login, password, cookies_path=None):
+        """
+        Creates lingualeo object and moves it to the designated thread
+        """
+        # TODO: Don't recreate object when password and/or login changed?
+        self.lingualeo_thread = QThread()
+        lingualeo = connect.Lingualeo(login, password, cookies_path)
+        lingualeo.moveToThread(self.lingualeo_thread)
+        lingualeo.Error.connect(self.showErrorMessage)
+        self.Authorize.connect(lingualeo.authorize)
+        lingualeo.AuthorizationStatus.connect(self.process_authorization)
+        self.lingualeo_thread.lingualeo = lingualeo
+        self.lingualeo_thread.start()
 
-    def authorize(self, login, password, cookies_path=None):
-        """
-        Creates lingualeo object and connects to the website
-        """
-        self.lingualeo = connect.Lingualeo(login, password, cookies_path)
-        self.lingualeo.Error.connect(self.showErrorMessage)
-        if self.lingualeo.get_connection():
-            # Disable login button and fields
-            self.set_login_form_enabled(False)
-            # Enable all other buttons
+    @pyqtSlot(bool)
+    def process_authorization(self, status):
+        if status:
             self.logoutButton.setEnabled(True)
             self.set_download_form_enabled(True)
+        else:
+            self.set_login_form_enabled(True)
+        self.showProgressBarBusy(False, '')
+        self.allow_to_close(True)
 
     def download_words(self, wordsets=None):
         # TODO: Run it inside the other thread to handle big dictionaries
@@ -326,15 +334,28 @@ class PluginWindow(QDialog):
         self.threadclass = QThread()
         downloader = connect.Download(words)
         downloader.moveToThread(self.threadclass)
-        downloader.Word.connect(self.addWord)
+        downloader.Word.connect(self.add_word)
         downloader.Counter.connect(self.progressBar.setValue)
-        downloader.FinalCounter.connect(self.downloadFinished)
+        downloader.FinalCounter.connect(self.download_finished)
         downloader.Error.connect(self.showErrorMessage)
         self.threadclass.started.connect(downloader.add_separately)
         self.threadclass.downloader = downloader
         self.threadclass.start()
 
-    def addWord(self, word):
+    def download_finished(self, final_count):
+        showInfo("%d words from LinguaLeo have been processed" % final_count)
+        # Terminate thread and wait for termination
+        self.threadclass.terminate()
+        self.threadclass.wait()
+
+        self.set_download_form_enabled(True)
+        self.logoutButton.setEnabled(True)
+        self.progressLabel.setText('')
+        self.progressBar.hide()
+        self.allow_to_close(True)
+        mw.reset()
+
+    def add_word(self, word):
         """
         Note is an SQLite object in Anki so you need
         to fill it out inside the main thread
