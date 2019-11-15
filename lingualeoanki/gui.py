@@ -343,6 +343,14 @@ class PluginWindow(QDialog):
 
 # UI helpers
 #####################################
+    def showProgressBarBusy(self, mode, label):
+        if mode:
+            self.progressBar.setRange(0, 0)
+            self.progressBar.setValue(0)  # is it required?
+            self.progressBar.show()
+        else:
+            self.progressBar.hide()
+        self.progressLabel.setText(label)
 
     def showErrorMessage(self, msg):
         showInfo(msg)
