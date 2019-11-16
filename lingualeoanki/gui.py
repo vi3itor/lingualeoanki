@@ -22,6 +22,7 @@ class PluginWindow(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.config = utils.get_config()
+        self.is_active_download = False
         # Initialize UI
         message = utils.get_version_update_notification(VERSION)
         title = 'Import from LinguaLeo (version {})'.format(VERSION) if not message else message
@@ -235,23 +236,19 @@ class PluginWindow(QDialog):
         """
         Override close event to safely close add-on window
         """
-        if hasattr(self, 'lingualeo_thread'):
-            # TODO: Check if self.lingualeo_thread is busy and ask user before quiting
-            self.lingualeo_thread.terminate()
-            self.lingualeo_thread.wait()
-
-        if hasattr(self, 'threadclass') and not self.threadclass.isFinished():
+        if self.is_active_download:
             qm = QMessageBox()
             answer = qm.question(self, '', "Are you sure you want to stop downloading?",
                                  qm.Yes | qm.Cancel, qm.Cancel)
-            if answer == qm.Yes and not self.threadclass.isFinished():
-                # TODO: Try using quit() instead?
-                self.threadclass.terminate()
-                self.threadclass.wait()
-            elif answer == qm.Cancel:
+            if answer == qm.Cancel:
                 event.ignore()
                 return
             # TODO: Don't close add-on window if the 'Stop' button was pressed
+
+        if hasattr(self, 'download_thread'):
+            self.download_thread.terminate()
+            self.download_thread.wait()
+
         # Delete attribute before closing to allow running the add-on again
         if hasattr(mw, ADDON_NAME):
             delattr(mw, ADDON_NAME)
@@ -351,6 +348,7 @@ class PluginWindow(QDialog):
             downloader.Counter.connect(self.progressBar.setValue)
             downloader.FinalCounter.connect(self.download_finished)
             downloader.Error.connect(self.showErrorMessage)
+            downloader.Busy.connect(self.set_busy_download)
             self.StartDownload.connect(downloader.add_separately)
             self.download_thread.downloader = downloader
             self.download_thread.start()
@@ -372,6 +370,13 @@ class PluginWindow(QDialog):
         to fill it out inside the main thread
         """
         utils.add_word(word, self.model, self.api_rbutton_old.isChecked())
+
+    @pyqtSlot(bool)
+    def set_busy_download(self, status):
+        """
+        When downloading media for words
+        """
+        self.is_active_download = status
 
 # UI helpers
 #####################################

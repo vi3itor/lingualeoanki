@@ -313,6 +313,7 @@ def is_word_unique(check_word, words):
 
 
 class Download(QObject):
+    Busy = pyqtSignal(bool)
     Counter = pyqtSignal(int)
     FinalCounter = pyqtSignal(int)
     Word = pyqtSignal(dict)
@@ -331,6 +332,7 @@ class Download(QObject):
         """
         counter = 0
         problem_words = []
+        self.Busy.emit(True)
 
         for word in words:
             self.Word.emit(word)
@@ -345,6 +347,7 @@ class Download(QObject):
         if problem_words:
             self.problem_words_msg(problem_words)
         self.FinalCounter.emit(counter)
+        self.Busy.emit(False)
 
     def problem_words_msg(self, problem_words):
         error_msg = ("We weren't able to download media for these "
