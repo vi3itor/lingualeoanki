@@ -320,10 +320,9 @@ class Download(QObject):
 
     def __init__(self, words, parent=None):
         QObject.__init__(self, parent)
-        self.words = words
 
-    @pyqtSlot()
-    def add_separately(self):
+    @pyqtSlot(list)
+    def add_separately(self, words):
         """
         Divides downloading and filling note to different threads
         because you cannot create SQLite objects outside the main
@@ -333,7 +332,7 @@ class Download(QObject):
         counter = 0
         problem_words = []
 
-        for word in self.words:
+        for word in words:
             self.Word.emit(word)
             try:
                 # TODO: Speed-up loading of media by using multi-threading
@@ -342,8 +341,6 @@ class Download(QObject):
                 problem_words.append(word.get('wordValue'))
             counter += 1
             self.Counter.emit(counter)
-        # TODO: save problem words in json format to user_files folder
-        #  and ask user to retry downloading problem words
 
         if problem_words:
             self.problem_words_msg(problem_words)

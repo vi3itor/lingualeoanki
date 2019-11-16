@@ -343,22 +343,21 @@ class PluginWindow(QDialog):
         self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
 
         # Start downloading
-        self.threadclass = QThread()
-        downloader = connect.Download(words)
-        downloader.moveToThread(self.threadclass)
-        downloader.Word.connect(self.add_word)
-        downloader.Counter.connect(self.progressBar.setValue)
-        downloader.FinalCounter.connect(self.download_finished)
-        downloader.Error.connect(self.showErrorMessage)
-        self.threadclass.started.connect(downloader.add_separately)
-        self.threadclass.downloader = downloader
-        self.threadclass.start()
+        if not hasattr(self, 'download_thread'):
+            self.download_thread = QThread()
+            downloader = connect.Download(words)
+            downloader.moveToThread(self.download_thread)
+            downloader.Word.connect(self.add_word)
+            downloader.Counter.connect(self.progressBar.setValue)
+            downloader.FinalCounter.connect(self.download_finished)
+            downloader.Error.connect(self.showErrorMessage)
+            self.StartDownload.connect(downloader.add_separately)
+            self.download_thread.downloader = downloader
+            self.download_thread.start()
+        self.StartDownload.emit(words)
 
     def download_finished(self, final_count):
         showInfo("%d words from LinguaLeo have been processed" % final_count)
-        # Terminate thread and wait for termination
-        self.threadclass.terminate()
-        self.threadclass.wait()
 
         self.set_download_form_enabled(True)
         self.logoutButton.setEnabled(True)
