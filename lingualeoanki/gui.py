@@ -3,7 +3,7 @@ import platform as pm
 from aqt import mw
 from aqt.utils import showInfo
 from aqt.qt import *
-
+# TODO: change to:  import connect as connector
 from . import connect
 from . import utils
 from . import styles
@@ -18,12 +18,17 @@ from ._version import VERSION
 
 class PluginWindow(QDialog):
     Authorize = pyqtSignal()
+    RequestWords = pyqtSignal(str, list, bool)
+    StartDownload = pyqtSignal(list)
 
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.config = utils.get_config()
         self.is_active_download = False
+        self.is_active_connection = False
+
         # Initialize UI
+        ###############
         message = utils.get_version_update_notification(VERSION)
         title = 'Import from LinguaLeo (version {})'.format(VERSION) if not message else message
         self.setWindowTitle(title)
@@ -154,8 +159,9 @@ class PluginWindow(QDialog):
         if self.config['stayLoggedIn']:
             self.passField.clearFocus()
             cookies_path = utils.get_cookies_path()
-            self.create_lingualeo_thread(self.loginField.text(), self.passField.text(), cookies_path)
+            self.create_lingualeo_object(self.loginField.text(), self.passField.text(), cookies_path)
             self.Authorize.emit()
+            self.showProgressBarBusy(True, "Connecting to Lingualeo...")
             # Disable login button and fields
             self.set_login_form_enabled(False)
         elif not self.config['rememberPassword']:
@@ -187,7 +193,7 @@ class PluginWindow(QDialog):
         else:
             self.config['stayLoggedIn'] = False
 
-        self.create_lingualeo_thread(login, password, cookies_path)
+        self.create_lingualeo_object(login, password, cookies_path)
         self.Authorize.emit()
         self.showProgressBarBusy(True, 'Connecting to LinguaLeo...')
         # Disable login button and fields
@@ -211,7 +217,7 @@ class PluginWindow(QDialog):
         # Disable buttons
         self.set_download_form_enabled(False)
         # TODO: Change 'Exit' Button label to 'Stop' and back
-        self.download_words()
+        self.request_words([])
 
     def wordsetButtonClicked(self):
         self.allow_to_close(False)
@@ -220,7 +226,7 @@ class PluginWindow(QDialog):
         if wordsets:
             word_status = self.get_progress_status()
             wordset_window = WordsetsWindow(wordsets, word_status)
-            wordset_window.Wordsets.connect(self.download_words)
+            wordset_window.Wordsets.connect(self.request_words)
             wordset_window.Cancel.connect(self.set_download_form_enabled)
             wordset_window.exec_()
         else:
@@ -236,14 +242,20 @@ class PluginWindow(QDialog):
         """
         Override close event to safely close add-on window
         """
-        if self.is_active_download:
+        if self.is_active_download or self.is_active_connection:
             qm = QMessageBox()
-            answer = qm.question(self, '', "Are you sure you want to stop downloading?",
+            reason = 'downloading' if self.is_active_download else 'connecting to LinguaLeo'
+            answer = qm.question(self, '', 'Are you sure you want to stop {}?'.format(reason),
                                  qm.Yes | qm.Cancel, qm.Cancel)
             if answer == qm.Cancel:
                 event.ignore()
                 return
             # TODO: Don't close add-on window if the 'Stop' button was pressed
+
+        # TODO: Try using quit() instead?
+        if hasattr(self, 'lingualeo_thread'):
+            self.lingualeo_thread.terminate()
+            self.lingualeo_thread.wait()
 
         if hasattr(self, 'download_thread'):
             self.download_thread.terminate()
@@ -272,6 +284,9 @@ class PluginWindow(QDialog):
             self.lingualeo_thread.lingualeo.Error.disconnect(self.showErrorMessage)
             self.Authorize.disconnect(self.lingualeo_thread.lingualeo.authorize)
             self.lingualeo_thread.lingualeo.AuthorizationStatus.disconnect(self.process_authorization)
+            self.lingualeo_thread.lingualeo.Words.disconnect(self.download_words)
+            self.lingualeo_thread.lingualeo.Busy.disconnect(self.set_busy_connecting)
+            self.RequestWords.disconnect(self.lingualeo_thread.lingualeo.get_words_to_add)
             # Delete previous LinguaLeo object
             # TODO: Investigate if it should be done differently
             self.lingualeo_thread.lingualeo.deleteLater()
@@ -280,6 +295,9 @@ class PluginWindow(QDialog):
         lingualeo.Error.connect(self.showErrorMessage)
         self.Authorize.connect(lingualeo.authorize)
         lingualeo.AuthorizationStatus.connect(self.process_authorization)
+        lingualeo.Words.connect(self.download_words)
+        lingualeo.Busy.connect(self.set_busy_connecting)
+        self.RequestWords.connect(lingualeo.get_words_to_add)
         self.lingualeo_thread.lingualeo = lingualeo
 
     @pyqtSlot(bool)
@@ -292,13 +310,19 @@ class PluginWindow(QDialog):
         self.showProgressBarBusy(False, '')
         self.allow_to_close(True)
 
-    def download_words(self, wordsets=None):
-        # TODO: Run it inside the other thread to handle big dictionaries
+    def request_words(self, wordsets):
         self.allow_to_close(False)
+        self.logoutButton.setEnabled(False)
         status = self.get_progress_status()
         use_old_api = self.api_rbutton_old.isChecked()
-        words = self.lingualeo.get_words_to_add(status, wordsets, use_old_api)
+        self.RequestWords.emit(status, wordsets, use_old_api)
+        self.showProgressBarBusy(True, 'Downloading list of words...')
+
+    @pyqtSlot(list)
+    def download_words(self, words):
+        self.showProgressBarBusy(True, 'Excluding already existing words...')
         filtered = self.filter_words(words)
+        self.showProgressBarBusy(False, '')
         if filtered:
             self.start_download_thread(filtered)
         else:
@@ -306,6 +330,7 @@ class PluginWindow(QDialog):
             msg = 'No %s words to download' % progress if progress != 'all' else 'No words to download'
             showInfo(msg)
             self.allow_to_close(True)
+            self.logoutButton.setEnabled(True)
             self.set_download_form_enabled(True)
             # TODO: Check if it is needed in other functions too
             # Activate add-on window
@@ -321,16 +346,15 @@ class PluginWindow(QDialog):
         """
         if not words:
             return None
-        update = self.checkBoxUpdateNotes.checkState()
-        if not update:
+        if not self.checkBoxUpdateNotes.isChecked():
             # Exclude duplicates, if full update is not required
             words = [word for word in words if not utils.is_duplicate(word)]
         return words
 
     def start_download_thread(self, words):
         # Activate progress bar
+        self.progressBar.setRange(0, len(words))
         self.progressBar.setValue(0)
-        self.progressBar.setMaximum(len(words))
         self.progressBar.show()
         self.progressLabel.setText('Downloading {} words...'.format(len(words)))
         self.progressLabel.show()
@@ -377,6 +401,13 @@ class PluginWindow(QDialog):
         When downloading media for words
         """
         self.is_active_download = status
+
+    @pyqtSlot(bool)
+    def set_busy_connecting(self, status):
+        """
+        When connecting to LinguaLeo for authorization or requesting list of words or wordsets
+        """
+        self.is_active_connection = status
 
 # UI helpers
 #####################################

@@ -10,8 +10,10 @@ from . import utils
 
 
 class Lingualeo(QObject):
+    Busy = pyqtSignal(bool)
     Error = pyqtSignal(str)
     AuthorizationStatus = pyqtSignal(bool)
+    Words = pyqtSignal(list)
 
     def __init__(self, email, password, cookies_path=None, parent=None):
         QObject.__init__(self, parent)
@@ -40,7 +42,9 @@ class Lingualeo(QObject):
 
     @pyqtSlot()
     def authorize(self):
+        self.Busy.emit(True)
         self.AuthorizationStatus.emit(self.get_connection())
+        self.Busy.emit(False)
 
     def get_connection(self):
         try:
@@ -113,7 +117,9 @@ class Lingualeo(QObject):
             return None
         return wordsets
 
-    def get_words_to_add(self, status, wordsets=None, use_old_api=False):
+    @pyqtSlot(str, list, bool)
+    def get_words_to_add(self, status, wordsets, use_old_api=False):
+        self.Busy.emit(True)
         if not self.get_connection():
             return None
         words = []
@@ -138,9 +144,11 @@ class Lingualeo(QObject):
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
-            return None
+            # TODO: Check if it is handled correctly (avoid double Info window)
+            words = []
 
-        return words
+        self.Words.emit(words)
+        self.Busy.emit(False)
 
     def get_words(self, status, wordset_id):
         """
@@ -214,6 +222,7 @@ class Lingualeo(QObject):
         :param wordset_id: id of only one wordset represented as list (e.g., [1] to download from main dictionary)
         :return: list of words, where each word is a dict
         """
+        # TODO: Unite get_words and get_words_old_api functions into one
         url = 'api.lingualeo.com/GetWords'
         headers = {'Content-Type': 'application/json'}
         values = {"apiVersion": "1.0.0", "attrList": WORDS_ATTRIBUTE_LIST,
