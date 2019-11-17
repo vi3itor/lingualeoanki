@@ -327,8 +327,8 @@ class PluginWindow(QDialog):
 
     @pyqtSlot(list)
     def download_words(self, words):
-        filtered = self.filter_words(words)
         self.show_progress_bar(True, 'Excluding already existing words...')
+        filtered = self.filter_words(words) if not self.checkBoxUpdateNotes.isChecked() else words
         self.show_progress_bar(False, '')
         if filtered:
             self.start_download_thread(filtered)
@@ -348,9 +348,8 @@ class PluginWindow(QDialog):
         """
         if not words:
             return None
-        if not self.checkBoxUpdateNotes.isChecked():
-            # Exclude duplicates, if full update is not required
-            words = [word for word in words if not utils.is_duplicate(word)]
+        # Exclude duplicates
+        words = [word for word in words if not utils.is_duplicate(word)]
         return words
 
     def start_download_thread(self, words):
