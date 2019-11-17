@@ -220,8 +220,6 @@ class PluginWindow(QDialog):
         self.request_words([])
 
     def wordsetButtonClicked(self):
-        self.allow_to_close(False)
-        self.set_download_form_enabled(False)
         wordsets = self.lingualeo.get_wordsets()
         if wordsets:
             word_status = self.get_progress_status()
@@ -231,6 +229,7 @@ class PluginWindow(QDialog):
             wordset_window.exec_()
         else:
             self.set_download_form_enabled(True)
+        self.set_elements_enabled(False)
 
     def reject(self):
         """
@@ -303,20 +302,19 @@ class PluginWindow(QDialog):
     @pyqtSlot(bool)
     def process_authorization(self, status):
         if status:
-            self.logoutButton.setEnabled(True)
-            self.set_download_form_enabled(True)
+            self.set_elements_enabled(True)
         else:
             self.set_login_form_enabled(True)
+            self.allow_to_close(True)
         self.showProgressBarBusy(False, '')
-        self.allow_to_close(True)
 
     def request_words(self, wordsets):
-        self.allow_to_close(False)
-        self.logoutButton.setEnabled(False)
+        self.set_elements_enabled(False)
+        # TODO: Change 'Exit' Button label to 'Stop' and back
         status = self.get_progress_status()
         use_old_api = self.api_rbutton_old.isChecked()
         self.RequestWords.emit(status, wordsets, use_old_api)
-        self.showProgressBarBusy(True, 'Downloading list of words...')
+        self.showProgressBarBusy(True, 'Requesting list of words...')
 
     @pyqtSlot(list)
     def download_words(self, words):
@@ -379,13 +377,10 @@ class PluginWindow(QDialog):
         self.StartDownload.emit(words)
 
     def download_finished(self, final_count):
-        showInfo("%d words from LinguaLeo have been processed" % final_count)
-
-        self.set_download_form_enabled(True)
-        self.logoutButton.setEnabled(True)
+        showInfo("%d words have been downloaded" % final_count)
+        self.set_elements_enabled(True)
         self.progressLabel.setText('')
         self.progressBar.hide()
-        self.allow_to_close(True)
         mw.reset()
 
     def add_word(self, word):
@@ -423,6 +418,15 @@ class PluginWindow(QDialog):
     def showErrorMessage(self, msg):
         showInfo(msg)
         mw.reset()
+
+    def set_elements_enabled(self, mode):
+        """
+        Enables or disables download form, logout button,
+        and allows or disallows closing the addon silently
+        """
+        self.set_download_form_enabled(mode)
+        self.logoutButton.setEnabled(mode)
+        self.allow_to_close(mode)
 
     def update_window(self):
         """
