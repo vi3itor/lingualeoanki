@@ -19,6 +19,7 @@ from ._version import VERSION
 class PluginWindow(QDialog):
     Authorize = pyqtSignal()
     RequestWords = pyqtSignal(str, list, bool)
+    RequestWordsets = pyqtSignal()
     StartDownload = pyqtSignal(list)
 
     def __init__(self, parent=None):
@@ -214,22 +215,11 @@ class PluginWindow(QDialog):
         self.allow_to_close(True)
 
     def importAllButtonClicked(self):
-        # Disable buttons
-        self.set_download_form_enabled(False)
-        # TODO: Change 'Exit' Button label to 'Stop' and back
         self.request_words([])
 
     def wordsetButtonClicked(self):
-        wordsets = self.lingualeo.get_wordsets()
-        if wordsets:
-            word_status = self.get_progress_status()
-            wordset_window = WordsetsWindow(wordsets, word_status)
-            wordset_window.Wordsets.connect(self.request_words)
-            wordset_window.Cancel.connect(self.set_download_form_enabled)
-            wordset_window.exec_()
-        else:
-            self.set_download_form_enabled(True)
         self.set_elements_enabled(False)
+        self.RequestWordsets.emit()
 
     def reject(self):
         """
@@ -284,8 +274,10 @@ class PluginWindow(QDialog):
             self.Authorize.disconnect(self.lingualeo_thread.lingualeo.authorize)
             self.lingualeo_thread.lingualeo.AuthorizationStatus.disconnect(self.process_authorization)
             self.lingualeo_thread.lingualeo.Words.disconnect(self.download_words)
+            self.lingualeo_thread.lingualeo.Wordsets.disconnect(self.process_wordsets)
             self.lingualeo_thread.lingualeo.Busy.disconnect(self.set_busy_connecting)
             self.RequestWords.disconnect(self.lingualeo_thread.lingualeo.get_words_to_add)
+            self.RequestWordsets.disconnect(self.lingualeo_thread.lingualeo.get_wordsets)
             # Delete previous LinguaLeo object
             # TODO: Investigate if it should be done differently
             self.lingualeo_thread.lingualeo.deleteLater()
@@ -295,8 +287,10 @@ class PluginWindow(QDialog):
         self.Authorize.connect(lingualeo.authorize)
         lingualeo.AuthorizationStatus.connect(self.process_authorization)
         lingualeo.Words.connect(self.download_words)
+        lingualeo.Wordsets.connect(self.process_wordsets)
         lingualeo.Busy.connect(self.set_busy_connecting)
         self.RequestWords.connect(lingualeo.get_words_to_add)
+        self.RequestWordsets.connect(lingualeo.get_wordsets)
         self.lingualeo_thread.lingualeo = lingualeo
 
     @pyqtSlot(bool)
@@ -307,6 +301,17 @@ class PluginWindow(QDialog):
             self.set_login_form_enabled(True)
             self.allow_to_close(True)
         self.showProgressBarBusy(False, '')
+
+    @pyqtSlot(list)
+    def process_wordsets(self, wordsets):
+        if wordsets:
+            word_status = self.get_progress_status()
+            wordset_window = WordsetsWindow(wordsets, word_status)
+            wordset_window.Wordsets.connect(self.request_words)
+            wordset_window.Cancel.connect(self.set_elements_enabled)
+            wordset_window.exec_()
+        else:
+            self.set_elements_enabled(True)
 
     def request_words(self, wordsets):
         self.activate_addon_window()

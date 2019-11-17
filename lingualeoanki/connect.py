@@ -14,6 +14,7 @@ class Lingualeo(QObject):
     Error = pyqtSignal(str)
     AuthorizationStatus = pyqtSignal(bool)
     Words = pyqtSignal(list)
+    Wordsets = pyqtSignal(list)
 
     def __init__(self, email, password, cookies_path=None, parent=None):
         QObject.__init__(self, parent)
@@ -77,14 +78,18 @@ class Lingualeo(QObject):
             return False
         return True
 
+    @pyqtSlot()
     def get_wordsets(self):
         """
         Get user's dictionaries (wordsets), including default ones,
         and return those, that are not empty
         """
-        if not self.get_connection():
-            return None
+        self.Busy.emit(True)
         wordsets = []
+        if not self.get_connection():
+            self.Wordsets.emit(wordsets)
+            self.Busy.emit(False)
+            return
         url = 'api.lingualeo.com/GetWordSets'
         values = {'apiVersion': '1.0.0',
                   'request': [{'subOp': 'myAll', 'type': 'user', 'perPage': 999,
@@ -114,15 +119,19 @@ class Lingualeo(QObject):
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
-            return None
-        return wordsets
+            wordsets = []
+
+        self.Wordsets.emit(wordsets)
+        self.Busy.emit(False)
 
     @pyqtSlot(str, list, bool)
     def get_words_to_add(self, status, wordsets, use_old_api=False):
         self.Busy.emit(True)
-        if not self.get_connection():
-            return None
         words = []
+        if not self.get_connection():
+            self.Words.emit(words)
+            self.Busy.emit(False)
+            return
         try:
             get_func = self.get_words_old_api if use_old_api else self.get_words
             wordset_ids = [wordset.get('id') for wordset in wordsets] if wordsets else [1]
