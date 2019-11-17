@@ -162,7 +162,7 @@ class PluginWindow(QDialog):
             cookies_path = utils.get_cookies_path()
             self.create_lingualeo_object(self.loginField.text(), self.passField.text(), cookies_path)
             self.Authorize.emit()
-            self.showProgressBarBusy(True, "Connecting to Lingualeo...")
+            self.show_progress_bar(True, "Connecting to Lingualeo...")
             # Disable login button and fields
             self.set_login_form_enabled(False)
         elif not self.config['rememberPassword']:
@@ -196,7 +196,7 @@ class PluginWindow(QDialog):
 
         self.create_lingualeo_object(login, password, cookies_path)
         self.Authorize.emit()
-        self.showProgressBarBusy(True, 'Connecting to LinguaLeo...')
+        self.show_progress_bar(True, 'Connecting to LinguaLeo...')
         # Disable login button and fields
         self.set_login_form_enabled(False)
         utils.update_config(self.config)
@@ -220,6 +220,7 @@ class PluginWindow(QDialog):
     def wordsetButtonClicked(self):
         self.set_elements_enabled(False)
         self.RequestWordsets.emit()
+        self.show_progress_bar(True, 'Requesting list of dictionaries...')
 
     def reject(self):
         """
@@ -300,10 +301,11 @@ class PluginWindow(QDialog):
         else:
             self.set_login_form_enabled(True)
             self.allow_to_close(True)
-        self.showProgressBarBusy(False, '')
+        self.show_progress_bar(False, '')
 
     @pyqtSlot(list)
     def process_wordsets(self, wordsets):
+        self.show_progress_bar(False, '')
         if wordsets:
             word_status = self.get_progress_status()
             wordset_window = WordsetsWindow(wordsets, word_status)
@@ -320,13 +322,13 @@ class PluginWindow(QDialog):
         status = self.get_progress_status()
         use_old_api = self.api_rbutton_old.isChecked()
         self.RequestWords.emit(status, wordsets, use_old_api)
-        self.showProgressBarBusy(True, 'Requesting list of words...')
+        self.show_progress_bar(True, 'Requesting list of words...')
 
     @pyqtSlot(list)
     def download_words(self, words):
-        self.showProgressBarBusy(True, 'Excluding already existing words...')
         filtered = self.filter_words(words)
-        self.showProgressBarBusy(False, '')
+        self.show_progress_bar(True, 'Excluding already existing words...')
+        self.show_progress_bar(False, '')
         if filtered:
             self.start_download_thread(filtered)
         else:
@@ -352,13 +354,8 @@ class PluginWindow(QDialog):
 
     def start_download_thread(self, words):
         # Activate progress bar
-        self.progressBar.setRange(0, len(words))
-        self.progressBar.setValue(0)
-        self.progressBar.show()
-        self.progressLabel.setText('Downloading {} words...'.format(len(words)))
-        self.progressLabel.show()
-        self.logoutButton.setEnabled(False)
-
+        label = 'Downloading {} words...'.format(len(words))
+        self.show_progress_bar(True, label, len(words))
         # Set Anki Model
         self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
 
@@ -407,9 +404,9 @@ class PluginWindow(QDialog):
 
 # UI helpers
 #####################################
-    def showProgressBarBusy(self, mode, label):
+    def show_progress_bar(self, mode, label, max_range=0):
         if mode:
-            self.progressBar.setRange(0, 0)
+            self.progressBar.setRange(0, max_range)
             self.progressBar.setValue(0)  # is it required?
             self.progressBar.show()
         else:
