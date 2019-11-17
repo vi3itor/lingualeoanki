@@ -18,7 +18,7 @@ def activate():
     else:
         config = utils.get_config()
         if config:
-            window = gui.PluginWindow()
+            window = gui.PluginWindow(mw)
             setattr(mw, ADDON_NAME, window)
             window.exec_()
         else:

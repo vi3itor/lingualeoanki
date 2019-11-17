@@ -357,9 +357,10 @@ class PluginWindow(QDialog):
         label = 'Downloading {} words...'.format(len(words))
         self.show_progress_bar(True, label, len(words))
         # Set Anki Model
-        self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
+        if not hasattr(self, 'model'):
+            self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
 
-        # Start downloading
+        # Create a thread if it is a first run
         if not hasattr(self, 'download_thread'):
             self.download_thread = QThread()
             downloader = connect.Download(words)
@@ -372,13 +373,13 @@ class PluginWindow(QDialog):
             self.StartDownload.connect(downloader.add_separately)
             self.download_thread.downloader = downloader
             self.download_thread.start()
+        # Start downloading
         self.StartDownload.emit(words)
 
     def download_finished(self, final_count):
         showInfo("%d words have been downloaded" % final_count)
         self.set_elements_enabled(True)
-        self.progressLabel.setText('')
-        self.progressBar.hide()
+        self.show_progress_bar(False, '')
         mw.reset()
 
     def add_word(self, word):
@@ -431,20 +432,19 @@ class PluginWindow(QDialog):
         It's not recommended to call self.repaint() directly,
         but at least on MacOS Anki 2.1.11 doesn't update widget's
         window for several seconds even when self.update() is called
-        TODO: Remove when it works as expected
+        TODO: Remove when it works as expected or repaint for Mac only
         """
         # self.update()
         self.repaint()
 
     def get_progress_status(self):
         progress = 'all'
-
         if self.rbutton_learned.isChecked():
             progress = 'learned'
         elif self.rbutton_learning.isChecked():
             progress = 'learning'
         elif self.rbutton_new.isChecked():
-            progress = 'new';
+            progress = 'new'
         return progress
 
     def set_download_form_enabled(self, mode):
