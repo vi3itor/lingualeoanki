@@ -19,7 +19,7 @@ from ._version import VERSION
 class PluginWindow(QDialog):
     Authorize = pyqtSignal()
     RequestWords = pyqtSignal(str, list, bool)
-    RequestWordsets = pyqtSignal()
+    RequestWordsets = pyqtSignal(str)
     StartDownload = pyqtSignal(list)
 
     def __init__(self, parent=None):
@@ -219,7 +219,8 @@ class PluginWindow(QDialog):
 
     def wordsetButtonClicked(self):
         self.set_elements_enabled(False)
-        self.RequestWordsets.emit()
+        word_status = self.get_progress_status()
+        self.RequestWordsets.emit(word_status)
         self.show_progress_bar(True, 'Requesting list of dictionaries...')
 
     def reject(self):
@@ -307,10 +308,10 @@ class PluginWindow(QDialog):
     def process_wordsets(self, wordsets):
         self.show_progress_bar(False, '')
         if wordsets:
-            word_status = self.get_progress_status()
-            wordset_window = WordsetsWindow(wordsets, word_status)
-            wordset_window.Wordsets.connect(self.request_words)
+            wordset_window = WordsetsWindow(wordsets)
+            wordset_window.SelectedWordsets.connect(self.request_words)
             wordset_window.Cancel.connect(self.set_elements_enabled)
+            wordset_window.Cancel.connect(self.activate_addon_window)
             wordset_window.exec_()
         else:
             self.set_elements_enabled(True)
@@ -475,7 +476,7 @@ class PluginWindow(QDialog):
         self.checkBoxSavePass.setEnabled(mode)
         self.update_window()
 
-    def activate_addon_window(self):
+    def activate_addon_window(self, optional=True):
         addon_window = getattr(mw, ADDON_NAME, None)
         if addon_window:
             addon_window.activateWindow()
@@ -494,16 +495,12 @@ class PluginWindow(QDialog):
 
 
 class WordsetsWindow(QDialog):
-    Wordsets = pyqtSignal(list)
+    SelectedWordsets = pyqtSignal(list)
     Cancel = pyqtSignal(bool)
 
-    def __init__(self, wordsets, word_status, parent=None):
+    def __init__(self, wordsets, parent=None):
         QDialog.__init__(self, parent)
         self.wordsets = wordsets
-        self.word_status = word_status
-        self.initUI()
-
-    def initUI(self):
         self.setWindowTitle('Choose dictionaries to import')
         if pm.system() == 'Windows':
             self.setWindowIcon(QIcon(utils.get_icon_path('dict.ico')))
@@ -518,18 +515,7 @@ class WordsetsWindow(QDialog):
         self.listWidget = QListWidget()
         self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
         for wordset in self.wordsets:
-            if 'countWords' in wordset:  # Main dictionary with all words
-                if self.word_status == 'learned':
-                    learned = wordset['countWordsLearned'] if 'countWordsLearned' in wordset else 0
-                    item_name = wordset['name'] + ' (' + str(learned) + ' learned words)'
-                else:  #
-                    item_name = wordset['name'] + ' (' + str(wordset['countWords']) + ' words in total)'
-            elif self.word_status == 'learned':  # for learned status in other user dictionaries
-                learned = wordset['cl'] if 'cl' in wordset else 0
-                item_name = wordset['name'] + ' (' + str(learned) + ' learned words)'
-            else:    # for other statuses (all, new, learning) of other user dictionaries
-                item_name = wordset['name'] + ' (' + str(wordset['cw']) + ' words in total)'
-            item = QListWidgetItem(item_name)
+            item = QListWidgetItem(wordset['list_name'])
             item.wordset_id = wordset['id']
             self.listWidget.addItem(item)
 
@@ -557,9 +543,9 @@ class WordsetsWindow(QDialog):
         selected_wordsets = []
         for wordset in self.wordsets:
             if str(wordset['id']) in selected_ids:
-                selected_wordsets.append(wordset.copy())
+                selected_wordsets.append(wordset['id'])
         self.close()
-        self.Wordsets.emit(selected_wordsets)
+        self.SelectedWordsets.emit(selected_wordsets)
 
     def cancelButtonClicked(self):
         # Send signal to activate buttons and radio buttons on the main add-on window

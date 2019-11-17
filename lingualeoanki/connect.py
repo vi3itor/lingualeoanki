@@ -78,11 +78,11 @@ class Lingualeo(QObject):
             return False
         return True
 
-    @pyqtSlot()
-    def get_wordsets(self):
+    @pyqtSlot(str)
+    def get_wordsets(self, status):
         """
         Get user's dictionaries (wordsets), including default ones,
-        and return those, that are not empty
+        and return ids and names of not empty ones
         """
         self.Busy.emit(True)
         wordsets = []
@@ -99,20 +99,28 @@ class Lingualeo(QObject):
         try:
             response = self.get_content(url, json.dumps(values), headers)
             if response.get('error') or not response.get('data'):
-                raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
+                raise Exception('Incorrect data received from LinguaLeo. Possibly API was changed again. '
                                 + response.get('error').get('message'))
             all_wordsets = response['data'][0]['items']
             # Add only non-empty dictionaries
             for wordset in all_wordsets:
-                if wordset.get('countWords') and wordset['countWords'] != 0:
-                    wordsets.append(wordset.copy())
+                count = wordset['countWordsLearned'] if status == 'learned' else wordset['countWords']
+                if count == 0:
+                    continue  # No need to show an empty dictionary in the list
+                list_name = '{} ({} {})'.format(wordset['name'], count, 'words' if count > 1 else 'word')
+                if wordset['id'] == 1 and status != 'learned':  # Main dictionary with all words
+                    list_name = list_name[:-1] + ' in total)'
+                wordsets.append({'list_name': list_name, 'id': wordset['id']})
             self.save_cookies()
             if not wordsets:
                 self.msg = 'No user dictionaries found'
         except (urllib.error.URLError, socket.error):
             self.msg = "Can't get dictionaries. Problem with internet connection."
         except ValueError:
-            self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
+            self.msg = "Error! Possibly, invalid data was received from LinguaLeo."
+        except KeyError:
+            self.msg = "Can't get list of wordsets. Possibly API was changed again. Please create a new issue " \
+                       "on GitHub: https://github.com/vi3itor/lingualeoanki/issues/new"
         except Exception as e:
             self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
                        "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e.args)
@@ -134,7 +142,7 @@ class Lingualeo(QObject):
             return
         try:
             get_func = self.get_words_old_api if use_old_api else self.get_words
-            wordset_ids = [wordset.get('id') for wordset in wordsets] if wordsets else [1]
+            wordset_ids = wordsets if wordsets else [1]
             for wordset_id in wordset_ids:
                 received_words = get_func(status, wordset_id)
                 # print(get_func.__name__ + ' ' + str(len(received_words)) + ' words received')
@@ -147,6 +155,9 @@ class Lingualeo(QObject):
             self.msg = "Can't download words. Problem with internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
+        except KeyError:
+            self.msg = "Can't get list of words. Possibly API was changed again. Please create a new issue " \
+                       "on GitHub: https://github.com/vi3itor/lingualeoanki/issues/new"
         except Exception as e:
             self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
                        "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e.args)
