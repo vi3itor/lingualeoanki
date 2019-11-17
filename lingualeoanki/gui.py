@@ -309,6 +309,7 @@ class PluginWindow(QDialog):
         self.showProgressBarBusy(False, '')
 
     def request_words(self, wordsets):
+        self.activate_addon_window()
         self.set_elements_enabled(False)
         # TODO: Change 'Exit' Button label to 'Stop' and back
         status = self.get_progress_status()
@@ -330,12 +331,7 @@ class PluginWindow(QDialog):
             self.allow_to_close(True)
             self.logoutButton.setEnabled(True)
             self.set_download_form_enabled(True)
-            # TODO: Check if it is needed in other functions too
-            # Activate add-on window
-            addon_window = getattr(mw, ADDON_NAME, None)
-            if addon_window:
-                addon_window.activateWindow()
-                addon_window.raise_()
+            self.activate_addon_window()
 
     def filter_words(self, words):
         """
@@ -476,6 +472,12 @@ class PluginWindow(QDialog):
         self.checkBoxStayLoggedIn.setEnabled(mode)
         self.checkBoxSavePass.setEnabled(mode)
         self.update_window()
+
+    def activate_addon_window(self):
+        addon_window = getattr(mw, ADDON_NAME, None)
+        if addon_window:
+            addon_window.activateWindow()
+            addon_window.raise_()
 
     def allow_to_close(self, flag):
         """
