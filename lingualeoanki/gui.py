@@ -331,7 +331,7 @@ class PluginWindow(QDialog):
         filtered = self.filter_words(words) if not self.checkBoxUpdateNotes.isChecked() else words
         self.show_progress_bar(False, '')
         if filtered:
-            self.start_download_thread(filtered)
+            self.start_downloading_media(filtered)
         else:
             progress = self.get_progress_status()
             msg = 'No %s words to download' % progress if progress != 'all' else 'No words to download'
@@ -352,7 +352,7 @@ class PluginWindow(QDialog):
         words = [word for word in words if not utils.is_duplicate(word)]
         return words
 
-    def start_download_thread(self, words):
+    def start_downloading_media(self, words):
         # Activate progress bar
         label = 'Downloading {} words...'.format(len(words))
         self.show_progress_bar(True, label, len(words))
@@ -360,21 +360,25 @@ class PluginWindow(QDialog):
         if not hasattr(self, 'model'):
             self.model = utils.prepare_model(mw.col, utils.fields, styles.model_css)
 
-        # Create a thread if it is a first run
-        if not hasattr(self, 'download_thread'):
-            self.download_thread = QThread()
-            downloader = connect.Download(words)
-            downloader.moveToThread(self.download_thread)
-            downloader.Word.connect(self.add_word)
-            downloader.Counter.connect(self.progressBar.setValue)
-            downloader.FinalCounter.connect(self.download_finished)
-            downloader.Error.connect(self.showErrorMessage)
-            downloader.Busy.connect(self.set_busy_download)
-            self.StartDownload.connect(downloader.add_separately)
-            self.download_thread.downloader = downloader
-            self.download_thread.start()
+        # Create and start a thread if it is a first run
+        self.create_download_thread()
         # Start downloading
         self.StartDownload.emit(words)
+
+    def create_download_thread(self):
+        if hasattr(self, 'download_thread'):
+            return
+        self.download_thread = QThread()
+        downloader = connect.Download()
+        downloader.moveToThread(self.download_thread)
+        downloader.Word.connect(self.add_word)
+        downloader.Counter.connect(self.progressBar.setValue)
+        downloader.FinalCounter.connect(self.download_finished)
+        downloader.Message.connect(self.showErrorMessage)
+        downloader.Busy.connect(self.set_busy_download)
+        self.StartDownload.connect(downloader.add_separately)
+        self.download_thread.downloader = downloader
+        self.download_thread.start()
 
     def download_finished(self, final_count):
         showInfo("%d words have been downloaded" % final_count)
