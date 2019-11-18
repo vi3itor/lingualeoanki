@@ -4,6 +4,7 @@ from .six.moves import urllib
 import socket
 import json
 import ssl
+import base64
 
 from aqt.qt import *
 from . import utils
@@ -387,6 +388,22 @@ class Download(QObject):
         error_msg += problem_words[-1] + '.'
         self.Message.emit(error_msg)
 
+    @pyqtSlot()
+    def check_for_new_version(self):
+        # TODO: Investigate if it is better to call Anki's internal mechanism to check for new versions? 
+        self.Busy.emit(True)
+        url = 'https://api.github.com/repos/vi3itor/lingualeoanki/contents/lingualeoanki/_version.py'
+        try:
+            # TODO: Find more secure fix
+            resp = urllib.request.urlopen(url, context=ssl._create_unverified_context())
+            resp = json.loads(resp.read())
+            github_file = base64.b64decode(resp['content']).decode('utf-8').split('\n')
+            if utils.is_newer_version_available(github_file):
+                self.Message.emit('Warning! A new version of Add-on is available. Please update!')
+        except:
+            # TODO: Handle connection exception
+            pass
+        self.Busy.emit(False)
 
 # New API requires list of attributes
 WORDS_ATTRIBUTE_LIST = {"id": "id", "wordValue": "wd", "origin": "wo", "wordType": "wt",

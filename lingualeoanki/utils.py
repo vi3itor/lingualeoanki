@@ -11,6 +11,7 @@ from aqt import mw
 from anki import notes
 
 from . import styles
+from ._version import VERSION
 
 
 fields = ['en', 'transcription',
@@ -318,15 +319,21 @@ def get_version_update_notification(version_in_memory):
     If they differ, notify user to restart Anki.
     :return: str with notification message or None
     """
-    version_prefix = 'VERSION = '
     version_file = os.path.join(get_addon_dir(), '_version.py')
     with open(version_file, 'r') as f:
-        for line in f:
-            if line.startswith(version_prefix):
-                version_in_file = line.split('\'')[-2]
-                if version_in_file != version_in_memory:
-                    return 'Restart Anki to update Add-on'
+        if is_newer_version_available(f):
+            return 'Please restart Anki to finish updating the Add-on'
     return None
+
+
+def is_newer_version_available(lines):
+    version_prefix = 'VERSION = '
+    for line in lines:
+        if line.startswith(version_prefix):
+            version_in_file = line.split('\'')[-2]
+            if version_in_file != VERSION:
+                return True
+    return False
 
 
 def get_icon_path(icon_file):

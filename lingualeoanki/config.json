@@ -3,5 +3,6 @@
   "password": "yourPassword",
   "rememberPassword": true,
   "stayLoggedIn": false,
-  "wordsPerRequest": 999
+  "wordsPerRequest": 999,
+  "checkForNewVersion": true
 }

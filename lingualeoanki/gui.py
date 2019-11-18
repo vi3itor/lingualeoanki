@@ -20,6 +20,7 @@ class PluginWindow(QDialog):
     Authorize = pyqtSignal()
     RequestWords = pyqtSignal(str, list, bool)
     RequestWordsets = pyqtSignal(str)
+    CheckVersion = pyqtSignal()
     StartDownload = pyqtSignal(list)
 
     def __init__(self, parent=None):
@@ -30,8 +31,7 @@ class PluginWindow(QDialog):
 
         # Initialize UI
         ###############
-        message = utils.get_version_update_notification(VERSION)
-        title = 'Import from LinguaLeo (version {})'.format(VERSION) if not message else message
+        title = 'Import from LinguaLeo (version {})'.format(VERSION)
         self.setWindowTitle(title)
         if pm.system() == 'Windows':
             self.setWindowIcon(QIcon(utils.get_icon_path('favicon.ico')))
@@ -157,6 +157,15 @@ class PluginWindow(QDialog):
             self.passField.setText(self.config['password'])
 
         self.show()
+        # Check for new version on disk and on github
+        message = utils.get_version_update_notification(VERSION)
+        if message:
+            showInfo(message)
+            self.setWindowTitle(message)
+        elif self.config['checkForNewVersion']:
+            self.create_download_thread()
+            self.CheckVersion.emit()
+
         if self.config['stayLoggedIn']:
             self.passField.clearFocus()
             cookies_path = utils.get_cookies_path()
@@ -376,6 +385,7 @@ class PluginWindow(QDialog):
         downloader.FinalCounter.connect(self.download_finished)
         downloader.Message.connect(self.showErrorMessage)
         downloader.Busy.connect(self.set_busy_download)
+        self.CheckVersion.connect(downloader.check_for_new_version)
         self.StartDownload.connect(downloader.add_separately)
         self.download_thread.downloader = downloader
         self.download_thread.start()
