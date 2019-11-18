@@ -346,9 +346,9 @@ class Download(QObject):
     Counter = pyqtSignal(int)
     FinalCounter = pyqtSignal(int)
     Word = pyqtSignal(dict)
-    Error = pyqtSignal(str)
+    Message = pyqtSignal(str)
 
-    def __init__(self, words, parent=None):
+    def __init__(self, parent=None):
         QObject.__init__(self, parent)
 
     @pyqtSlot(list)
@@ -385,7 +385,7 @@ class Download(QObject):
         for problem_word in problem_words[:-1]:
             error_msg += problem_word + ', '
         error_msg += problem_words[-1] + '.'
-        self.Error.emit(error_msg)
+        self.Message.emit(error_msg)
 
 
 # New API requires list of attributes
