@@ -6,6 +6,7 @@ import socket
 import ssl
 import locale
 import sys
+import time
 
 from aqt import mw
 from anki import notes
@@ -70,27 +71,13 @@ def prepare_model(collection, fields, model_css):
     return model
 
 
-def download_media_file(url):
-    DOWNLOAD_TIMEOUT = 20
-    destination_folder = mw.col.media.dir()
-    name = url.split('/')[-1]
-    name = get_valid_name(name)
-    abs_path = os.path.join(destination_folder, name)
-    # Fix '\n' symbols in the url (they were found in the long sentences)
-    url = url.replace('\n', '')
-    # TODO: find a better way for unsecure connection
-    resp = urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT, context=ssl._create_unverified_context())
-    content = resp.read()
-    with open(abs_path, "wb") as media_file:
-        media_file.write(content)
-
-
-def send_to_download(word):
+def send_to_download(word, timeout, retries, sleep_seconds):
     # try to download the picture and the sound the specified number of times,
     # if not succeeded, raise the last error happened to be shown as a problem word
     sound_url = word.get('pronunciation')
     if sound_url and is_valid_ascii(sound_url):
-        try_downloading_media(sound_url)
+        try_downloading_media(sound_url, timeout, retries, sleep_seconds)
+
     pic_url = word.get('picture')
     # TODO: Remove or refactor the following code that supports old API
     translations = word.get('translations')
@@ -99,27 +86,38 @@ def send_to_download(word):
         if translation.get('pic'):
             pic_url = translation['pic']
     # End of temporary code
-
     if pic_url and is_not_default_picture(pic_url):
         if not is_valid_ascii(pic_url):
             raise urllib.error.URLError('Invalid picture url: ' + pic_url)
-        try_downloading_media(pic_url)
+        try_downloading_media(pic_url, timeout, retries, sleep_seconds)
 
 
-def try_downloading_media(url):
-    # TODO: Move to config (and also DOWNLOAD_TIMEOUT)
-    NUM_RETRIES = 3
+def try_downloading_media(url, timeout, retries, sleep_seconds):
     exc_happened = None
-    for i in list(range(NUM_RETRIES)):
+    for i in list(range(retries)):
         exc_happened = None
         try:
-            download_media_file(url)
+            download_media_file(url, timeout)
             break
         except (urllib.error.URLError, socket.error) as e:
             exc_happened = e
-            # TODO: implement sleeping thread
+            time.sleep(sleep_seconds)
     if exc_happened:
         raise exc_happened
+
+
+def download_media_file(url, timeout):
+    destination_folder = mw.col.media.dir()
+    name = url.split('/')[-1]
+    name = get_valid_name(name)
+    abs_path = os.path.join(destination_folder, name)
+    # Fix '\n' symbols in the url (they were found in the long sentences)
+    url = url.replace('\n', '')
+    # TODO: find a better way for unsecure connection
+    resp = urllib.request.urlopen(url, timeout=timeout, context=ssl._create_unverified_context())
+    content = resp.read()
+    with open(abs_path, "wb") as media_file:
+        media_file.write(content)
 
 
 def fill_note(word, note, is_old_api):

@@ -4,5 +4,9 @@
   "rememberPassword": true,
   "stayLoggedIn": false,
   "wordsPerRequest": 999,
+  "parallelDownloads": 3,
+  "downloadTimeout": 20,
+  "numberOfRetries": 3,
+  "sleepSeconds": 5,
   "checkForNewVersion": true
 }

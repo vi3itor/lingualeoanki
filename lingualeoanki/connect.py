@@ -351,6 +351,18 @@ class Download(QObject):
 
     def __init__(self, parent=None):
         QObject.__init__(self, parent)
+        config = utils.get_config()
+        self.timeout = config['downloadTimeout']
+        self.retries = config['numberOfRetries']
+        self.sleep_seconds = config['sleepSeconds']
+        self.threadpool = QThreadPool(self)
+        MAX_PARALLEL_DOWNLOADS = 3
+        max_threads = config['parallelDownloads']
+        parallel_downloads = max_threads if max_threads <= MAX_PARALLEL_DOWNLOADS else MAX_PARALLEL_DOWNLOADS
+        self.threadpool.setMaxThreadCount(parallel_downloads)
+        self.problem_words = []
+        self.counter = 0
+        self.total_words = 0
 
     @pyqtSlot(list)
     def add_separately(self, words):
@@ -360,32 +372,36 @@ class Download(QObject):
         thread in Anki. Also you cannot download files in the main
         thread because it will freeze GUI
         """
-        counter = 0
-        problem_words = []
+        self.counter = 0
+        self.total_words = len(words)
         self.Busy.emit(True)
 
         for word in words:
-            self.Word.emit(word)
-            try:
-                # TODO: Speed-up loading of media by using multi-threading
-                utils.send_to_download(word)
-            except (urllib.error.URLError, socket.error):
-                problem_words.append(word.get('wordValue'))
-            counter += 1
-            self.Counter.emit(counter)
+            download_worker = DownloadWorker(word, self.timeout, self.retries, self.sleep_seconds)
+            download_worker.signals.Word.connect(self.emit_word_and_counter)
+            download_worker.signals.ProblemWord.connect(self.problem_words.append)
+            # print('Adding worker for ' + word['wordValue'])
+            self.threadpool.start(download_worker)
 
-        if problem_words:
-            self.problem_words_msg(problem_words)
-        self.FinalCounter.emit(counter)
-        self.Busy.emit(False)
+    @pyqtSlot(dict)
+    def emit_word_and_counter(self, word):
+        self.Word.emit(word)
+        self.counter += 1
+        print("Counter " + str(self.counter))
+        self.Counter.emit(self.counter)
+        if self.counter == self.total_words:
+            if self.problem_words:
+                self.emit_problem_words_msg()
+            self.FinalCounter.emit(self.counter)
+            self.Busy.emit(False)
 
-    def problem_words_msg(self, problem_words):
+    def emit_problem_words_msg(self):
         error_msg = ("We weren't able to download media for these "
                      "words because of broken links in LinguaLeo "
                      "or problems with an internet connection: ")
-        for problem_word in problem_words[:-1]:
+        for problem_word in self.problem_words[:-1]:
             error_msg += problem_word + ', '
-        error_msg += problem_words[-1] + '.'
+        error_msg += self.problem_words[-1] + '.'
         self.Message.emit(error_msg)
 
     @pyqtSlot()
@@ -399,11 +415,40 @@ class Download(QObject):
             resp = json.loads(resp.read())
             github_file = base64.b64decode(resp['content']).decode('utf-8').split('\n')
             if utils.is_newer_version_available(github_file):
-                self.Message.emit('Warning! A new version of Add-on is available. Please update!')
+                self.Message.emit('Warning! A new version of Add-on is available. Please consider updating!')
         except:
             # TODO: Handle connection exception
             pass
         self.Busy.emit(False)
+
+
+class DownloadWorker(QRunnable):
+    def __init__(self, word, timeout, retries, sleep_seconds):
+        QRunnable.__init__(self)
+        self.word = word
+        self.timeout = timeout
+        self.retries = retries
+        self.sleep_seconds = sleep_seconds
+        self.signals = WorkerSignals()
+
+    def run(self):
+        try:
+            # print('Downloading media for ' + self.word['wordValue'] + ' just started')
+            utils.send_to_download(self.word, self.timeout, self.retries, self.sleep_seconds)
+        except (urllib.error.URLError, socket.error):
+            # print("Problem with " + self.word['wordValue'])
+            self.signals.ProblemWord.emit(self.word.get('wordValue'))
+        # print('Worker for ' + self.word['wordValue'] + ' finished')
+        self.signals.Word.emit(self.word)
+
+
+class WorkerSignals(QObject):
+    """
+    Defines the signals for a worker thread.
+    """
+    Word = pyqtSignal(dict)
+    ProblemWord = pyqtSignal(str)
+
 
 # New API requires list of attributes
 WORDS_ATTRIBUTE_LIST = {"id": "id", "wordValue": "wd", "origin": "wo", "wordType": "wt",
