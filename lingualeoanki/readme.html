@@ -8,13 +8,38 @@
 
 <p>The add-on downloads your dictionary words from <a href="https://lingualeo.com/">LinguaLeo</a> - another great resource to learn English, and transforms them into Anki cards. Both &#39;English to Russian&#39; and &#39;Russian to English&#39; cards are created and they include pronunciation sound, image, transcription, and context.</p>
 
-<figure><img src="https://i.imgur.com/qSwZn5bl.png" alt="screenshot"/><figcaption>screenshot</figcaption></figure>
+<figure><img src="https://i.imgur.com/3mhKJScl.png" alt="screenshot"/><figcaption>screenshot</figcaption></figure>
 
 <p><a href="https://lingualeo.com/">LinguaLeo</a> has a user-friendly interface for adding new words to learn and a good <a href="https://lingualeo.com/ru/browserapps">browser extension</a> to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several <a href="https://lingualeo.com/ru/training">trainings</a>, you need Anki to stick them in your memory forever with as little time and effort as possible. </p>
 
 <h3>Notice on recent update of LinguaLeo</h3>
 
-<p>The <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">update</a> of Lingualeo on April 30, 2019 brought several <a href="https://corp.lingualeo.com/ru/2019/05/01/spasibo-druzya-rabota-nad-oshibkami/">issues</a>. As of July 30, 2019 they are still experimenting and changing API from time to time. Current version of add-on (2.1.5) is fully compatible with the update, except of downloading context for the word. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on <a href="https://lingualeo.com/">Lingualeo</a> first and write to the support. For the add-on problems please <a href="https://github.com/vi3itor/lingualeoanki/issues/new">create an issue on Github</a> or mail me at 4yourquestions {at} gmail.com. Thank you! </p>
+<p>The <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">update</a> of Lingualeo on April 30, 2019 brought several <a href="https://corp.lingualeo.com/ru/2019/07/12/qa-news/">issues</a>. As of November, 2019 they are still experimenting and changing API from time to time. Current version of add-on (2.2.0) is fully compatible with the update. It is not possible to get context for words for now when using a new API, but with old API it works as before. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on <a href="https://lingualeo.com/">Lingualeo</a> first and write to the support. For the add-on problems please <a href="https://github.com/vi3itor/lingualeoanki/issues/new">create an issue on Github</a> or mail me at 4yourquestions {at} gmail.com. Thank you! </p>
+
+<h3>New in version 2.2 (2019-11-20):</h3>
+
+<h3>Added</h3>
+
+<ul>
+	<li>Ability to choose what API to use.</li>
+	<li>Check for new version on start.</li>
+	<li>Show version info in the window title.</li>
+	<li>Config option for number of words per request.</li>
+	<li>Config options for download timeout, number of retries, sleep seconds and parallel downloads.</li>
+	<li>Get word context again by using old API.</li>
+	<li>Show busy progress bar when requesting list of words and wordsets.</li>
+	<li>Show number of found words in a progress bar. </li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+	<li>Media is downloaded 3 times faster because of parallel downloads. </li>
+	<li>List of words and wordsets is requested asynchronously and doesn&#39;t freeze the GUI.</li>
+	<li>&quot;Update existing notes&quot; option will update not only media, but also translation and context.</li>
+	<li>Renamed &#39;All&#39; radio-button to &#39;Any&#39;.</li>
+	<li>Improved dictionary word count in wordset window. </li>
+</ul>
 
 <h3>New in version 2.1:</h3>
 
@@ -85,7 +110,7 @@
 
 <p>The easiest (and preferable) way to install the add-on is by using the Anki&#39;s built-in add-ons managing system. In this case, it will be easy to <a href="#update">update</a> the add-on and get the latest version with new features and bug fixes. To install the add-on go to:<br/>(in Anki 2.1.x) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Get add-ons...&quot;<br/>(in Anki 2.0) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Browse &amp; Install&quot;<br/>and input add-on&#39;s code: 1411073333. Restart Anki.</p>
 
-<p>If for some reason you wish to install the add-on manually, download the archive with the latest version from the <a href="https://github.com/vi3itor/lingualeoanki/">repository on GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-5.zip">for Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-5.zip">for Anki 2.0</a>), open Anki on your computer, go to:<br/>(in Anki 2.1.x) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;View Files&quot;<br/>(in Anki 2.0) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Open Add-ons Folder&quot;<br/>and put the content of the archive there. If you use Anki 2.1.x create an additional folder named &quot;lingualeoanki&quot; inside &quot;addons21&quot; folder and put the content of the archive there. Restart Anki.<br/>See the following gif for the details on manual installation in Anki 2.0 (with Russian captures):</p>
+<p>If for some reason you wish to install the add-on manually, download the archive with the latest version from the <a href="https://github.com/vi3itor/lingualeoanki/">repository on GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-0.zip">for Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-0.zip">for Anki 2.0</a>), open Anki on your computer, go to:<br/>(in Anki 2.1.x) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;View Files&quot;<br/>(in Anki 2.0) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Open Add-ons Folder&quot;<br/>and put the content of the archive there. If you use Anki 2.1.x create an additional folder named &quot;lingualeoanki&quot; inside &quot;addons21&quot; folder and put the content of the archive there. Restart Anki.<br/>See the following gif for the details on manual installation in Anki 2.0 (with Russian captures):</p>
 
 <p><a href="https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif">how to manually install</a></p>
 
@@ -129,14 +154,11 @@
 <h5>User Interface:</h5>
 
 <ul>
-	<li>&quot;Loading...&quot; message to show user that list of words or list of dictionaries is being downloaded.</li>
 	<li>Add Russian localization since beginners are more comfortable with native language.</li>
 	<li>Additional configuration window to set up: </li>
 	<li>what style of &quot;Russian to English&quot; cards to create: with typing answer or without;</li>
-	<li>download timeout, number of retries and sleep seconds;</li>
 	<li>choose from-to dates for importing words;</li>
 	<li>option to highlight the word in context;</li>
-	<li>show number of words in progress bar. </li>
 	<li>Improve error messages by narrowing down the reason.</li>
 </ul>
 
@@ -145,7 +167,6 @@
 <ul>
 	<li>Add user dictionaries (wordsets) as tags.</li>
 	<li>Save problem words in json format and ask to retry downloading problem words only.</li>
-	<li>Update not only media, but also translation(s), context, tags.</li>
 	<li>Improve duplicate search to automatically update notes when any information was changed.</li>
 </ul>
 
@@ -169,13 +190,38 @@
 
 <p>Дополнение позволяет в один клик скачать ваши сохранённые слова из <a href="https://lingualeo.com/">LinguaLeo</a>, другой замечательной образовательной платформы для изучения и практики английского языка, и создать для них карточки Anki. Карточки создаются как в варианте &quot;русский - английский&quot;, так и &quot;английский - русский&quot; и включают в себя изображения, транскрипцию, аудио с произношением и предложение с контекстом из ЛингваЛео.<br/></p>
 
-<figure><img src="https://i.imgur.com/qSwZn5bl.png" alt="screenshot"/><figcaption>screenshot</figcaption></figure>
+<figure><img src="https://i.imgur.com/3mhKJScl.png" alt="screenshot"/><figcaption>screenshot</figcaption></figure>
 
 <p><a href="https://lingualeo.com/">ЛингваЛео</a> имеет удобный интерфейс для добавления новых слов и неплохое <a href="https://lingualeo.com/ru/browserapps">расширение для браузера</a> для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких <a href="https://lingualeo.com/ru/training">тренировок</a>, Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.</p>
 
 <h3>Внимание! Обновление Lingualeo 30.04.2019</h3>
 
-<p>В связи с <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">обновлением</a> сервиса Lingualeo от 30 апреля 2019 возможны временные <a href="https://corp.lingualeo.com/ru/2019/05/01/spasibo-druzya-rabota-nad-oshibkami/">неполадки</a> в его работе. По состоянию на 30 июля 2019 команда Lingualeo по-прежнему продолжает экспериментировать и время от времени изменяет API. В актуальной версии дополнения (2.1.5) восстановлена его работа, за исключением загрузки контекста. Сайт Lingualeo по-прежнему работает нестабильно: не отображает все слова, показывает неверный контекст слов и т.п. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте <a href="https://lingualeo.com/">Lingualeo</a> и напишите в поддержку. Если же проблема в дополнении - <a href="https://github.com/vi3itor/lingualeoanki/issues/new">создайте issue на Github</a> либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! </p>
+<p>В связи с <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">обновлением</a> сервиса Lingualeo от 30 апреля 2019 возможны временные <a href="https://corp.lingualeo.com/ru/2019/07/12/qa-news/">неполадки</a> в его работе. По состоянию на 20 ноября 2019 года команда Lingualeo по-прежнему продолжает экспериментировать и время от времени изменяет API. В актуальной версии дополнения (2.2.0) восстановлена его работа, но загружать контекст пока что можно только с использованием старого API. Сайт Lingualeo по-прежнему работает нестабильно: не отображает все слова, показывает неверный контекст слов и т.п. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте <a href="https://lingualeo.com/">Lingualeo</a> и напишите в поддержку. Если же проблема в дополнении - <a href="https://github.com/vi3itor/lingualeoanki/issues/new">создайте issue на Github</a> либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! </p>
+
+<h3>Новое в версии 2.2 (2019-11-20):</h3>
+
+<h3>Добавлено</h3>
+
+<ul>
+	<li>Возможность выбрать API (новый или старый) для соединения с LinguaLeo.</li>
+	<li>Проверка наличия новой версии при запуске дополнения.</li>
+	<li>Отображение версии дополнения и напоминания перезапустить Anki для завершения установки обновления.</li>
+	<li>Параметр в конфиге для количества слов за один запрос (при загрузке списка слов). На текущий момент сервис LinguaLeo работает нестабильно и изменения этого параметра поможет найти &quot;потерянные&quot; слова.</li>
+	<li>Параметр в конфиге для таймаута запроса, количества попыток и длительности ожидания перед повторным скачиванием.</li>
+	<li>Снова можно загружать контекст для слов (при использовании старого API).</li>
+	<li>Сообщение &quot;Загружается...&quot;, уведомляющее пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).</li>
+	<li>Отображение количества слов во время загрузки. </li>
+</ul>
+
+<h3>Изменено</h3>
+
+<ul>
+	<li>Картинки и звуки загружаются до 3-ёх раз быстрее благодаря многопоточности. </li>
+	<li>Список слов и словарей запрашивается асинхронно и не тормозит пользовательский интерфейс.</li>
+	<li>&quot;Update existing notes&quot; опция обновляет не только картинки и звуки, но также перевод(ы), контекст и транскрипцию.</li>
+	<li>Кнопка &#39;All&#39; переименована на &#39;Any&#39;.</li>
+	<li>Улучшено отображение количества слов для словарей. </li>
+</ul>
 
 <h3>Новое в версии 2.1:</h3>
 
@@ -246,7 +292,7 @@
 
 <p>Наиболее простой (и рекомендуемый) способ установки: с помощью системы управления дополнениями Anki. В таком случае вы сможете с лёгкостью обновлять дополнение и получать новые верии с новыми функциями и исправленными ошибками. Для этого выберите пункт меню программы:<br/>(для Anki 2.1.x) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Скачать дополнения&quot; (Get Add-ons...)<br/>(для Anki 2.0) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Обзор и установка&quot; (Browse &amp; Install)<br/>введите код 1411073333 и перезапустите Anki.<br/></p>
 
-<p>Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из <a href="https://github.com/vi3itor/lingualeoanki/">репозитория на GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-5.zip">для Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-5.zip">для Anki 2.0</a>), откройте Anki на вашем компьютере, выберите пункт меню:<br/>(для Anki 2.1.x) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) и кликните на кнопку &quot;Просмотреть файлы&quot; (View Files)<br/>(для Anki 2.0) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Открыть папку с дополнениями&quot; (Open Add-ons Folder)<br/>и скопируйте туда содержимое архива. Если вы используете Anki 2.1.x, создайте папку с именем &quot;lingualeoanki&quot; в папку &quot;addons21&quot; и скопируйте туда содержимое архива. Перезапустите программу.<br/>Гифка с наглядным изображением процесса ручной установки для Anki 2.0: <a href="https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif">как установить дополнение вручную</a></p>
+<p>Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из <a href="https://github.com/vi3itor/lingualeoanki/">репозитория на GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-0.zip">для Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-0.zip">для Anki 2.0</a>), откройте Anki на вашем компьютере, выберите пункт меню:<br/>(для Anki 2.1.x) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) и кликните на кнопку &quot;Просмотреть файлы&quot; (View Files)<br/>(для Anki 2.0) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Открыть папку с дополнениями&quot; (Open Add-ons Folder)<br/>и скопируйте туда содержимое архива. Если вы используете Anki 2.1.x, создайте папку с именем &quot;lingualeoanki&quot; в папку &quot;addons21&quot; и скопируйте туда содержимое архива. Перезапустите программу.<br/>Гифка с наглядным изображением процесса ручной установки для Anki 2.0: <a href="https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif">как установить дополнение вручную</a></p>
 
 <h3>Обновление</h3>
 
@@ -292,14 +338,11 @@
 <h5>Пользовательский интерфейс:</h5>
 
 <ul>
-	<li>Сообщение &quot;Загружается...&quot;, чтобы уведомлять пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).</li>
 	<li>Русский язык интерфейса, так как начинающим комфортнее работать с дополнением на родном языке.</li>
 	<li>Дополнительное окно конфигурации для установки настроек импорта, таких как: </li>
 	<li>какого типа карточки создавать: с вводом ответа или без (для русско-английских карточек);</li>
-	<li>таймаут запроса, количество попыток и продолжительность ожидания перед повторным скачиванием;</li>
 	<li>выбор промежутка времени для импортирования слов;</li>
 	<li>опция подсветки слова в контексте;</li>
-	<li>показывать количество слов во время загрузки. </li>
 	<li>Уточнить сообщения об ошибках.</li>
 </ul>
 
@@ -308,7 +351,6 @@
 <ul>
 	<li>Добавлять пользовательские словари как теги.</li>
 	<li>Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.</li>
-	<li>Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.</li>
 	<li>Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).</li>
 </ul>
 

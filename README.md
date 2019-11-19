@@ -126,20 +126,16 @@ To rate this add-on and leave feedback, go to [its page][9], log in to your Anki
 #### Features expected to appear in next releases:
 
 ##### User Interface:
-- "Loading..." message to show user that list of words or list of dictionaries is being downloaded.
 - Add Russian localization since beginners are more comfortable with native language.
 - Additional configuration window to set up: 
    - what style of "Russian to English" cards to create: with typing answer or without;
-   - download timeout, number of retries and sleep seconds;
    - choose from-to dates for importing words;
    - option to highlight the word in context;
-   - show number of words in progress bar. 
 - Improve error messages by narrowing down the reason.
 
 ##### Import:
 - Add user dictionaries (wordsets) as tags.
 - Save problem words in json format and ask to retry downloading problem words only.
-- Update not only media, but also translation(s), context, tags.
 - Improve duplicate search to automatically update notes when any information was changed.
 
 
