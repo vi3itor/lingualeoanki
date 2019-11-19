@@ -121,9 +121,9 @@ def download_media_file(url, timeout):
 
 
 def fill_note(word, note, is_old_api):
-    note['en'] = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
+    note['en'] = word.get('wordValue')
     # print("Filling word {}".format(word['wd']))
-    note['ru'] = word.get('combinedTranslation') if word.get('combinedTranslation') else 'ПЕРЕВОД_ОТСУТСТВУЕТ'
+    note['ru'] = word.get('combinedTranslation')
     picture_name = word.get('picture').split('/')[-1] if word.get('picture') else ''
     if is_old_api:
         # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
@@ -160,51 +160,44 @@ def add_word(word, model, is_old_api):
     collection = mw.col
     note = notes.Note(collection, model)
     note = fill_note(word, note, is_old_api)
-    # TODO: Rewrite to use is_duplicate()
-    word_value = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
-    dupes = collection.findDupes("en", word_value)
-    # a hack to support words with apostrophes
-    note_dupes1 = collection.findNotes("en:'%s'" % word_value)
-    note_dupes2 = collection.findNotes('en:"%s"' % word_value)
-    note_dupes = note_dupes1 + note_dupes2
-    if not dupes and not note_dupes:
+
+    word_value = word.get('wordValue')
+    note_dupes = get_duplicates(word_value)
+
+    if not note_dupes:
         collection.addNote(note)
-    # TODO: Update notes if translation or tags (user wordsets) changed
-    elif (note['picture_name'] or note['sound_name']) and note_dupes:
-        # update existing notes with new pictures and sounds in case
-        # they have been changed in LinguaLeo's UI
+    else:
         for nid in note_dupes:
             note_in_db = notes.Note(collection, id=nid)
-            # a dirty hack below until a new field in the model is introduced
-            # put a space before or after a *sound* field of an existing note if you want it to be updated
-            # if a note has no picture or sound, it will be updated anyway
-            # TODO: Check if hack is still needed, remove if not
-            sound_name = note_in_db['sound_name']
-            sound_name = sound_name.replace("&nbsp;", " ")
-            note_needs_update = sound_name != sound_name.strip()
-            if note['picture_name'] and (note_needs_update or not note_in_db['picture_name'].strip()):
-                note_in_db['picture_name'] = note['picture_name']
-            if note['sound_name'] and (note_needs_update or not note_in_db['sound_name'].strip()):
-                note_in_db['sound_name'] = note['sound_name']
+            note_in_db['ru'] = note['ru']
+            note_in_db['context'] = note['context']
+            note_in_db['transcription'] = note['transcription']
+            note_in_db['picture_name'] = note['picture_name']
+            note_in_db['sound_name'] = note['sound_name']
             note_in_db.flush()
+            # TODO: Update tags (user wordsets) when implemented
     # TODO: Check if it is possible to update Anki's media collection to remove old (unused) media
 
 
-def is_duplicate(word):
+def get_duplicates(word_value):
+    collection = mw.col
+    # a hack to support words with apostrophes
+    if "'" in word_value or '"' in word_value:
+        note_dupes1 = collection.findNotes("en:'%s'" % word_value)
+        note_dupes2 = collection.findNotes('en:"%s"' % word_value)
+        note_dupes = list(set(note_dupes1 + note_dupes2))
+    else:
+        note_dupes = collection.findNotes("en:'%s'" % word_value)
+    return note_dupes
+
+
+def is_duplicate(word_value):
     """
     Check if the word exists in collection
-    :param word: dictionary
+    :param word_value: str
     :return: bool
     """
-    collection = mw.col
-    word_value = word.get('wordValue') if word.get('wordValue') else 'NO_WORD_VALUE'
-    dupes = collection.findDupes("en", word_value)
-    # a hack to support words with apostrophes
-    # TODO: Debug to find out if it is still required
-    note_dupes1 = collection.findNotes("en:'%s'" % word_value)
-    note_dupes2 = collection.findNotes('en:"%s"' % word_value)
-    note_dupes = note_dupes1 + note_dupes2
-    return True if dupes or note_dupes else False
+    return True if get_duplicates(word_value) else False
 
 
 def is_valid_ascii(url):

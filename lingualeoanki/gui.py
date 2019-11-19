@@ -358,7 +358,7 @@ class PluginWindow(QDialog):
         if not words:
             return None
         # Exclude duplicates
-        words = [word for word in words if not utils.is_duplicate(word)]
+        words = [word for word in words if not utils.is_duplicate(word.get('wordValue'))]
         return words
 
     def start_downloading_media(self, words):
