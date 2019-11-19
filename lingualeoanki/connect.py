@@ -403,6 +403,7 @@ class Download(QObject):
             error_msg += problem_word + ', '
         error_msg += self.problem_words[-1] + '.'
         self.Message.emit(error_msg)
+        self.problem_words = []
 
     @pyqtSlot()
     def check_for_new_version(self):
