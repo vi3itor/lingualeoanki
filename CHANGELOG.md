@@ -10,21 +10,35 @@ and this project adheres to [Semantic Versioning][2].
 Section to track upcoming changes
 
 ##### User Interface:
-- "Loading..." message to show user that list of words or list of dictionaries is being downloaded.
 - Add Russian localization since beginners are more comfortable with native language.
 - Additional configuration window to set up: 
    - what type of "Russian to English" cards to create: with typing answer or without;
-   - download timeout, number of retries and sleep seconds;
    - choose from-to dates for importing words;
    - option to highlight the word in context;
-   - show number of words in progress bar. 
 - Improve error messages by narrowing down the reason.
 
 ##### Import:
 - Add user dictionaries (wordsets) as tags.
 - Save problem words in json format and ask to retry downloading only them.
-- Update not only media, but also translation(s), context, tags.
 - Improve duplicate search to automatically update notes when any information was changed.
+
+## [2.2.0] - 2019-11-20
+### Added
+- Ability to choose what API to use.
+- Check for new version on start.
+- Show version info in the window title.
+- Config option for number of words per request.
+- Config options for download timeout, number of retries, sleep seconds and parallel downloads.
+- Get word context again by using old API.
+- Show busy progress bar when requesting list of words and wordsets.
+- Show number of found words in a progress bar. 
+
+### Changed
+- Media is downloaded 3 times faster because of parallel downloads. 
+- List of words and wordsets is requested asynchronously and doesn't freeze the GUI.
+- "Update existing notes" option will update not only media, but also translation and context.
+- Renamed 'All' radio-button to 'Any'.
+- Improved dictionary word count in wordset window. 
 
 ## [2.1.5] - 2019-07-30
 ### Added
@@ -123,28 +137,42 @@ Section to track upcoming changes
 В этом разделе будут записываться изменения, которые ожидаются в будущих релизах. 
 
 ##### Пользовательский интерфейс:
-- Сообщение "Загружается...", чтобы уведомлять пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
 - Русский язык интерфейса, так как начинающим комфортнее работать с дополнением на родном языке.
 - Дополнительное окно конфигурации для установки настроек импорта, таких как: 
    - какого типа карточки создавать: с вводом ответа или без (для русско-английских карточек);
-   - таймаут запроса, количество попыток и продолжительность ожидания перед повторным скачиванием;
    - выбор промежутка времени для импортирования слов;
    - опция подсветки слова в контексте;
-   - показывать количество слов во время загрузки. 
 - Уточнить сообщения об ошибках.
 
 ##### Загрузка слов:
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
-- Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.2.0] - 2019-11-20
+### Добавлено
+- Возможность выбрать API (новый или старый) для соединения с LinguaLeo.
+- Проверка наличия новой версии при запуске дополнения.
+- Отображение версии дополнения и напоминания перезапустить Anki для завершения установки обновления.
+- Параметр в конфиге для количества слов за один запрос (при загрузке списка слов). На текущий момент сервис LinguaLeo работает нестабильно и изменения этого параметра поможет найти "потерянные" слова.
+- Параметр в конфиге для таймаута запроса, количества попыток и длительности ожидания перед повторным скачиванием.
+- Снова можно загружать контекст для слов (при использовании старого API).
+- Сообщение "Загружается...", уведомляющее пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
+- Отображение количества слов во время загрузки. 
+
+### Изменено
+- Картинки и звуки загружаются до 3-ёх раз быстрее благодаря многопоточности. 
+- Список слов и словарей запрашивается асинхронно и не тормозит пользовательский интерфейс.
+- "Update existing notes" опция обновляет не только картинки и звуки, но также перевод(ы), контекст и транскрипцию.
+- Кнопка 'All' переименована на 'Any'.
+- Улучшено отображение количества слов для словарей. 
 
 ## [2.1.5] - 2019-07-30
 ### Добавлено
 - Импорт всех выбранных переводов для слова (так же как на сайте Lingualeo).
 - Из-за обновлений на сервере пришлось снова переехать на новый API.
 
-### Removed
+### Удалено
 - На данный момент контекст слова не загружается. (Вернётся в следующих версиях)
 
 ## [2.1.4] - 2019-07-12
