@@ -85,6 +85,8 @@ class Lingualeo(QObject):
         Get user's dictionaries (wordsets), including default ones,
         and return ids and names of not empty ones
         """
+        # TODO: Unite exception proccessing for get_wordsets and get_words_to_add into one function (e.g. get_data),
+        #  it will make code cleaner and reduce errors
         self.Busy.emit(True)
         wordsets = []
         if not self.get_connection():
@@ -387,7 +389,7 @@ class Download(QObject):
     def emit_word_and_counter(self, word):
         self.Word.emit(word)
         self.counter += 1
-        print("Counter " + str(self.counter))
+        # print("Counter " + str(self.counter))
         self.Counter.emit(self.counter)
         if self.counter == self.total_words:
             if self.problem_words:
