@@ -4,8 +4,6 @@
 
 [scroll down for description in Russian (пролистайте вниз для описания на русском языке)][1]
 
-#### WARNING: LinguaLeo has changed the API (again). Please wait until I fix the add-on. Thank you!
-
 This is an add-on for [Anki][2] - powerful, intelligent flashcards, that makes remembering things easy via space repetition.
 
 The add-on downloads your dictionary words from [LinguaLeo][3] - another great resource to learn English, and transforms them into Anki cards. Both 'English to Russian' and 'Russian to English' cards are created and they include pronunciation sound, image, transcription, and context.
@@ -15,7 +13,25 @@ The add-on downloads your dictionary words from [LinguaLeo][3] - another great r
 [LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
 ### Notice on recent update of LinguaLeo 
-The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. As of July 30, 2019 they are still experimenting and changing API from time to time. Current version of add-on (2.1.5) is fully compatible with the update, except of downloading context for the word. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on [Lingualeo][3] first and write to the support. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
+The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. As of November, 2019 they are still experimenting and changing API from time to time. Current version of add-on (2.2.0) is fully compatible with the update, when using new API it is not possible for now to get context for words, but with old API it works as before. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on [Lingualeo][3] first and write to the support. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
+
+### New in version 2.2 (2019-11-20):
+### Added
+- Ability to choose what API to use.
+- Check for new version on start.
+- Show version info in the window title.
+- Config option for number of words per request.
+- Config options for download timeout, number of retries, sleep seconds and parallel downloads.
+- Get word context again by using old API.
+- Show busy progress bar when requesting list of words and wordsets.
+- Show number of found words in a progress bar. 
+
+### Changed
+- Media is downloaded 3 times faster because of parallel downloads. 
+- List of words and wordsets is requested asynchronously and doesn't freeze the GUI.
+- "Update existing notes" option will update not only media, but also translation and context.
+- Renamed 'All' radio-button to 'Any'.
+- Improved dictionary word count in wordset window. 
 
 ### New in version 2.1:
 #### Added
@@ -146,8 +162,6 @@ And to all users who gave valuable comments and feedback and helped to test on d
 ##### Russian
 [scroll up for description in English][22]
 
-#### ВНИМАНИЕ: LinguaLeo снова изменили API. Я постараюсь исправить дополнение в течение нескольких дней. Спасибо!
-
 ### Описание
 
 Дополнение для [Anki][2] - программы для облегчения запоминания слов, выражений и любой другой информации с помощью интервальных повторений.
@@ -159,7 +173,25 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [ЛингваЛео][3] имеет удобный интерфейс для добавления новых слов и неплохое [расширение для браузера][4] для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких [тренировок][5], Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.
 
 ### Внимание! Обновление Lingualeo 30.04.2019
-В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. По состоянию на 30 июля 2019 команда Lingualeo по-прежнему продолжает экспериментировать и время от времени изменяет API. В актуальной версии дополнения (2.1.5) восстановлена его работа, за исключением загрузки контекста. Сайт Lingualeo по-прежнему работает нестабильно: не отображает все слова, показывает неверный контекст слов и т.п. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3] и напишите в поддержку. Если же проблема в дополнении - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
+В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. По состоянию на 20 ноября 2019 года команда Lingualeo по-прежнему продолжает экспериментировать и время от времени изменяет API. В актуальной версии дополнения (2.2.0) восстановлена его работа, но загружать контекст пока что можно только с использованием старого API. Сайт Lingualeo по-прежнему работает нестабильно: не отображает все слова, показывает неверный контекст слов и т.п. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3] и напишите в поддержку. Если же проблема в дополнении - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
+
+### Новое в версии 2.2 (2019-11-20):
+### Добавлено
+- Возможность выбрать API (новый или старый) для соединения с LinguaLeo.
+- Проверка наличия новой версии при запуске дополнения.
+- Отображение версии дополнения и напоминания перезапустить Anki для завершения установки обновления.
+- Параметр в конфиге для количества слов за один запрос (при загрузке списка слов). На текущий момент сервис LinguaLeo работает нестабильно и изменения этого параметра поможет найти "потерянные" слова.
+- Параметр в конфиге для таймаута запроса, количества попыток и длительности ожидания перед повторным скачиванием.
+- Снова можно загружать контекст для слов (при использовании старого API).
+- Сообщение "Загружается...", уведомляющее пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
+- Отображение количества слов во время загрузки. 
+
+### Изменено
+- Картинки и звуки загружаются до 3-ёх раз быстрее благодаря многопоточности. 
+- Список слов и словарей запрашивается асинхронно и не тормозит пользовательский интерфейс.
+- "Update existing notes" опция обновляет не только картинки и звуки, но также перевод(ы), контекст и транскрипцию.
+- Кнопка 'All' переименована на 'Any'.
+- Улучшено отображение количества слов для словарей. 
 
 ### Новое в версии 2.1:
 ####  Добавлено
@@ -253,20 +285,16 @@ And to all users who gave valuable comments and feedback and helped to test on d
 #### Ожидается в следующих версиях:
 
 ##### Пользовательский интерфейс:
-- Сообщение "Загружается...", чтобы уведомлять пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
 - Русский язык интерфейса, так как начинающим комфортнее работать с дополнением на родном языке.
 - Дополнительное окно конфигурации для установки настроек импорта, таких как: 
    - какого типа карточки создавать: с вводом ответа или без (для русско-английских карточек);
-   - таймаут запроса, количество попыток и продолжительность ожидания перед повторным скачиванием;
    - выбор промежутка времени для импортирования слов;
    - опция подсветки слова в контексте;
-   - показывать количество слов во время загрузки. 
 - Уточнить сообщения об ошибках.
 
 ##### Загрузка слов:
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
-- Обновлять не только картинки и звуки, но также перевод(ы), контекст, теги.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
 
 ### Авторы
@@ -307,13 +335,13 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [21]:	https://github.com/bikenik/alfred-lingualeo
 [22]:	#description
 [23]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
-[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-1-5.zip
-[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-1-5.zip
+[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-0.zip
+[25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-0.zip
 [26]:   https://bitbucket.org/vkhaustov/lingualeoanki/
-[27]:   https://i.imgur.com/qSwZn5bl.png
+[27]:   https://i.imgur.com/3mhKJScl.png
 [28]:   #update
 [29]:   #installation
 [30]:   https://corp.lingualeo.com/ru/2019/04/30/news/
-[31]:   https://corp.lingualeo.com/ru/2019/05/01/spasibo-druzya-rabota-nad-oshibkami/
+[31]:   https://corp.lingualeo.com/ru/2019/07/12/qa-news/
 [32]:   https://github.com/troggy
 [33]:   http://troggy.github.io/anki-leo/
