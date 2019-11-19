@@ -336,15 +336,16 @@ class PluginWindow(QDialog):
 
     @pyqtSlot(list)
     def download_words(self, words):
-        self.show_progress_bar(True, 'Excluding already existing words...')
+        self.show_progress_bar(True, 'Found {} words. Excluding already existing...'.format(len(words)))
+        self.update_window()
         filtered = self.filter_words(words) if not self.checkBoxUpdateNotes.isChecked() else words
-        self.show_progress_bar(False, '')
         if filtered:
             self.start_downloading_media(filtered)
         else:
             progress = self.get_progress_status()
             msg = 'No %s words to download' % progress if progress != 'all' else 'No words to download'
             showInfo(msg)
+            self.show_progress_bar(False, '')
             self.allow_to_close(True)
             self.logoutButton.setEnabled(True)
             self.set_download_form_enabled(True)
@@ -443,13 +444,14 @@ class PluginWindow(QDialog):
 
     def update_window(self):
         """
+        Update window by repainting and processing the events
         It's not recommended to call self.repaint() directly,
-        but at least on MacOS Anki 2.1.11 doesn't update widget's
+        but at least on MacOS Anki 2.1.16 doesn't update widget's
         window for several seconds even when self.update() is called
         TODO: Remove when it works as expected or repaint for Mac only
         """
-        # self.update()
-        self.repaint()
+        self.repaint()  # self.update()
+        mw.app.processEvents()
 
     def get_progress_status(self):
         progress = 'all'
