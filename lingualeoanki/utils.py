@@ -120,20 +120,20 @@ def download_media_file(url, timeout):
         media_file.write(content)
 
 
-def fill_note(word, note, is_old_api):
+def fill_note(word, note):
     note['en'] = word.get('wordValue')
     # print("Filling word {}".format(word['wd']))
     note['ru'] = word.get('combinedTranslation')
     picture_name = word.get('picture').split('/')[-1] if word.get('picture') else ''
-    if is_old_api:
+    # TODO: Remove old api code when not needed
+    translations = word.get('translations')
+    if translations:  # translations is used in old API
         # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
-        translations = word.get('translations')
-        if translations:  # apparently, there might be no translation
-            translation = translations[0]
-            if translation.get('ctx'):
-                note['context'] = translation['ctx']
-            if translation.get('pic'):
-                picture_name = translation['pic'].split('/')[-1]
+        translation = translations[0]
+        if translation.get('ctx'):
+            note['context'] = translation['ctx']
+        if translation.get('pic'):
+            picture_name = translation['pic'].split('/')[-1]
     if picture_name and is_valid_ascii(picture_name) and \
             is_not_default_picture(picture_name):
         picture_name = get_valid_name(picture_name)
@@ -154,12 +154,12 @@ def fill_note(word, note, is_old_api):
     return note
 
 
-def add_word(word, model, is_old_api):
+def add_word(word, model):
     # TODO: Use picture_name and sound_name to check
     #  if update is needed and don't download media if not
     collection = mw.col
     note = notes.Note(collection, model)
-    note = fill_note(word, note, is_old_api)
+    note = fill_note(word, note)
 
     word_value = word.get('wordValue')
     note_dupes = get_duplicates(word_value)

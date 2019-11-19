@@ -402,7 +402,7 @@ class PluginWindow(QDialog):
         Note is an SQLite object in Anki so you need
         to fill it out inside the main thread
         """
-        utils.add_word(word, self.model, self.api_rbutton_old.isChecked())
+        utils.add_word(word, self.model)
 
     @pyqtSlot(bool)
     def set_busy_download(self, status):
