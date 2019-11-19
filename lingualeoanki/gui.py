@@ -309,6 +309,7 @@ class PluginWindow(QDialog):
         if status:
             self.set_elements_enabled(True)
         else:
+            utils.clean_cookies()
             self.set_login_form_enabled(True)
             self.allow_to_close(True)
         self.show_progress_bar(False, '')
