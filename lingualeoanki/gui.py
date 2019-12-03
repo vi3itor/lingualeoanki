@@ -252,14 +252,10 @@ class PluginWindow(QDialog):
                 return
             # TODO: Don't close add-on window if the 'Stop' button was pressed
 
-        # TODO: Try using quit() instead?
         if hasattr(self, 'lingualeo_thread'):
-            self.lingualeo_thread.terminate()
-            self.lingualeo_thread.wait()
-
+            self.stop_thread(self.lingualeo_thread)
         if hasattr(self, 'download_thread'):
-            self.download_thread.terminate()
-            self.download_thread.wait()
+            self.stop_thread(self.download_thread)
 
         # Delete attribute before closing to allow running the add-on again
         if hasattr(mw, ADDON_NAME):
@@ -268,6 +264,12 @@ class PluginWindow(QDialog):
                 not self.checkBoxStayLoggedIn.checkState():
             utils.clean_cookies()
         mw.reset()
+
+    def stop_thread(self, thread):
+        thread.quit()
+        # Wait 5 seconds for thread to quit and terminate if needed
+        if not thread.wait(5000):
+            thread.terminate()
 
 # Functions for connecting to LinguaLeo and downloading words
 ###########################################################
@@ -393,7 +395,8 @@ class PluginWindow(QDialog):
         self.download_thread.start()
 
     def download_finished(self, final_count):
-        showInfo("%d words have been downloaded" % final_count)
+        mess = 'words have' if final_count != 1 else 'word has'
+        showInfo("{} {} been downloaded".format(final_count, mess))
         self.set_elements_enabled(True)
         self.show_progress_bar(False, '')
         mw.reset()
