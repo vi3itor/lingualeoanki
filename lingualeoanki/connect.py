@@ -210,7 +210,7 @@ class Lingualeo(QObject):
                 values['offset'] = offset
             response = self.get_content(url, json.dumps(values), headers)
             word_groups = response.get('data')
-            if response.get('error') or not word_groups:
+            if response.get('error'):
                 raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
                                 + response.get('error'))
             words_received = 0
