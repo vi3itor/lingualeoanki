@@ -110,7 +110,8 @@ class Lingualeo(QObject):
                 count = wordset['countWordsLearned'] if status == 'learned' else wordset['countWords']
                 if count == 0:
                     continue  # No need to show an empty dictionary in the list
-                list_name = '{} ({} {})'.format(wordset['name'], count, 'words' if count > 1 else 'word')
+                # To avoid unicode string error on Python 2.7, it should be set in the following way
+                list_name = wordset['name'] + ' ({} {})'.format(count, 'words' if count > 1 else 'word')
                 if wordset['id'] == 1 and status != 'learned':  # Main dictionary with all words
                     list_name = list_name[:-1] + ' in total)'
                 wordsets.append({'list_name': list_name, 'id': wordset['id']})
