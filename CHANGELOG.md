@@ -22,6 +22,11 @@ Section to track upcoming changes
 - Save problem words in json format and ask to retry downloading only them.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.2.1] - 2019-12-03
+### Changed
+- Remove unnecessary error message when no words received.
+- Fix dictionary loading for Anki 2.0.52.
+
 ## [2.2.0] - 2019-11-20
 ### Added
 - Ability to choose what API to use.
@@ -148,6 +153,11 @@ Section to track upcoming changes
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.2.1] - 2019-12-03
+### Изменено
+- Не отображать сообщение об ошибке, если отсутствуют слова выбранной категории.
+- Исправлена загрузка списка словарей в старой версии Anki (2.0.52).
 
 ## [2.2.0] - 2019-11-20
 ### Добавлено
