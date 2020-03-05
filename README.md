@@ -13,9 +13,9 @@ The add-on downloads your dictionary words from [LinguaLeo][3] - another great r
 [LinguaLeo][3] has a user-friendly interface for adding new words to learn and a good [browser extension][4] to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several [trainings][5], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
 ### Notice on recent update of LinguaLeo 
-The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. As of December, 2019 they are still experimenting and changing API from time to time. Current version of add-on (2.2.1) is fully compatible with the update. It is not possible to get context for words for now when using a new API, but with old API it works as before. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on [Lingualeo][3] first and write to the support. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
+The [update][30] of Lingualeo on April 30, 2019 brought several [issues][31]. As of December, 2019 they are still experimenting and changing API from time to time. Current version of add-on (2.2.2) is fully compatible with the update. It is not possible to get context for words for now when using a new API, but with old API it works as before. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on [Lingualeo][3] first and write to the support. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
 
-### New in version 2.2 (2019-11-20, last updated 2019-12-03):
+### New in version 2.2 (2019-11-20, last updated 2020-03-05):
 ### Added
 - Ability to choose what API to use.
 - Check for new version on start.
@@ -169,9 +169,9 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [ЛингваЛео][3] имеет удобный интерфейс для добавления новых слов и неплохое [расширение для браузера][4] для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких [тренировок][5], Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.
 
 ### Внимание! Обновление Lingualeo 30.04.2019
-В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. По состоянию на декабрь 2019 года команда Lingualeo по-прежнему продолжает экспериментировать и время от времени изменяет API. В актуальной версии дополнения (2.2.1) восстановлена его работа, но загружать контекст пока что можно только с использованием старого API. Сайт Lingualeo по-прежнему работает нестабильно: не отображает все слова, показывает неверный контекст слов и т.п. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3] и напишите в поддержку. Если же проблема в дополнении - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
+В связи с [обновлением][30] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][31] в его работе. По состоянию на декабрь 2019 года команда Lingualeo по-прежнему продолжает экспериментировать и время от времени изменяет API. В актуальной версии дополнения (2.2.2) восстановлена его работа, но загружать контекст пока что можно только с использованием старого API. Сайт Lingualeo по-прежнему работает нестабильно: не отображает все слова, показывает неверный контекст слов и т.п. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][3] и напишите в поддержку. Если же проблема в дополнении - [создайте issue на Github][10] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
 
-### Новое в версии 2.2 (2019-11-20, обновлено 2019-12-03):
+### Новое в версии 2.2 (2019-11-20, обновлено 2020-03-05):
 ### Добавлено
 - Возможность выбрать API (новый или старый) для соединения с LinguaLeo.
 - Проверка наличия новой версии при запуске дополнения.
@@ -331,7 +331,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [21]:	https://github.com/bikenik/alfred-lingualeo
 [22]:	#description
 [23]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
-[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-1.zip
+[24]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-2.zip
 [25]:   https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-1.zip
 [26]:   https://bitbucket.org/vkhaustov/lingualeoanki/
 [27]:   https://i.imgur.com/3mhKJScl.png
