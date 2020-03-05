@@ -54,6 +54,10 @@ class Lingualeo(QObject):
                 status = self.auth()
                 if status.get('error_msg'):
                     self.msg = status['error_msg']
+        except urllib.error.HTTPError:
+            self.msg = "We got HTTP Error. Probably API has been changed (again). " \
+                       "Please try again. If error persists, please copy the error message and create a new issue " \
+                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new)."
         except (urllib.error.URLError, socket.error) as e:
             # TODO: Find better (secure) fix
             """
