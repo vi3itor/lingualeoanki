@@ -98,9 +98,8 @@ class Lingualeo(QObject):
                   'request': [{'subOp': 'myAll', 'type': 'user', 'perPage': 999,
                                'attrList': WORDSETS_ATTRIBUTE_LIST, 'sortBy': 'created'}],
                   'ctx': {'config': {'isCheckData': True, 'isLogging': True}}}
-        headers = {'Content-Type': 'application/json'}
         try:
-            response = self.get_content(url, json.dumps(values), headers)
+            response = self.get_content(url, values)
             if response.get('error') or not response.get('data'):
                 raise Exception('Incorrect data received from LinguaLeo. Possibly API was changed again. '
                                 + response.get('error').get('message'))
@@ -187,7 +186,6 @@ class Lingualeo(QObject):
         :return: list of words, where each word is a dict
         """
         url = 'api.lingualeo.com/GetWords'
-        headers = {'Content-Type': 'application/json'}
         date_group = 'start'
         offset = {}
         values = {"apiVersion": "1.0.1", "attrList": WORDS_ATTRIBUTE_LIST,
@@ -209,7 +207,7 @@ class Lingualeo(QObject):
             else:
                 values['dateGroup'] = date_group
                 values['offset'] = offset
-            response = self.get_content(url, json.dumps(values), headers)
+            response = self.get_content(url, values)
             word_groups = response.get('data')
             if response.get('error'):
                 raise Exception('Incorrect data received from LinguaLeo. Possibly API has been changed again. '
@@ -248,19 +246,18 @@ class Lingualeo(QObject):
         """
         # TODO: Unite get_words and get_words_old_api functions into one
         url = 'api.lingualeo.com/GetWords'
-        headers = {'Content-Type': 'application/json'}
         values = {"apiVersion": "1.0.0", "attrList": WORDS_ATTRIBUTE_LIST,
                   "category": "", "mode": "basic", "perPage": self.WORDS_PER_REQUEST, "status": status,
                   "wordSetIds": [wordset_id], "offset": None, "search": "", "training": None,
                   "ctx": {"config": {"isCheckData": True, "isLogging": True}}}
 
         words = []
-        next_chunk = self.get_content(url, json.dumps(values), headers).get('data')
+        next_chunk = self.get_content(url, values).get('data')
         # Continue getting the words until list is not empty
         while next_chunk:
             words += next_chunk
             values['offset'] = {'wordId': next_chunk[-1].get('id')}
-            next_chunk = self.get_content(url, json.dumps(values), headers).get('data')
+            next_chunk = self.get_content(url, values).get('data')
 
         return words
 
@@ -292,17 +289,21 @@ class Lingualeo(QObject):
         status = json.loads(response.read()).get('is_authorized')
         return status
 
-    def get_content(self, url, data, headers):
+    def get_content(self, url, values, more_headers=None):
         """
         A method to request content using new API
         :param url:
-        :param data: either json or urlencoded data
-        :param headers: dic
+        :param values: json
+        :param more_headers: dic
         :return: json
         """
         full_url = self.url_prefix + url
+        data = json.dumps(values)
         data = data.encode("utf-8")
 
+        headers = {'Content-Type': 'application/json'}
+        if more_headers:
+            headers.update(more_headers)
         # We have to create a request object, because urllibopener won't change default headers
         req = urllib.request.Request(full_url, data, headers)
         req.add_header('User-Agent', 'Anki Add-on')
