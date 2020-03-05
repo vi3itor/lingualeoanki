@@ -22,6 +22,10 @@ Section to track upcoming changes
 - Save problem words in json format and ask to retry downloading only them.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.2.2] - 2020-03-05
+### Changed
+- Updated to a new API for authorization.
+
 ## [2.2.1] - 2019-12-03
 ### Changed
 - Remove unnecessary error message when no words received.
@@ -153,6 +157,10 @@ Section to track upcoming changes
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.2.2] - 2020-03-05
+### Изменено
+- Обновлена авторизация в связи с изменением API.
 
 ## [2.2.1] - 2019-12-03
 ### Изменено
