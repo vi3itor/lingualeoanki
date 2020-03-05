@@ -272,11 +272,16 @@ class Lingualeo(QObject):
     #########################
 
     def auth(self):
-        url = 'lingualeo.com/ru/uauth/dispatch'
-        values = {'email': self.email, 'password': self.password}
-        data = urllib.parse.urlencode(values)
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        content = self.get_content(url, data, headers)
+        url = 'lingualeo.com/auth'
+        values = {
+            "type": "mixed",
+            "credentials": {"email": self.email, "password": self.password}
+        }
+        # Without this header request gets Error 405: Not Allowed
+        extra_headers = {'Referer': 'https://lingualeo.com/ru/'}
+        content = self.get_content(url, values, extra_headers)
+        # TODO: If user enters incorrect email, LinguaLeo will create a new account!
+        #  I hope they will fix it soon, otherwise we need to notify user
         self.save_cookies()
         return content
 
