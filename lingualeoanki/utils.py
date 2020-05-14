@@ -111,6 +111,9 @@ def download_media_file(url, timeout):
     name = url.split('/')[-1]
     name = get_valid_name(name)
     abs_path = os.path.join(destination_folder, name)
+    if os.path.exists(abs_path):
+        # No need to download file again if it already exists
+        return
     # Fix '\n' symbols in the url (they were found in the long sentences)
     url = url.replace('\n', '')
     # TODO: find a better way for unsecure connection
