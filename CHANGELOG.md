@@ -22,6 +22,11 @@ Section to track upcoming changes
 - Save problem words in json format and ask to retry downloading only them.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.2.3] - 2020-05-13
+### Changed
+- (Anki >= 2.1.24) Fixed duplicate note creation, and add-on hanging on if word or sentence contains apostrophe.
+- Sound and images are not downloaded if the file with identical name exists.
+
 ## [2.2.2] - 2020-03-05
 ### Changed
 - Updated to a new API for authorization.
@@ -157,6 +162,11 @@ Section to track upcoming changes
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.2.3] - 2020-05-13
+### Изменено
+- (Anki >= 2.1.24) Исправлена проблема с созданием дупликатов, а также проблема с зависанием аддона, когда импортируемое слово содержит апостроф.
+- Картинки и звуки больше не загружаются, если файл с таким именем уже существует.
 
 ## [2.2.2] - 2020-03-05
 ### Изменено
