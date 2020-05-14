@@ -186,6 +186,10 @@ def get_duplicates(word_value):
         escaped = word_value.replace('"', '\\"')
         # Note: We can't search for 'en' field when there are escaped double quotes
         note_dupes = collection.findNotes('"%s"' % escaped)
+        # Support Anki < 2.1.24, where searching with single quotes was still allowed
+        if not note_dupes:
+            # TODO: check for Anki version
+            note_dupes = collection.findNotes("en:'%s'" % word_value)
     else:
         note_dupes = collection.findNotes('en:"%s"' % word_value)
     # TODO: Check why findNotes returns duplicated note ids
