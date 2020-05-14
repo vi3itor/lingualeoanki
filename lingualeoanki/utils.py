@@ -185,10 +185,11 @@ def get_duplicates(word_value):
     if "'" in word_value or '"' in word_value:
         note_dupes1 = collection.findNotes("en:'%s'" % word_value)
         note_dupes2 = collection.findNotes('en:"%s"' % word_value)
-        note_dupes = list(set(note_dupes1 + note_dupes2))
+        # TODO: Find a better way to check for duplicates
+        note_dupes = set(list(note_dupes1) + list(note_dupes2))
     else:
         note_dupes = collection.findNotes("en:'%s'" % word_value)
-    return note_dupes
+    return list(note_dupes)
 
 
 def is_duplicate(word_value):
