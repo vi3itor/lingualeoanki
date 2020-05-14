@@ -85,7 +85,7 @@ def send_to_download(word, timeout, retries, sleep_seconds):
         translation = translations[0]
         if translation.get('pic'):
             pic_url = translation['pic']
-    # End of temporary code
+    # End of old API code
     if pic_url and is_not_default_picture(pic_url):
         if not is_valid_ascii(pic_url):
             raise urllib.error.URLError('Invalid picture url: ' + pic_url)
@@ -142,9 +142,8 @@ def fill_note(word, note):
         picture_name = get_valid_name(picture_name)
         note['picture_name'] = '<img src="%s" />' % picture_name
 
-    # TODO: Add checkbox for context
-    #  and get it differently, since with API 1.0.1 it is not possible
-    #  to get context at the time of getting list of words
+    # TODO: Investigate if it is possible to get context differently, since with API 1.0.1
+    #  there is no context at the time of getting list of words
 
     if word.get('transcription'):
         note['transcription'] = '[' + word['transcription'] + ']'
@@ -158,8 +157,6 @@ def fill_note(word, note):
 
 
 def add_word(word, model):
-    # TODO: Use picture_name and sound_name to check
-    #  if update is needed and don't download media if not
     collection = mw.col
     note = notes.Note(collection, model)
     note = fill_note(word, note)
@@ -226,9 +223,7 @@ def is_not_default_picture(picture_name):
     All words that have no picture link to the same .png file.
     We shouldn't download it or fill into the note.
     """
-    if picture_name != '0bbdd3793cb97ec4189557013fc4d6e4bed4f714.png':
-        return True
-    return False
+    return picture_name != '0bbdd3793cb97ec4189557013fc4d6e4bed4f714.png'
 
 
 def get_valid_name(orig_name):

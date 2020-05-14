@@ -396,7 +396,7 @@ class PluginWindow(QDialog):
 
     def download_finished(self, final_count):
         mess = 'words have' if final_count != 1 else 'word has'
-        showInfo("{} {} been downloaded".format(final_count, mess))
+        showInfo("{} {} been imported".format(final_count, mess))
         self.set_elements_enabled(True)
         self.show_progress_bar(False, '')
         mw.reset()
