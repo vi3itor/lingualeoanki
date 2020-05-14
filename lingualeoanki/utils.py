@@ -181,15 +181,17 @@ def add_word(word, model):
 
 def get_duplicates(word_value):
     collection = mw.col
-    # a hack to support words with apostrophes
-    if "'" in word_value or '"' in word_value:
-        note_dupes1 = collection.findNotes("en:'%s'" % word_value)
-        note_dupes2 = collection.findNotes('en:"%s"' % word_value)
-        # TODO: Find a better way to check for duplicates
-        note_dupes = set(list(note_dupes1) + list(note_dupes2))
+    # check for sentences or words containing double quotes
+    if '"' in word_value:
+        escaped = word_value.replace('"', '\\"')
+        # Note: We can't search for 'en' field when there are escaped double quotes
+        note_dupes = collection.findNotes('"%s"' % escaped)
     else:
-        note_dupes = collection.findNotes("en:'%s'" % word_value)
-    return list(note_dupes)
+        note_dupes = collection.findNotes('en:"%s"' % word_value)
+    # TODO: Check why findNotes returns duplicated note ids
+    #  there might be a different function to find unique note ids
+    # Cast protobuf sequence to list, then exclude duplicates
+    return set(list(note_dupes)) if note_dupes else None
 
 
 def is_duplicate(word_value):
