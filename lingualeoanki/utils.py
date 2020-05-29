@@ -19,6 +19,16 @@ fields = ['en', 'transcription',
           'ru', 'picture_name',
           'sound_name', 'context']
 
+# TODO: Check anki versioning and find a better fix
+try:
+    from anki import buildinfo
+    anki_version = buildinfo.version.split('.')[-1]
+    anki_version = int(anki_version)
+except:
+    print("Can't find or parse anki_version")
+    # it means that it's definitely less then 2.1.23
+    anki_version = 20
+
 
 def create_templates(collection):
     template_eng = collection.models.newTemplate('en -> ru')
@@ -183,12 +193,12 @@ def get_duplicates(word_value):
     collection = mw.col
     # check for sentences or words containing double quotes
     if '"' in word_value:
-        escaped = word_value.replace('"', '\\"')
-        # Note: We can't search for 'en' field when there are escaped double quotes
-        note_dupes = collection.findNotes('"%s"' % escaped)
-        # Support Anki < 2.1.24, where searching with single quotes was still allowed
-        if not note_dupes:
-            # TODO: check for Anki version
+        if anki_version > 23:
+            escaped = word_value.replace('"', '\\"')
+            # Note: We can't search for 'en' field when there are escaped double quotes
+            note_dupes = collection.findNotes('"%s"' % escaped)
+        else:
+            # Support Anki < 2.1.24, where searching with single quotes was still allowed
             note_dupes = collection.findNotes("en:'%s'" % word_value)
     else:
         note_dupes = collection.findNotes('en:"%s"' % word_value)
