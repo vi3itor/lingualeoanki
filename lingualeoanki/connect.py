@@ -287,7 +287,7 @@ class Lingualeo(QObject):
         return content
 
     def is_authorized(self):
-        url = 'api.lingualeo.com/api/isauthorized'
+        url = 'api.lingualeo.com/isauthorized'
         full_url = self.url_prefix + url
         response = self.opener.open(full_url)
         status = json.loads(response.read()).get('is_authorized')
