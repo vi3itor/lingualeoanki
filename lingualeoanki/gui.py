@@ -78,6 +78,7 @@ class PluginWindow(QDialog):
         self.api_button_group = QButtonGroup()
         self.api_rbutton_new = QRadioButton('New (no context yet)')
         self.api_rbutton_old = QRadioButton('Old (with context)')
+        self.api_rbutton_old.setEnabled(False)
         self.api_rbutton_new.setChecked(True)
         self.api_button_group.addButton(self.api_rbutton_new, 0)
         self.api_button_group.addButton(self.api_rbutton_old, 1)
@@ -333,8 +334,8 @@ class PluginWindow(QDialog):
         self.set_elements_enabled(False)
         # TODO: Change 'Exit' Button label to 'Stop' and back
         status = self.get_progress_status()
-        use_old_api = self.api_rbutton_old.isChecked()
-        self.RequestWords.emit(status, wordsets, use_old_api)
+        with_context = self.api_rbutton_old.isChecked()
+        self.RequestWords.emit(status, wordsets, with_context)
         self.show_progress_bar(True, 'Requesting list of words...')
 
     @pyqtSlot(list)
@@ -480,7 +481,7 @@ class PluginWindow(QDialog):
         self.rbutton_learned.setEnabled(mode)
         self.checkBoxUpdateNotes.setEnabled(mode)
         self.api_rbutton_new.setEnabled(mode)
-        self.api_rbutton_old.setEnabled(mode)
+        # self.api_rbutton_old.setEnabled(mode)
         self.update_window()
 
     def set_login_form_enabled(self, mode):

@@ -140,7 +140,7 @@ class Lingualeo(QObject):
         self.Busy.emit(False)
 
     @pyqtSlot(str, list, bool)
-    def get_words_to_add(self, status, wordsets, use_old_api=False):
+    def get_words_to_add(self, status, wordsets, with_context=False):
         self.Busy.emit(True)
         words = []
         if not self.get_connection():
@@ -148,7 +148,7 @@ class Lingualeo(QObject):
             self.Busy.emit(False)
             return
         try:
-            get_func = self.get_words_old_api if use_old_api else self.get_words
+            get_func = self.get_words_with_context if with_context else self.get_words
             wordset_ids = wordsets if wordsets else [1]
             for wordset_id in wordset_ids:
                 received_words = get_func(status, wordset_id)
@@ -196,7 +196,6 @@ class Lingualeo(QObject):
                   "category": "", "dateGroup": date_group, "mode": "basic", "perPage": self.WORDS_PER_REQUEST,
                   "status": status, "offset": offset, "search": "", "training": None, "wordSetId": wordset_id,
                   "ctx": {"config": {"isCheckData": True, "isLogging": True}}}
-        # TODO: Remove ctx parameter from values?
 
         words = []
         words_received = 0
@@ -239,7 +238,7 @@ class Lingualeo(QObject):
                     break
         return words
 
-    def get_words_old_api(self, status, wordset_id):
+    def get_words_with_context(self, status, wordset_id):
         """
         This temporary function is to support old API until LinguaLeo fixes all issues with new API:
         currently some words aren't seen in the Web interface (and can't be downloaded with call to new API)
