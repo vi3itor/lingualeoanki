@@ -22,6 +22,15 @@ Section to track upcoming changes
 - Save problem words in json format and ask to retry downloading only them.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.2.5] - 2020-07-11
+### Changed
+- Updated the url for authorization.
+- Disabled Old API radio button (context is probably coming in future versions).
+
+## [2.2.4] - 2020-05-29
+### Changed
+- Fixed regression for sentences with double quotes.
+
 ## [2.2.3] - 2020-05-13
 ### Changed
 - (Anki >= 2.1.24) Fixed duplicate note creation, and add-on hanging on if word or sentence contains apostrophe.
@@ -162,6 +171,15 @@ Section to track upcoming changes
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.2.5] - 2020-07-11
+### Изменено
+- Обновлена ссылка для проверки авторизации.
+- Временно отключена возможность выбора старого API. Загрузка контекста планируется в следующих версиях.
+
+## [2.2.4] - 2020-05-29
+### Изменено
+- Исправлена регрессия для предложений с двойными кавычками.
 
 ## [2.2.3] - 2020-05-13
 ### Изменено
