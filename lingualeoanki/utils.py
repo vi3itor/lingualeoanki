@@ -42,7 +42,8 @@ def create_templates(collection):
 
 def create_new_model(collection, fields, model_css):
     model = collection.models.new("LinguaLeo_model")
-    model['tags'].append("LinguaLeo")
+    # TODO: Quick fix. Check if it is even needed
+    # model['tags'].append("LinguaLeo")
     model['css'] = model_css
     for field in fields:
         collection.models.addField(model, collection.models.newField(field))
