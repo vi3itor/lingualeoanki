@@ -9,9 +9,15 @@ import sys
 import time
 
 from aqt import mw
-from anki.rsbackend import InvalidInput
 from aqt.utils import showInfo  # TODO: remove when search problem is fixed
 from anki import notes
+
+try:
+    from anki.rsbackend import InvalidInput  # TODO: Check if it actually breaks earlier versions
+except ImportError:
+    # define our class to avoid error on earlier versions
+    class InvalidInput(Exception):
+        pass
 
 from . import styles
 from ._version import VERSION
