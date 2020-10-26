@@ -25,6 +25,7 @@ Section to track upcoming changes
 ## [2.2.7] - 2020-10-26
 ### Changed
 - Check for unexpected symbols while searching for duplicates.
+- Skip words containing no English text.
 
 ## [2.2.6] - 2020-08-16
 ### Changed
@@ -183,6 +184,7 @@ Section to track upcoming changes
 ## [2.2.7] - 2020-10-26
 ### Изменено
 - Проверка на запрещённые символы при поиске дубликатов.
+- Пропускать слова, в которых нет поля с текстом на английском языке. 
 
 ## [2.2.6] - 2020-08-16
 ### Изменено
