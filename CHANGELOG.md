@@ -22,6 +22,10 @@ Section to track upcoming changes
 - Save problem words in json format and ask to retry downloading only them.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.2.7] - 2020-10-26
+### Changed
+- Check for unexpected symbols while searching for duplicates.
+
 ## [2.2.6] - 2020-08-16
 ### Changed
 - (>= Anki 2.1.28) Fixed an error for new users of the add-on.
@@ -175,6 +179,10 @@ Section to track upcoming changes
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.2.7] - 2020-10-26
+### Изменено
+- Проверка на запрещённые символы при поиске дубликатов.
 
 ## [2.2.6] - 2020-08-16
 ### Изменено
