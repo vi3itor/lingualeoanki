@@ -176,11 +176,13 @@ def fill_note(word, note):
 
 
 def add_word(word, model):
+    word_value = word.get('wordValue')
+    if word_value == '':
+        return
     collection = mw.col
     note = notes.Note(collection, model)
     note = fill_note(word, note)
 
-    word_value = word.get('wordValue')
     note_dupes = get_duplicates(word_value)
 
     if not note_dupes:
@@ -234,6 +236,8 @@ def is_duplicate(word_value):
     :param word_value: str
     :return: bool
     """
+    if word_value == '':
+        return True
     return True if get_duplicates(word_value) else False
 
 
