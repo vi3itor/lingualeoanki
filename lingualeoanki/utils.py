@@ -9,6 +9,8 @@ import sys
 import time
 
 from aqt import mw
+from anki.rsbackend import InvalidInput
+from aqt.utils import showInfo  # TODO: remove when search problem is fixed
 from anki import notes
 
 from . import styles
@@ -192,17 +194,28 @@ def add_word(word, model):
 
 def get_duplicates(word_value):
     collection = mw.col
-    # check for sentences or words containing double quotes
-    if '"' in word_value:
-        if anki_version > 23:
-            escaped = word_value.replace('"', '\\"')
-            # Note: We can't search for 'en' field when there are escaped double quotes
-            note_dupes = collection.findNotes('"%s"' % escaped)
+    # escape backslash
+    if '\\' in word_value:
+        word_value = word_value.replace('\\', '\\\\')
+    try:
+        # check for sentences or words containing double quotes
+        if '"' in word_value:
+            if anki_version > 23:
+                escaped = word_value.replace('"', '\\"')
+                # Note: We can't search for 'en' field when there are escaped double quotes
+                note_dupes = collection.findNotes('"%s"' % escaped)
+            else:
+                # Support Anki < 2.1.24, where searching with single quotes was still allowed
+                note_dupes = collection.findNotes("en:'%s'" % word_value)
         else:
-            # Support Anki < 2.1.24, where searching with single quotes was still allowed
-            note_dupes = collection.findNotes("en:'%s'" % word_value)
-    else:
-        note_dupes = collection.findNotes('en:"%s"' % word_value)
+            note_dupes = collection.findNotes('en:"%s"' % word_value)
+    except InvalidInput:
+        # TODO: find a better solution for this fix
+        problem = "The word '{}' contains unexpected symbols and it can't be checked for duplicates. " \
+                  "Please open an issue on GitHub: https://github.com/vi3itor/lingualeoanki/issues/new".format(word_value)
+        showInfo(problem)
+        return None
+
     # TODO: Check why findNotes returns duplicated note ids
     #  there might be a different function to find unique note ids
     # Cast protobuf sequence to list, then exclude duplicates
