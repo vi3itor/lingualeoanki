@@ -258,10 +258,14 @@ def is_valid_ascii(url):
 
 def is_not_default_picture(picture_name):
     """
-    All words that have no picture link to the same .png file.
+    All words that have no picture link to the same image file.
     We shouldn't download it or fill into the note.
     """
-    return picture_name != '0bbdd3793cb97ec4189557013fc4d6e4bed4f714.png'
+    default_names = [
+        '0bbdd3793cb97ec4189557013fc4d6e4bed4f714.png',
+        '1611_1361481210.jpg'
+    ]
+    return picture_name in default_names
 
 
 def get_valid_name(orig_name):
