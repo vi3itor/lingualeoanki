@@ -22,6 +22,10 @@ Section to track upcoming changes
 - Save problem words in json format and ask to retry downloading only them.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.2.8] - 2021-02-23
+### Changed
+- Fix picture downloading error for words added with Chrome extension.
+
 ## [2.2.7] - 2020-10-26
 ### Changed
 - Check for unexpected symbols while searching for duplicates.
@@ -180,6 +184,10 @@ Section to track upcoming changes
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.2.8] - 2021-02-23
+### Изменено
+- Исправлена ошибка при загрузке изображений для слов, добавленных с помощью Chrome расширения.
 
 ## [2.2.7] - 2020-10-26
 ### Изменено
