@@ -347,7 +347,7 @@ def update_config(config):
             pass
 
 
-def get_version_update_notification(version_in_memory):
+def get_version_update_notification():
     """
     When a user updates add-on using Anki's built-in add-on manager,
     they need to restart Anki for changes to take effect.

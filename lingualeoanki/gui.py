@@ -159,7 +159,7 @@ class PluginWindow(QDialog):
 
         self.show()
         # Check for new version on disk and on github
-        message = utils.get_version_update_notification(VERSION)
+        message = utils.get_version_update_notification()
         if message:
             showInfo(message)
             self.setWindowTitle(message)
