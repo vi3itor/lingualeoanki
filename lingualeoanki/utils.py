@@ -105,7 +105,7 @@ def send_to_download(word, timeout, retries, sleep_seconds):
         if translation.get('pic'):
             pic_url = translation['pic']
     # End of old API code
-    if pic_url and is_not_default_picture(pic_url):
+    if pic_url and not is_default_picture(pic_url):
         if not is_valid_ascii(pic_url):
             raise urllib.error.URLError('Invalid picture url: ' + pic_url)
         try_downloading_media(pic_url, timeout, retries, sleep_seconds)
@@ -128,6 +128,8 @@ def try_downloading_media(url, timeout, retries, sleep_seconds):
 def download_media_file(url, timeout):
     destination_folder = mw.col.media.dir()
     name = url.split('/')[-1]
+    if is_default_picture(name):
+        return
     name = get_valid_name(name)
     abs_path = os.path.join(destination_folder, name)
     if os.path.exists(abs_path):
@@ -157,7 +159,7 @@ def fill_note(word, note):
         if translation.get('pic'):
             picture_name = translation['pic'].split('/')[-1]
     if picture_name and is_valid_ascii(picture_name) and \
-            is_not_default_picture(picture_name):
+            not is_default_picture(picture_name):
         picture_name = get_valid_name(picture_name)
         note['picture_name'] = '<img src="%s" />' % picture_name
 
@@ -256,7 +258,7 @@ def is_valid_ascii(url):
     return True
 
 
-def is_not_default_picture(picture_name):
+def is_default_picture(picture_name):
     """
     All words that have no picture link to the same image file.
     We shouldn't download it or fill into the note.
