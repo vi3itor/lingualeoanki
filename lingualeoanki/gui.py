@@ -264,7 +264,6 @@ class PluginWindow(QDialog):
         if hasattr(self, 'checkBoxStayLoggedIn') and \
                 not self.checkBoxStayLoggedIn.checkState():
             utils.clean_cookies()
-        mw.reset()
 
     def stop_thread(self, thread):
         thread.quit()
@@ -400,7 +399,6 @@ class PluginWindow(QDialog):
         showInfo("{} {} been imported".format(final_count, mess))
         self.set_elements_enabled(True)
         self.show_progress_bar(False, '')
-        mw.reset()
 
     def add_word(self, word):
         """
@@ -436,7 +434,6 @@ class PluginWindow(QDialog):
 
     def showErrorMessage(self, msg):
         showInfo(msg)
-        mw.reset()
 
     def set_elements_enabled(self, mode):
         """
