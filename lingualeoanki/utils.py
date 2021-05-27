@@ -1,11 +1,7 @@
 import os
 from random import randint
 import json
-from .six.moves import urllib
-import socket
-import ssl
-import locale
-import sys
+import requests
 import time
 
 from aqt import mw
@@ -107,7 +103,7 @@ def send_to_download(word, timeout, retries, sleep_seconds):
     # End of old API code
     if pic_url and not is_default_picture(pic_url):
         if not is_valid_ascii(pic_url):
-            raise urllib.error.URLError('Invalid picture url: ' + pic_url)
+            raise requests.ConnectionError('Invalid picture url: ' + pic_url)
         try_downloading_media(pic_url, timeout, retries, sleep_seconds)
 
 
@@ -118,7 +114,7 @@ def try_downloading_media(url, timeout, retries, sleep_seconds):
         try:
             download_media_file(url, timeout)
             break
-        except (urllib.error.URLError, socket.error) as e:
+        except requests.ConnectionError as e:
             exc_happened = e
             time.sleep(sleep_seconds)
     if exc_happened:
@@ -137,11 +133,9 @@ def download_media_file(url, timeout):
         return
     # Fix '\n' symbols in the url (they were found in the long sentences)
     url = url.replace('\n', '')
-    # TODO: find a better way for unsecure connection
-    resp = urllib.request.urlopen(url, timeout=timeout, context=ssl._create_unverified_context())
-    content = resp.read()
+    resp = requests.get(url, timeout=timeout)
     with open(abs_path, "wb") as media_file:
-        media_file.write(content)
+        media_file.write(resp.content)
 
 
 def fill_note(word, note):
@@ -297,7 +291,7 @@ def get_addon_dir():
 
 def get_cookies_path():
     """
-    Returns a full path to cookies.txt in the user_files folder
+    Returns a full path to cookies.dat in the user_files folder
     :return:
     """
     # user_files folder in the current addon's dir
@@ -309,7 +303,7 @@ def get_cookies_path():
         except:
             # TODO: Improve error handling
             return None
-    return os.path.join(uf_dir, 'cookies.txt')
+    return os.path.join(uf_dir, 'cookies.dat')
 
 
 def clean_cookies():
@@ -370,12 +364,3 @@ def is_newer_version_available(lines):
             if version_in_file != VERSION:
                 return True
     return False
-
-
-def get_icon_path(icon_file):
-    icon_path = os.path.join(get_addon_dir(), icon_file)
-    # Check Python version for Anki 2.0 support
-    if sys.version_info[0] < 3:
-        loc = locale.getdefaultlocale()[1]
-        icon_path = icon_path.decode(loc)
-    return icon_path

@@ -1,9 +1,7 @@
 import os
-from .six.moves import http_cookiejar
-from .six.moves import urllib
-import socket
+import requests
+import pickle
 import json
-import ssl
 import base64
 
 from aqt.qt import *
@@ -21,26 +19,21 @@ class Lingualeo(QObject):
         QObject.__init__(self, parent)
         self.email = email
         self.password = password
-        self.cj = http_cookiejar.MozillaCookieJar()
+        self.session = requests.Session()
         if cookies_path:
             self.cookies_path = cookies_path
-            if not os.path.exists(cookies_path):
-                self.save_cookies()
-            else:
+            if os.path.exists(cookies_path):
                 try:
-                    self.cj.load(cookies_path)
-                except (IOError, TypeError, ValueError):
-                    # TODO: process exceptions separately
-                    self.cj = http_cookiejar.MozillaCookieJar()
-                except:
-                    # TODO: Handle corrupt cookies loading
-                    self.cj = http_cookiejar.MozillaCookieJar()
-        self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+                    with open(cookies_path, 'rb') as f:
+                        cookies = pickle.load(f)
+                        self.session.cookies.update(cookies)
+                except:  # (IOError, TypeError, ValueError):
+                    # TODO: process exceptions separately, e.g. handle corrupt cookies
+                    self.session.cookies = requests.cookies.RequestsCookieJar()
         config = utils.get_config()
         self.WORDS_PER_REQUEST = config['wordsPerRequest'] if config else 999
         self.url_prefix = 'https://'
         self.msg = ''
-        self.tried_ssl_fix = False
 
     @pyqtSlot()
     def authorize(self):
@@ -54,27 +47,15 @@ class Lingualeo(QObject):
                 status = self.auth()
                 if status.get('error_msg'):
                     self.msg = status['error_msg']
-        except urllib.error.HTTPError:
+        except requests.HTTPError:
             self.msg = "We got HTTP Error. Probably API has been changed (again). " \
                        "Please try again. If error persists, please copy the error message and create a new issue " \
                        "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new)."
-        except (urllib.error.URLError, socket.error) as e:
-            # TODO: Find better (secure) fix
-            """
-            SSLError was noticed on MacOS, because Python 3.6m used in Anki doesn't have 
-            security certificates downloaded. The easiest (but unsecure) way is to create SSL context.
-            """
-            if 'SSL' in str(e.args) and not self.tried_ssl_fix:
-                # Problem with https connection, trying ssl fix
-                https_handler = urllib.request.HTTPSHandler(context=ssl._create_unverified_context())
-                self.opener = urllib.request.build_opener(https_handler, urllib.request.HTTPCookieProcessor(self.cj))
-                self.tried_ssl_fix = True
-                return self.get_connection()
-            else:
-                self.msg = "Can't authorize. Problems with internet connection. Error message: " + str(e.args)
-        except ValueError:
+        except requests.ConnectionError as e:
+            self.msg = "Can't authorize. Problems with internet connection."
+        except json.JSONDecodeError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
-        except Exception as e:
+        except requests.RequestException as e:
             self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
                        "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e.args)
         if self.msg:
@@ -121,7 +102,7 @@ class Lingualeo(QObject):
             self.save_cookies()
             if not wordsets:
                 self.msg = 'No user dictionaries found'
-        except (urllib.error.URLError, socket.error):
+        except requests.ConnectionError:
             self.msg = "Can't get dictionaries. Problem with internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo."
@@ -143,6 +124,7 @@ class Lingualeo(QObject):
     def get_words_to_add(self, status, wordsets, with_context=False):
         self.Busy.emit(True)
         words = []
+        unique_word_ids = set()
         if not self.get_connection():
             self.Words.emit(words)
             self.Busy.emit(False)
@@ -153,12 +135,14 @@ class Lingualeo(QObject):
             for wordset_id in wordset_ids:
                 received_words = get_func(status, wordset_id)
                 # print(get_func.__name__ + ' ' + str(len(received_words)) + ' words received')
-                words = get_unique_words(received_words, words)
-            # print(str(len(words)) + ' unique words')
+                for word in received_words:
+                    if word['id'] not in unique_word_ids:
+                        words.append(word)
+                        unique_word_ids.add(word['id'])
             # TODO: Notify user if len(unique_words) is less than a number of words in the main wordset
 
             self.save_cookies()
-        except (urllib.error.URLError, socket.error):
+        except requests.ConnectionError:
             self.msg = "Can't download words. Problem with internet connection."
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
@@ -266,7 +250,8 @@ class Lingualeo(QObject):
 
     def save_cookies(self):
         if hasattr(self, 'cookies_path'):
-            self.cj.save(self.cookies_path)
+            with open(self.cookies_path, 'wb') as f:
+                pickle.dump(self.session.cookies, f)
 
     # Low level methods
     #########################
@@ -287,9 +272,8 @@ class Lingualeo(QObject):
 
     def is_authorized(self):
         url = 'api.lingualeo.com/isauthorized'
-        full_url = self.url_prefix + url
-        response = self.opener.open(full_url)
-        status = json.loads(response.read()).get('is_authorized')
+        response = self.session.get(self.url_prefix + url)
+        status = response.json().get('is_authorized', False)
         return status
 
     def get_content(self, url, values, more_headers=None):
@@ -300,58 +284,20 @@ class Lingualeo(QObject):
         :param more_headers: dic
         :return: json
         """
-        full_url = self.url_prefix + url
-        data = json.dumps(values)
-        data = data.encode("utf-8")
 
-        headers = {'Content-Type': 'application/json'}
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Anki Add-on'
+        }
         if more_headers:
             headers.update(more_headers)
-        # We have to create a request object, because urllibopener won't change default headers
-        req = urllib.request.Request(full_url, data, headers)
-        req.add_header('User-Agent', 'Anki Add-on')
 
-        response = self.opener.open(req)
-        return json.loads(response.read())
+        response = self.session.post(self.url_prefix + url, data=json.dumps(values), headers=headers)
+        # TODO: check for status code? r.status_code
+        return response.json()
 
-    """
-    Using requests module (only in Anki 2.1) it can be performed as:
-
-    def requests_get_content(self, url, data):
-        full_url = self.url_prefix + url
-        headers = {'Content-Type': 'text/plain'}
-        r = requests.post(full_url, json=data, headers=headers)
-        # print(r.status_code)
-        return r.json()
-    """
     # TODO: Add processing of http status codes in exceptions,
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
-
-
-def get_unique_words(more_words, already_unique_words):
-    """
-    Until LinguaLeo team fixes problems with their API,
-    we have to manually filter out repeating words
-    """
-    for word_to_check in more_words:
-        if is_word_unique(word_to_check, already_unique_words):
-            already_unique_words.append(word_to_check)
-    return already_unique_words
-
-
-def is_word_unique(check_word, words):
-    """
-    Helper function to test if a check_word doesn't appear in the list of words.
-    Used for filtering out repeating words while downloading from multiple wordsets.
-    :param check_word: dict
-    :param words: list of dict
-    :return: bool
-    """
-    # TODO: Improve algorithm for finding unique words
-    for word in words:
-        if word['id'] == check_word['id']:
-            return False
-    return True
 
 
 class Download(QObject):
@@ -424,8 +370,7 @@ class Download(QObject):
         url = 'https://api.github.com/repos/vi3itor/lingualeoanki/contents/lingualeoanki/_version.py'
         try:
             # TODO: Find more secure fix
-            resp = urllib.request.urlopen(url, context=ssl._create_unverified_context())
-            resp = json.loads(resp.read())
+            resp = requests.get(url).json()
             github_file = base64.b64decode(resp['content']).decode('utf-8').split('\n')
             if utils.is_newer_version_available(github_file):
                 self.Message.emit('Warning! A new version of Add-on is available. Please consider updating!')
@@ -448,7 +393,7 @@ class DownloadWorker(QRunnable):
         try:
             # print('Downloading media for ' + self.word['wordValue'] + ' just started')
             utils.send_to_download(self.word, self.timeout, self.retries, self.sleep_seconds)
-        except (urllib.error.URLError, socket.error):
+        except requests.RequestException:
             # print("Problem with " + self.word['wordValue'])
             self.signals.ProblemWord.emit(self.word.get('wordValue'))
         # print('Worker for ' + self.word['wordValue'] + ' finished')
