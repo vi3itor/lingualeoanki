@@ -34,7 +34,7 @@ class PluginWindow(QDialog):
         title = 'Import from LinguaLeo (version {})'.format(VERSION)
         self.setWindowTitle(title)
         if pm.system() == 'Windows':
-            self.setWindowIcon(QIcon(utils.get_icon_path('favicon.ico')))
+            self.setWindowIcon(QIcon(os.path.join(utils.get_addon_dir(), 'favicon.ico')))
 
         # Login section widgets
         loginLabel = QLabel('Your LinguaLeo login:')

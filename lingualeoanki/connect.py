@@ -19,17 +19,17 @@ class Lingualeo(QObject):
         QObject.__init__(self, parent)
         self.email = email
         self.password = password
-        self.session = requests.Session()
+        self.cookies = requests.cookies.RequestsCookieJar()
         if cookies_path:
             self.cookies_path = cookies_path
             if os.path.exists(cookies_path):
                 try:
                     with open(cookies_path, 'rb') as f:
                         cookies = pickle.load(f)
-                        self.session.cookies.update(cookies)
+                        self.cookies.update(cookies)
                 except:  # (IOError, TypeError, ValueError):
                     # TODO: process exceptions separately, e.g. handle corrupt cookies
-                    self.session.cookies = requests.cookies.RequestsCookieJar()
+                    self.cookies = requests.cookies.RequestsCookieJar()
         config = utils.get_config()
         self.WORDS_PER_REQUEST = config['wordsPerRequest'] if config else 999
         self.url_prefix = 'https://'
@@ -99,7 +99,6 @@ class Lingualeo(QObject):
                 if wordset['id'] == 1 and status != 'learned':  # Main dictionary with all words
                     list_name = list_name[:-1] + ' in total)'
                 wordsets.append({'list_name': list_name, 'id': wordset['id']})
-            self.save_cookies()
             if not wordsets:
                 self.msg = 'No user dictionaries found'
         except requests.ConnectionError:
@@ -140,8 +139,6 @@ class Lingualeo(QObject):
                         words.append(word)
                         unique_word_ids.add(word['id'])
             # TODO: Notify user if len(unique_words) is less than a number of words in the main wordset
-
-            self.save_cookies()
         except requests.ConnectionError:
             self.msg = "Can't download words. Problem with internet connection."
         except ValueError:
@@ -248,10 +245,11 @@ class Lingualeo(QObject):
 
         return words
 
-    def save_cookies(self):
+    def update_cookies(self, cookies):
+        self.cookies = cookies
         if hasattr(self, 'cookies_path'):
             with open(self.cookies_path, 'wb') as f:
-                pickle.dump(self.session.cookies, f)
+                pickle.dump(self.cookies, f)
 
     # Low level methods
     #########################
@@ -264,24 +262,21 @@ class Lingualeo(QObject):
         }
         # Without this header request gets Error 405: Not Allowed
         extra_headers = {'Referer': 'https://lingualeo.com/ru/'}
-        content = self.get_content(url, values, extra_headers)
-        # TODO: If user enters incorrect email, LinguaLeo will create a new account!
-        #  I hope they will fix it soon, otherwise we need to notify user
-        self.save_cookies()
+        content = self.get_content(url, values, extra_headers, update_cookies=True)
         return content
 
     def is_authorized(self):
         url = 'api.lingualeo.com/isauthorized'
-        response = self.session.get(self.url_prefix + url)
-        status = response.json().get('is_authorized', False)
-        return status
+        response = requests.get(self.url_prefix + url, cookies=self.cookies)
+        return response.json().get('is_authorized', False)
 
-    def get_content(self, url, values, more_headers=None):
+    def get_content(self, url, values, more_headers=None, update_cookies=False):
         """
         A method to request content using new API
         :param url:
-        :param values: json
-        :param more_headers: dic
+        :param values: body (json) for the POST request
+        :param more_headers: dictionary with additional headers
+        :param update_cookies: boolean flag to update cookies
         :return: json
         """
 
@@ -292,8 +287,10 @@ class Lingualeo(QObject):
         if more_headers:
             headers.update(more_headers)
 
-        response = self.session.post(self.url_prefix + url, data=json.dumps(values), headers=headers)
+        response = requests.post(self.url_prefix + url, data=json.dumps(values), headers=headers, cookies=self.cookies)
         # TODO: check for status code? r.status_code
+        if update_cookies:
+            self.update_cookies(response.cookies)
         return response.json()
 
     # TODO: Add processing of http status codes in exceptions,
@@ -314,9 +311,9 @@ class Download(QObject):
         self.retries = config['numberOfRetries']
         self.sleep_seconds = config['sleepSeconds']
         self.threadpool = QThreadPool(self)
-        MAX_PARALLEL_DOWNLOADS = 3
+        max_parallel_downloads = 3
         max_threads = config['parallelDownloads']
-        parallel_downloads = max_threads if max_threads <= MAX_PARALLEL_DOWNLOADS else MAX_PARALLEL_DOWNLOADS
+        parallel_downloads = min(max_threads, max_parallel_downloads)
         self.threadpool.setMaxThreadCount(parallel_downloads)
         self.problem_words = []
         self.counter = 0
