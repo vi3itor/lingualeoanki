@@ -4,8 +4,6 @@ import json
 from .six.moves import urllib
 import socket
 import ssl
-import locale
-import sys
 import time
 
 from aqt import mw
@@ -34,7 +32,7 @@ try:
     anki_version = int(anki_version)
 except:
     print("Can't find or parse anki_version")
-    # it means that it's definitely less then 2.1.23
+    # it means that it's definitely less than 2.1.23
     anki_version = 20
 
 
@@ -370,12 +368,3 @@ def is_newer_version_available(lines):
             if version_in_file != VERSION:
                 return True
     return False
-
-
-def get_icon_path(icon_file):
-    icon_path = os.path.join(get_addon_dir(), icon_file)
-    # Check Python version for Anki 2.0 support
-    if sys.version_info[0] < 3:
-        loc = locale.getdefaultlocale()[1]
-        icon_path = icon_path.decode(loc)
-    return icon_path

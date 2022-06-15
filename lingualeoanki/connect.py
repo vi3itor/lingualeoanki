@@ -143,6 +143,7 @@ class Lingualeo(QObject):
     def get_words_to_add(self, status, wordsets, with_context=False):
         self.Busy.emit(True)
         words = []
+        unique_word_ids = set()
         if not self.get_connection():
             self.Words.emit(words)
             self.Busy.emit(False)
@@ -153,8 +154,10 @@ class Lingualeo(QObject):
             for wordset_id in wordset_ids:
                 received_words = get_func(status, wordset_id)
                 # print(get_func.__name__ + ' ' + str(len(received_words)) + ' words received')
-                words = get_unique_words(received_words, words)
-            # print(str(len(words)) + ' unique words')
+                for word in received_words:
+                    if word['id'] not in unique_word_ids:
+                        words.append(word)
+                        unique_word_ids.add(word['id'])
             # TODO: Notify user if len(unique_words) is less than a number of words in the main wordset
 
             self.save_cookies()
@@ -272,7 +275,7 @@ class Lingualeo(QObject):
     #########################
 
     def auth(self):
-        url = 'lingualeo.com/auth'
+        url = 'lingualeo.com/api/auth'
         values = {
             "type": "mixed",
             "credentials": {"email": self.email, "password": self.password}
@@ -280,8 +283,7 @@ class Lingualeo(QObject):
         # Without this header request gets Error 405: Not Allowed
         extra_headers = {'Referer': 'https://lingualeo.com/ru/'}
         content = self.get_content(url, values, extra_headers)
-        # TODO: If user enters incorrect email, LinguaLeo will create a new account!
-        #  I hope they will fix it soon, otherwise we need to notify user
+        # Fun fact: if user enters incorrect email, LinguaLeo will create a new account!
         self.save_cookies()
         return content
 
@@ -289,7 +291,7 @@ class Lingualeo(QObject):
         url = 'api.lingualeo.com/isauthorized'
         full_url = self.url_prefix + url
         response = self.opener.open(full_url)
-        status = json.loads(response.read()).get('is_authorized')
+        status = json.loads(response.read()).get('is_authorized', False)
         return status
 
     def get_content(self, url, values, more_headers=None):
@@ -328,32 +330,6 @@ class Lingualeo(QObject):
     #  see: http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
 
 
-def get_unique_words(more_words, already_unique_words):
-    """
-    Until LinguaLeo team fixes problems with their API,
-    we have to manually filter out repeating words
-    """
-    for word_to_check in more_words:
-        if is_word_unique(word_to_check, already_unique_words):
-            already_unique_words.append(word_to_check)
-    return already_unique_words
-
-
-def is_word_unique(check_word, words):
-    """
-    Helper function to test if a check_word doesn't appear in the list of words.
-    Used for filtering out repeating words while downloading from multiple wordsets.
-    :param check_word: dict
-    :param words: list of dict
-    :return: bool
-    """
-    # TODO: Improve algorithm for finding unique words
-    for word in words:
-        if word['id'] == check_word['id']:
-            return False
-    return True
-
-
 class Download(QObject):
     Busy = pyqtSignal(bool)
     Counter = pyqtSignal(int)
@@ -368,9 +344,9 @@ class Download(QObject):
         self.retries = config['numberOfRetries']
         self.sleep_seconds = config['sleepSeconds']
         self.threadpool = QThreadPool(self)
-        MAX_PARALLEL_DOWNLOADS = 3
+        max_parallel_downloads = 3
         max_threads = config['parallelDownloads']
-        parallel_downloads = max_threads if max_threads <= MAX_PARALLEL_DOWNLOADS else MAX_PARALLEL_DOWNLOADS
+        parallel_downloads = min(max_threads, max_parallel_downloads)
         self.threadpool.setMaxThreadCount(parallel_downloads)
         self.problem_words = []
         self.counter = 0
