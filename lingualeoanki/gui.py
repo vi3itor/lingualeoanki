@@ -41,7 +41,7 @@ class PluginWindow(QDialog):
         self.loginField = QLineEdit()
         passLabel = QLabel('Your LinguaLeo password:')
         self.passField = QLineEdit()
-        self.passField.setEchoMode(QLineEdit.Password)
+        self.passField.setEchoMode(QLineEdit.EchoMode.Password)
         self.loginButton = QPushButton("Log In")
         self.logoutButton = QPushButton("Log Out")
         self.loginButton.clicked.connect(self.loginButtonClicked)
@@ -92,7 +92,7 @@ class PluginWindow(QDialog):
         login_form.addRow(passLabel, self.passField)
         # Vertical layout for checkboxes
         login_checkboxes = QVBoxLayout()
-        login_checkboxes.setAlignment(Qt.AlignCenter)
+        login_checkboxes.setAlignment(Qt.AlignmentFlag.AlignCenter)
         login_checkboxes.addWidget(self.checkBoxStayLoggedIn)
         login_checkboxes.addWidget(self.checkBoxSavePass)
         # Horizontal layout for login buttons
@@ -324,7 +324,7 @@ class PluginWindow(QDialog):
             wordset_window.SelectedWordsets.connect(self.request_words)
             wordset_window.Cancel.connect(self.set_elements_enabled)
             wordset_window.Cancel.connect(self.activate_addon_window)
-            wordset_window.exec_()
+            wordset_window.exec()
         else:
             self.set_elements_enabled(True)
 
@@ -530,7 +530,7 @@ class WordsetsWindow(QDialog):
         key_name = 'Ctrl' if pm.system() == 'Windows' or pm.system() == 'Linux' else 'Cmd'
         label = QLabel('Hold %s to select several dictionaries' % key_name)
         self.listWidget = QListWidget()
-        self.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.listWidget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         for wordset in self.wordsets:
             item = QListWidgetItem(wordset['list_name'])
             item.wordset_id = wordset['id']
