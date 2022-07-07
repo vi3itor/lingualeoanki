@@ -11,6 +11,8 @@ model_css = '''
         font-style: italic;
     }'''
 
+# TODO: Move picture from question to answer here and in ru_question
+#  Also, think about doing one-time check and suggesting existing users to update the style
 en_question = """
     <strong>{{en}}</strong>
     <br><br>
