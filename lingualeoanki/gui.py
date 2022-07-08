@@ -367,7 +367,7 @@ class PluginWindow(QDialog):
 
     def start_downloading_media(self, words):
         # Activate progress bar
-        label = 'Downloading {} words...'.format(len(words))
+        label = 'Downloading media for {} words...'.format(len(words))
         self.show_progress_bar(True, label, len(words))
         # Set Anki Model
         if not hasattr(self, 'model'):
@@ -395,8 +395,8 @@ class PluginWindow(QDialog):
         self.download_thread.start()
 
     def download_finished(self, final_count):
-        mess = 'words have' if final_count != 1 else 'word has'
-        showInfo("{} {} been imported".format(final_count, mess))
+        message = 'words have' if final_count != 1 else 'word has'
+        showInfo("{} {} been imported".format(final_count, message))
         self.set_elements_enabled(True)
         self.show_progress_bar(False, '')
 

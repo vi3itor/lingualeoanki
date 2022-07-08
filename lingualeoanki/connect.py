@@ -49,6 +49,8 @@ class Lingualeo(QObject):
         self.Busy.emit(False)
 
     def get_connection(self):
+        """Make sure that user is authorized and activated the supported language pair."""
+        # TODO: rewrite the method, unify handling of the exceptions
         try:
             if not self.is_authorized():
                 status = self.auth()
@@ -64,24 +66,60 @@ class Lingualeo(QObject):
             SSLError was noticed on MacOS, because Python 3.6m used in Anki doesn't have 
             security certificates downloaded. The easiest (but unsecure) way is to create SSL context.
             """
-            if 'SSL' in str(e.args) and not self.tried_ssl_fix:
+            if 'SSL' in str(e) and not self.tried_ssl_fix:
                 # Problem with https connection, trying ssl fix
                 https_handler = urllib.request.HTTPSHandler(context=ssl._create_unverified_context())
                 self.opener = urllib.request.build_opener(https_handler, urllib.request.HTTPCookieProcessor(self.cj))
                 self.tried_ssl_fix = True
                 return self.get_connection()
             else:
-                self.msg = "Can't authorize. Problems with internet connection. Error message: " + str(e.args)
+                self.msg = "Can't authorize. Problems with internet connection. Error message: " + str(e)
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
         except Exception as e:
             self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
-                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e.args)
+                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e)
+        # TODO: Refactor, use msg instead of self.msg
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
             return False
+        # Check for supported language pair
+        return self.confirm_language_pair()
+
+    def confirm_language_pair(self):
+        """Verify that user activated a supporting language pair in the profile"""
+        user_info = self.get_user_profile()
+        if not user_info:
+            return False
+        if not (user_info["nativeLang"] == "ru" and user_info["targetLang"] == "en"):
+            msg = 'Only English-Russian mode is currently supported. Please go to lingualeo.com, select English to ' \
+                  'study and try again. Other languages may be supported in the future. If you still have any ' \
+                  'problems please open a new issue on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new)'
+            self.Error.emit(msg)
+            return False
         return True
+
+    def get_user_profile(self):
+        """
+        Use LinguaLeo API to get user profile information.
+        """
+        url = 'api.lingualeo.com/ProcessTraining'
+        values = {"apiVersion": "1.1.0", "trainingName": "getUserStatus"}
+        msg, exc_msg = '', ''
+        try:
+            response = self.get_content(url, values)
+            status = response.get('status', '')
+            if status == 'error':
+                msg = response['error']['message']
+            elif status == 'ok' and response['data'] and response["data"]["nativeLang"] and response["data"]["targetLang"]:
+                return response['data']
+        except Exception as e:
+            exc_msg = str(e)
+        msg = "There's been an unexpected error when requesting user profile information. Please copy the error message and create a new issue " \
+              "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + (msg if msg else exc_msg)
+        self.Error.emit(msg)
+        return None
 
     @pyqtSlot(str)
     def get_wordsets(self, status):
@@ -89,7 +127,7 @@ class Lingualeo(QObject):
         Get user's dictionaries (wordsets), including default ones,
         and return ids and names of not empty ones
         """
-        # TODO: Unite exception proccessing for get_wordsets and get_words_to_add into one function (e.g. get_data),
+        # TODO: Unite exception processing for get_wordsets and get_words_to_add into one function (e.g. get_data),
         #  it will make code cleaner and reduce errors
         self.Busy.emit(True)
         wordsets = []
@@ -130,7 +168,7 @@ class Lingualeo(QObject):
                        "on GitHub: https://github.com/vi3itor/lingualeoanki/issues/new"
         except Exception as e:
             self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
-                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e.args)
+                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e)
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
@@ -170,7 +208,7 @@ class Lingualeo(QObject):
                        "on GitHub: https://github.com/vi3itor/lingualeoanki/issues/new"
         except Exception as e:
             self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
-                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e.args)
+                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e)
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
@@ -395,7 +433,10 @@ class Download(QObject):
 
     @pyqtSlot()
     def check_for_new_version(self):
-        # TODO: Investigate if it is better to call Anki's internal mechanism to check for new versions? 
+        # Older anki clients (< 2.1.23 shouldn't check for new versions of the add-on)
+        if utils.anki_version < 23:
+            return
+        # TODO: Investigate if it is better to call Anki's internal mechanism to check for new versions?
         self.Busy.emit(True)
         url = 'https://api.github.com/repos/vi3itor/lingualeoanki/contents/lingualeoanki/_version.py'
         try:

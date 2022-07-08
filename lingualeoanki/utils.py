@@ -48,8 +48,6 @@ def create_templates(collection):
 
 def create_new_model(collection, fields, model_css):
     model = collection.models.new("LinguaLeo_model")
-    # TODO: Quick fix. Check if it is even needed
-    # model['tags'].append("LinguaLeo")
     model['css'] = model_css
     for field in fields:
         collection.models.addField(model, collection.models.newField(field))
@@ -62,13 +60,11 @@ def create_new_model(collection, fields, model_css):
 
 
 def is_model_exist(collection, fields):
-    name_exist = 'LinguaLeo_model' in collection.models.allNames()
-    if name_exist:
-        fields_ok = collection.models.fieldNames(collection.models.byName(
-                                                'LinguaLeo_model')) == fields
-    else:
-        fields_ok = False
-    return name_exist and fields_ok
+    if 'LinguaLeo_model' in collection.models.allNames():
+        ll_fields = set(collection.models.fieldNames(collection.models.byName(
+                                                'LinguaLeo_model')))
+        return all(f in ll_fields for f in fields)
+    return False
 
 
 def prepare_model(collection, fields, model_css):
@@ -80,9 +76,9 @@ def prepare_model(collection, fields, model_css):
         model = collection.models.byName('LinguaLeo_model')
     else:
         model = create_new_model(collection, fields, model_css)
-    # TODO: Move Deck name to config?
-    # Create a deck "LinguaLeo" and write id to deck_id
-    model['did'] = collection.decks.id('LinguaLeo')
+        # TODO: Move Deck name to config?
+        # Create a deck "LinguaLeo" and write id to deck_id
+        model['did'] = collection.decks.id('LinguaLeo')
     collection.models.setCurrent(model)
     collection.models.save(model)
     return model
@@ -111,7 +107,7 @@ def send_to_download(word, timeout, retries, sleep_seconds):
 
 def try_downloading_media(url, timeout, retries, sleep_seconds):
     exc_happened = None
-    for i in list(range(retries)):
+    for _ in list(range(retries)):
         exc_happened = None
         try:
             download_media_file(url, timeout)
@@ -149,7 +145,7 @@ def fill_note(word, note):
     picture_name = word.get('picture').split('/')[-1] if word.get('picture') else ''
     # TODO: Remove old api code when not needed
     translations = word.get('translations')
-    if translations:  # translations is used in old API
+    if translations:  # translations are used in old API
         # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
         translation = translations[0]
         if translation.get('ctx'):
@@ -273,10 +269,11 @@ def get_valid_name(orig_name):
     Unfortunately, from April 30, 2019,
     media filenames can be very long and contain '\n' symbols,
     the function checks if it is the case
-    and returns a name without '\n' and only up to 30 characters
+    and returns a name without '\n' and only up to max_length=50 characters
     """
-    if len(orig_name) > 50 or orig_name.find('\n'):
-        new_name = orig_name[-30:]
+    max_length = 50
+    if len(orig_name) > max_length or orig_name.find('\n'):
+        new_name = orig_name[-max_length:]
         new_name = new_name.replace('\n', '')
         return new_name
     else:

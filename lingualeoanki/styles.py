@@ -11,12 +11,12 @@ model_css = '''
         font-style: italic;
     }'''
 
+# TODO: think about doing one-time check and suggesting existing users to update the style:
+#   because the picture was moved to the answer side
 en_question = """
     <strong>{{en}}</strong>
     <br><br>
     {{transcription}}
-    <br><br>
-    {{picture_name}}
     <br><br>
     {{sound_name}}
     """
@@ -26,13 +26,13 @@ en_answer = """
     <hr id=answer>
     <font color="#0000ff">{{ru}}</font>
     <br><br>
+    {{picture_name}}
+    <br><br>
     <em>{{context}}</em>
     """
 
 ru_question = """
     {{ru}}
-    <br><br>
-    {{picture_name}}
     <br><br>
     """
 
@@ -45,5 +45,7 @@ ru_answer = """
     <br>
     {{sound_name}}
     <br>
+    {{picture_name}}
+    <br><br>
     <em>{{context}}</em>
     """

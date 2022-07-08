@@ -22,6 +22,14 @@ Section to track upcoming changes
 - Save problem words in json format and ask to retry downloading only them.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.2.9] - 2022-07-07
+This is the last release that supports older Anki versions with Qt5.
+### Changed
+- Fix errors for new authorizations (#24).
+- Don't create a new model if the user added new fields (#22)
+- Verify that user activated a supporting English-Russian language pair in the profile.
+- The picture will be shown on the answer side (for the new users only). 
+
 ## [2.2.8] - 2021-02-23
 ### Changed
 - Fix picture downloading error for words added with Chrome extension.
@@ -183,7 +191,15 @@ Section to track upcoming changes
 ##### Загрузка слов:
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
-- Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+- Исправить функцию поиска дубликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.2.9] - 2022-07-07
+Это последний релиз аддона, который поддерживает устаревшие версии Anki с Qt5.
+### Изменено
+- Исправлена ошибка авторизации (#24).
+- Новая модель больше не создаётся, если пользователь добавил новые поля (#22)
+- В момент авторизации происходит проверка на поддерживаемую пару языков.
+- Картинка перенесена на сторону ответов (только для новых пользователей). 
 
 ## [2.2.8] - 2021-02-23
 ### Изменено
@@ -209,7 +225,7 @@ Section to track upcoming changes
 
 ## [2.2.3] - 2020-05-13
 ### Изменено
-- (Anki >= 2.1.24) Исправлена проблема с созданием дупликатов, а также проблема с зависанием аддона, когда импортируемое слово содержит апостроф.
+- (Anki >= 2.1.24) Исправлена проблема с созданием дубликатов, а также проблема с зависанием аддона, когда импортируемое слово содержит апостроф.
 - Картинки и звуки больше не загружаются, если файл с таким именем уже существует.
 
 ## [2.2.2] - 2020-03-05
