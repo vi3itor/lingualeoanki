@@ -16,7 +16,7 @@ The add-on downloads your dictionary words from [LinguaLeo][3] - another great r
 ### Notice on recent update of LinguaLeo
 The [update][7] of Lingualeo on April 30, 2019 brought several [issues][8]. As of October, 2020 they are still experimenting and changing API from time to time. Current version of add-on (2.2.8) is fully compatible with the update. It is not possible to get context for words when using a new API. Future versions of add-on will try to bring context back. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on [Lingualeo][9] first and write to the support. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
 
-### New in version 2.2 (2019-11-20, last updated 2021-02-23):
+### New in version 2.2 (2019-11-20, last updated 2022-07-07):
 ### Added
 - Ability to choose what API to use.
 - Check for new version on start.
@@ -191,7 +191,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 - "Update existing notes" опция обновляет не только картинки и звуки, но также перевод(ы), контекст и транскрипцию.
 - Кнопка 'All' переименована на 'Any'.
 - Улучшено отображение количества слов для словарей.
-- (Anki \>= 2.1.24) Исправлена проблема с созданием дупликатов, а также проблема с зависанием аддона, когда импортируемое слово содержит апостроф.
+- (Anki \>= 2.1.24) Исправлена проблема с созданием дубликатов, а также проблема с зависанием аддона, когда импортируемое слово содержит апостроф.
 - Картинки и звуки больше не загружаются, если файл с таким именем уже существует.
 
 ### Новое в версии 2.1:
@@ -273,7 +273,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 Если авторизация прошла успешно, вы можете выбрать какие слова импортировать (по текущему статусу, так же как в веб интерфейсе): "All" (все, в независимости от текущего статуса), "New" (только новые), "Learning" (на изучении) либо "Learned" (только изученные).
 Если в некоторых словах вы обновили изображение или звук и хотите, чтобы эти изменения попали в Anki, выберите пункт "Update existing notes."  
 
-Для того, чтобы импортировать слова из главного словаря (все пользовательские слова), нажмите кнопку "Import all words." Для того, чтобы выбрать наборы слов (пользовательские словари) для импорта, нажмите "Import from dictionaries" и выберите один или несколько наборов (удерживая клавишу Ctrl либо Cmd) и нажмите "Import."
+Для того чтобы импортировать слова из главного словаря (все пользовательские слова), нажмите кнопку "Import all words." Для того, чтобы выбрать наборы слов (пользовательские словари) для импорта, нажмите "Import from dictionaries" и выберите один или несколько наборов (удерживая клавишу Ctrl либо Cmd) и нажмите "Import."
 Никаких моделей, шаблонов, колод создавать не нужно, дополнение сделает всю работу за вас. Проще некуда.
 
 Наберитесь терпения. Импорт 1000 слов может занять 10 минут и более в зависимости от веса аудио с произношением и картинок и скорости вашего интернета.  
@@ -281,7 +281,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 
 ### Кроме того
 
-Для того, чтобы оценить дополнение и оставить комментарий перейдите на [его страницу][50], войдите в аккаунт AnkiWeb в правом верхнем углу и кликните "Rate this." Но если вы хотите новую функцию или обнаружили ошибку, пожалуйста, не оставляйте сообщение о ней в комментарии, а скопируйте текст ошибки и [создайте issue на GitHub][51], либо напишите на email: 4yourquestions [собачка] gmail.com. 
+Для того чтобы оценить дополнение и оставить комментарий перейдите на [его страницу][50], войдите в аккаунт AnkiWeb в правом верхнем углу и кликните "Rate this." Но если вы хотите новую функцию или обнаружили ошибку, пожалуйста, не оставляйте сообщение о ней в комментарии, а скопируйте текст ошибки и [создайте issue на GitHub][51], либо напишите на email: 4yourquestions [собачка] gmail.com. 
 
 #### Ожидается в следующих версиях:
 
@@ -296,7 +296,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 ##### Загрузка слов:
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
-- Исправить функцию поиска дупликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+- Исправить функцию поиска дубликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
 
 ### Авторы
 
@@ -326,7 +326,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [11]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md
 [12]:	#update
 [13]:	https://github.com/vi3itor/lingualeoanki/
-[14]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-7.zip
+[14]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-9.zip
 [15]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-1.zip
 [16]:	https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif
 [17]:	#installation
@@ -359,7 +359,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [44]:	https://github.com/vi3itor/lingualeoanki/issues/new
 [45]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
 [46]:	https://github.com/vi3itor/lingualeoanki/
-[47]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-7.zip
+[47]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-9.zip
 [48]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-1.zip
 [49]:	https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif
 [50]:	https://ankiweb.net/shared/info/1411073333
