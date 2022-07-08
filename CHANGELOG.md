@@ -22,11 +22,19 @@ Section to track upcoming changes
 - Save problem words in json format and ask to retry downloading only them.
 - Improve duplicate search to automatically update notes when any information was changed.
 
+## [2.3.0] - 2022-07-08
+Currently, requires Anki 2.1.49 or higher.
+### Changed
+- Get word context.
+- Drop the support for old anki versions.
+- Update deprecated anki functions.
+- Fully support Qt6.
+
 ## [2.2.9] - 2022-07-07
 This is the last release that supports older Anki versions with Qt5.
 ### Changed
 - Fix errors for new authorizations (#24).
-- Don't create a new model if the user added new fields (#22)
+- Don't create a new model if the user added new fields (#22).
 - Verify that user activated a supporting English-Russian language pair in the profile.
 - The picture will be shown on the answer side (for the new users only). 
 
@@ -193,11 +201,18 @@ This is the last release that supports older Anki versions with Qt5.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Исправить функцию поиска дубликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
 
+## [2.3.0] - 2022-07-08
+Требуется Anki версии 2.1.49 или выше.
+### Изменено
+- Загрузка контекста слов снова работает.
+- Старые версии Anki больше не поддерживаются.
+- Добавлена поддержка Qt6 и исправлены устаревшие функции anki.
+
 ## [2.2.9] - 2022-07-07
 Это последний релиз аддона, который поддерживает устаревшие версии Anki с Qt5.
 ### Изменено
 - Исправлена ошибка авторизации (#24).
-- Новая модель больше не создаётся, если пользователь добавил новые поля (#22)
+- Новая модель больше не создаётся, если пользователь добавил новые поля (#22).
 - В момент авторизации происходит проверка на поддерживаемую пару языков.
 - Картинка перенесена на сторону ответов (только для новых пользователей). 
 
