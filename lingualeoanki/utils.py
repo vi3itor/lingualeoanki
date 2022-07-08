@@ -84,13 +84,6 @@ def send_to_download(word, timeout, retries, sleep_seconds):
         try_downloading_media(sound_url, timeout, retries, sleep_seconds)
 
     pic_url = word.get('picture')
-    # TODO: Remove or refactor the following code that supports old API
-    translations = word.get('translations')
-    if translations:
-        translation = translations[0]
-        if translation.get('pic'):
-            pic_url = translation['pic']
-    # End of old API code
     if pic_url and not is_default_picture(pic_url):
         if not is_valid_ascii(pic_url):
             raise urllib.error.URLError('Invalid picture url: ' + pic_url)
@@ -132,26 +125,17 @@ def download_media_file(url, timeout):
 
 def fill_note(word, note):
     note['en'] = word.get('wordValue')
-    # print("Filling word {}".format(word['wd']))
     note['ru'] = word.get('combinedTranslation')
     picture_name = word.get('picture').split('/')[-1] if word.get('picture') else ''
-    # TODO: Remove old api code when not needed
-    translations = word.get('translations')
-    if translations:  # translations are used in old API
-        # User's choice translation has index 0, then come translations sorted by votes (higher to lower)
-        translation = translations[0]
-        if translation.get('ctx'):
-            note['context'] = translation['ctx']
-        if translation.get('pic'):
-            picture_name = translation['pic'].split('/')[-1]
+    if word.get('context'):
+        ctxt = word['context']
+        if len(ctxt.split('\n')) < 5:
+            # TODO: There was a problem with context created by Chrome extension, see if it's needed
+            note['context'] = ctxt
     if picture_name and is_valid_ascii(picture_name) and \
             not is_default_picture(picture_name):
         picture_name = get_valid_name(picture_name)
         note['picture_name'] = '<img src="%s" />' % picture_name
-
-    # TODO: Investigate if it is possible to get context differently, since with API 1.0.1
-    #  there is no context at the time of getting list of words
-
     if word.get('transcription'):
         note['transcription'] = '[' + word['transcription'] + ']'
     sound_url = word.get('pronunciation')

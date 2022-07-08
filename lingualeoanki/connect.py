@@ -176,8 +176,8 @@ class Lingualeo(QObject):
         self.Wordsets.emit(wordsets)
         self.Busy.emit(False)
 
-    @pyqtSlot(str, list, bool)
-    def get_words_to_add(self, status, wordsets, with_context=False):
+    @pyqtSlot(str, list)
+    def get_words_to_add(self, status, wordsets):
         self.Busy.emit(True)
         words = []
         unique_word_ids = set()
@@ -186,11 +186,9 @@ class Lingualeo(QObject):
             self.Busy.emit(False)
             return
         try:
-            get_func = self.get_words_with_context if with_context else self.get_words
             wordset_ids = wordsets if wordsets else [1]
             for wordset_id in wordset_ids:
-                received_words = get_func(status, wordset_id)
-                # print(get_func.__name__ + ' ' + str(len(received_words)) + ' words received')
+                received_words = self.get_words(status, wordset_id)
                 for word in received_words:
                     if word['id'] not in unique_word_ids:
                         words.append(word)
@@ -274,32 +272,6 @@ class Lingualeo(QObject):
                         '''We either need to continue with this group or try the next'''
                         extra_date_group = word_group.get('groupName')
                     break
-        return words
-
-    def get_words_with_context(self, status, wordset_id):
-        """
-        This temporary function is to support old API until LinguaLeo fixes all issues with new API:
-        currently some words aren't seen in the Web interface (and can't be downloaded with call to new API)
-        and it's not possible to get context for the words at once using new API yet.
-        :param status: progress status of the word: 'all', 'new', 'learning', 'learned'
-        :param wordset_id: id of only one wordset represented as list (e.g., [1] to download from main dictionary)
-        :return: list of words, where each word is a dict
-        """
-        # TODO: Unite get_words and get_words_old_api functions into one
-        url = 'api.lingualeo.com/GetWords'
-        values = {"apiVersion": "1.0.0", "attrList": WORDS_ATTRIBUTE_LIST,
-                  "category": "", "mode": "basic", "perPage": self.WORDS_PER_REQUEST, "status": status,
-                  "wordSetIds": [wordset_id], "offset": None, "search": "", "training": None,
-                  "ctx": {"config": {"isCheckData": True, "isLogging": True}}}
-
-        words = []
-        next_chunk = self.get_content(url, values).get('data')
-        # Continue getting the words until list is not empty
-        while next_chunk:
-            words += next_chunk
-            values['offset'] = {'wordId': next_chunk[-1].get('id')}
-            next_chunk = self.get_content(url, values).get('data')
-
         return words
 
     def save_cookies(self):
@@ -481,7 +453,7 @@ WORDS_ATTRIBUTE_LIST = {"id": "id", "wordValue": "wd", "origin": "wo", "wordType
                         "pronunciation": "pron", "relatedWords": "rw", "association": "as",
                         "trainings": "trainings", "listWordSets": "listWordSets",
                         "combinedTranslation": "trc", "picture": "pic", "speechPartId": "pid",
-                        "wordLemmaId": "lid", "wordLemmaValue": "lwd"}
+                        "wordLemmaId": "lid", "wordLemmaValue": "lwd", "context": "ctx"}
 
 WORDSETS_ATTRIBUTE_LIST = {"type": "type", "id": "id", "name": "name", "countWords": "cw",
                            "countWordsLearned": "cl", "wordSetId": "wordSetId", "picture": "pic",

@@ -11,14 +11,14 @@ from ._name import ADDON_NAME
 from ._version import VERSION
 
 
-# TODO: Make Russian localization
+# TODO: Make other localizations (Russian, Portuguese, etc.)
 #  (since beginners are more comfortable with native language)
 
 # TODO: Implement "Loading..." window to show user that list of words or list of dictionaries is being downloaded
 
 class PluginWindow(QDialog):
     Authorize = pyqtSignal()
-    RequestWords = pyqtSignal(str, list, bool)
+    RequestWords = pyqtSignal(str, list)
     RequestWordsets = pyqtSignal(str)
     CheckVersion = pyqtSignal()
     StartDownload = pyqtSignal(list)
@@ -74,15 +74,6 @@ class PluginWindow(QDialog):
         self.progressLabel = QLabel('')
         self.progressBar = QProgressBar()
 
-        self.api_label = QLabel('Choose API:')
-        self.api_button_group = QButtonGroup()
-        self.api_rbutton_new = QRadioButton('New (no context yet)')
-        self.api_rbutton_old = QRadioButton('Old (with context)')
-        self.api_rbutton_old.setEnabled(False)
-        self.api_rbutton_new.setChecked(True)
-        self.api_button_group.addButton(self.api_rbutton_new, 0)
-        self.api_button_group.addButton(self.api_rbutton_old, 1)
-
         # TODO: Implement GUI element to ask what style cards to create:
         #  with typing correct answer or without (or use config for that purpose)
 
@@ -102,12 +93,6 @@ class PluginWindow(QDialog):
         login_buttons.addWidget(self.loginButton)
         login_buttons.addWidget(self.logoutButton)
         login_buttons.addStretch()
-        # Horizontal layout for API
-        api_layout = QHBoxLayout()
-        api_layout.addWidget(self.api_label)
-        api_layout.addWidget(self.api_rbutton_new)
-        api_layout.addWidget(self.api_rbutton_old)
-        api_layout.addStretch()
 
         # Horizontal layout for radio buttons and update checkbox
         options_layout = QHBoxLayout()
@@ -126,7 +111,6 @@ class PluginWindow(QDialog):
 
         # Form layout for option buttons and progress bar
         downloading_layout = QFormLayout()
-        downloading_layout.addRow(api_layout)
         downloading_layout.addRow(options_layout)
         downloading_layout.addRow(progress_layout)
         # Horizontal layout for import and exit buttons
@@ -247,8 +231,8 @@ class PluginWindow(QDialog):
             qm = QMessageBox()
             reason = 'downloading' if self.is_active_download else 'connecting to LinguaLeo'
             answer = qm.question(self, '', 'Are you sure you want to stop {}?'.format(reason),
-                                 qm.Yes | qm.Cancel, qm.Cancel)
-            if answer == qm.Cancel:
+                                 qm.StandardButton.Yes | qm.StandardButton.Cancel, qm.StandardButton.Cancel)
+            if answer == qm.StandardButton.Cancel:
                 event.ignore()
                 return
             # TODO: Don't close add-on window if the 'Stop' button was pressed
@@ -333,8 +317,7 @@ class PluginWindow(QDialog):
         self.set_elements_enabled(False)
         # TODO: Change 'Exit' Button label to 'Stop' and back
         status = self.get_progress_status()
-        with_context = self.api_rbutton_old.isChecked()
-        self.RequestWords.emit(status, wordsets, with_context)
+        self.RequestWords.emit(status, wordsets)
         self.show_progress_bar(True, 'Requesting list of words...')
 
     @pyqtSlot(list)
@@ -466,8 +449,6 @@ class PluginWindow(QDialog):
         self.rbutton_learning.setEnabled(mode)
         self.rbutton_learned.setEnabled(mode)
         self.checkBoxUpdateNotes.setEnabled(mode)
-        self.api_rbutton_new.setEnabled(mode)
-        # self.api_rbutton_old.setEnabled(mode)
         self.update()
 
     def set_login_form_enabled(self, mode):
