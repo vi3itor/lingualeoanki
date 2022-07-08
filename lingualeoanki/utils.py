@@ -1,5 +1,4 @@
 import os
-from random import randint
 import json
 from .six.moves import urllib
 import socket
@@ -37,32 +36,32 @@ except:
 
 
 def create_templates(collection):
-    template_eng = collection.models.newTemplate('en -> ru')
+    # TODO: Generate template names based on a language pair
+    template_eng = collection.models.new_template('en -> ru')
     template_eng['qfmt'] = styles.en_question
     template_eng['afmt'] = styles.en_answer
-    template_ru = collection.models.newTemplate('ru -> en')
+    template_ru = collection.models.new_template('ru -> en')
     template_ru['qfmt'] = styles.ru_question
     template_ru['afmt'] = styles.ru_answer
-    return (template_eng, template_ru)
+    return template_eng, template_ru
 
 
 def create_new_model(collection, fields, model_css):
     model = collection.models.new("LinguaLeo_model")
     model['css'] = model_css
     for field in fields:
-        collection.models.addField(model, collection.models.newField(field))
+        collection.models.add_field(model, collection.models.new_field(field))
     template_eng, template_ru = create_templates(collection)
-    collection.models.addTemplate(model, template_eng)
-    collection.models.addTemplate(model, template_ru)
-    model['id'] = randint(100000, 1000000)  # Essential for upgrade detection
+    collection.models.add_template(model, template_eng)
+    collection.models.add_template(model, template_ru)
     collection.models.update(model)
     return model
 
 
 def is_model_exist(collection, fields):
-    if 'LinguaLeo_model' in collection.models.allNames():
-        ll_fields = set(collection.models.fieldNames(collection.models.byName(
-                                                'LinguaLeo_model')))
+    ll_model = collection.models.by_name('LinguaLeo_model')
+    if ll_model:
+        ll_fields = set(collection.models.field_names(ll_model))
         return all(f in ll_fields for f in fields)
     return False
 
@@ -73,14 +72,14 @@ def prepare_model(collection, fields, model_css):
     Creates a deck to keep them.
     """
     if is_model_exist(collection, fields):
-        model = collection.models.byName('LinguaLeo_model')
+        model = collection.models.by_name('LinguaLeo_model')
     else:
         model = create_new_model(collection, fields, model_css)
         # TODO: Move Deck name to config?
         # Create a deck "LinguaLeo" and write id to deck_id
         model['did'] = collection.decks.id('LinguaLeo')
-    collection.models.setCurrent(model)
-    collection.models.save(model)
+    collection.models.set_current(model)
+    collection.models.update(model)
     return model
 
 
@@ -197,6 +196,7 @@ def add_word(word, model):
 
 
 def get_duplicates(word_value):
+    # TODO: Use find_dupes instead, but check how quotes and other special symbols are handled
     collection = mw.col
     # escape backslash
     if '\\' in word_value:
@@ -207,12 +207,12 @@ def get_duplicates(word_value):
             if anki_version > 23:
                 escaped = word_value.replace('"', '\\"')
                 # Note: We can't search for 'en' field when there are escaped double quotes
-                note_dupes = collection.findNotes('"%s"' % escaped)
+                note_dupes = collection.find_notes('"%s"' % escaped)
             else:
                 # Support Anki < 2.1.24, where searching with single quotes was still allowed
                 note_dupes = collection.findNotes("en:'%s'" % word_value)
         else:
-            note_dupes = collection.findNotes('en:"%s"' % word_value)
+            note_dupes = collection.find_notes('en:"%s"' % word_value)
     except InvalidInput:
         # TODO: find a better solution for this fix
         problem = "The word '{}' contains unexpected symbols and it can't be checked for duplicates. " \
