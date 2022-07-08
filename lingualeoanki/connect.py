@@ -9,6 +9,9 @@ import base64
 from aqt.qt import *
 from . import utils
 
+github_message = "copy the error message and create a new issue on GitHub " \
+                 "(https://github.com/vi3itor/lingualeoanki/issues/new)."
+
 
 class Lingualeo(QObject):
     Busy = pyqtSignal(bool)
@@ -58,8 +61,7 @@ class Lingualeo(QObject):
                     self.msg = status['error_msg']
         except urllib.error.HTTPError:
             self.msg = "We got HTTP Error. Probably API has been changed (again). " \
-                       "Please try again. If error persists, please copy the error message and create a new issue " \
-                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new)."
+                       f"Please try again. If error persists, please {github_message}"
         except (urllib.error.URLError, socket.error) as e:
             # TODO: Find better (secure) fix
             """
@@ -77,8 +79,7 @@ class Lingualeo(QObject):
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
         except Exception as e:
-            self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
-                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e)
+            self.msg = f"There's been an unexpected error. Please {github_message}. Error: {str(e)}"
         # TODO: Refactor, use msg instead of self.msg
         if self.msg:
             self.Error.emit(self.msg)
@@ -95,7 +96,7 @@ class Lingualeo(QObject):
         if not (user_info["nativeLang"] == "ru" and user_info["targetLang"] == "en"):
             msg = 'Only English-Russian mode is currently supported. Please go to lingualeo.com, select English to ' \
                   'study and try again. Other languages may be supported in the future. If you still have any ' \
-                  'problems please open a new issue on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new)'
+                  f'problems please {github_message}'
             self.Error.emit(msg)
             return False
         return True
@@ -116,8 +117,8 @@ class Lingualeo(QObject):
                 return response['data']
         except Exception as e:
             exc_msg = str(e)
-        msg = "There's been an unexpected error when requesting user profile information. Please copy the error message and create a new issue " \
-              "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + (msg if msg else exc_msg)
+        msg = f"There's been an unexpected error when requesting user profile information. Please {github_message}" \
+              f" Error: {(msg if msg else exc_msg)}"
         self.Error.emit(msg)
         return None
 
@@ -164,11 +165,9 @@ class Lingualeo(QObject):
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo."
         except KeyError:
-            self.msg = "Can't get list of wordsets. Possibly API was changed again. Please create a new issue " \
-                       "on GitHub: https://github.com/vi3itor/lingualeoanki/issues/new"
+            self.msg = f"Can't get list of wordsets. Possibly API was changed again. Please {github_message}"
         except Exception as e:
-            self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
-                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e)
+            self.msg = f"There's been an unexpected error. Please {github_message}. Error: {str(e)}"
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
@@ -204,11 +203,9 @@ class Lingualeo(QObject):
         except ValueError:
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
         except KeyError:
-            self.msg = "Can't get list of words. Possibly API was changed again. Please create a new issue " \
-                       "on GitHub: https://github.com/vi3itor/lingualeoanki/issues/new"
+            self.msg = f"Can't get list of words. Possibly API was changed again. Please {github_message}"
         except Exception as e:
-            self.msg = "There's been an unexpected error. Please copy the error message and create a new issue " \
-                       "on GitHub (https://github.com/vi3itor/lingualeoanki/issues/new). Error: " + str(e)
+            self.msg = f"There's been an unexpected error. Please {github_message}. Error: {str(e)}"
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
@@ -433,9 +430,6 @@ class Download(QObject):
 
     @pyqtSlot()
     def check_for_new_version(self):
-        # Older anki clients (< 2.1.23 shouldn't check for new versions of the add-on)
-        if utils.anki_version < 23:
-            return
         # TODO: Investigate if it is better to call Anki's internal mechanism to check for new versions?
         self.Busy.emit(True)
         url = 'https://api.github.com/repos/vi3itor/lingualeoanki/contents/lingualeoanki/_version.py'

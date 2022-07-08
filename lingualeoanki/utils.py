@@ -1,5 +1,4 @@
 import os
-import json
 from .six.moves import urllib
 import socket
 import ssl
@@ -24,15 +23,9 @@ fields = ['en', 'transcription',
           'ru', 'picture_name',
           'sound_name', 'context']
 
-# TODO: Check anki versioning and find a better fix
-try:
-    from anki import buildinfo
-    anki_version = buildinfo.version.split('.')[-1]
-    anki_version = int(anki_version)
-except:
-    print("Can't find or parse anki_version")
-    # it means that it's definitely less than 2.1.23
-    anki_version = 20
+# Might be useful in the future to determine anki version
+# from anki import buildinfo
+# anki_version = int(buildinfo.version.split('.')[-1])
 
 
 def create_templates(collection):
@@ -204,13 +197,9 @@ def get_duplicates(word_value):
     try:
         # check for sentences or words containing double quotes
         if '"' in word_value:
-            if anki_version > 23:
-                escaped = word_value.replace('"', '\\"')
-                # Note: We can't search for 'en' field when there are escaped double quotes
-                note_dupes = collection.find_notes('"%s"' % escaped)
-            else:
-                # Support Anki < 2.1.24, where searching with single quotes was still allowed
-                note_dupes = collection.findNotes("en:'%s'" % word_value)
+            escaped = word_value.replace('"', '\\"')
+            # Note: We can't search for 'en' field when there are escaped double quotes
+            note_dupes = collection.find_notes('"%s"' % escaped)
         else:
             note_dupes = collection.find_notes('en:"%s"' % word_value)
     except InvalidInput:
@@ -316,30 +305,14 @@ def clean_cookies():
 
 
 def get_config():
-    # Load config from config.json file
     if getattr(getattr(mw, "addonManager", None), "getConfig", None):
-        config = mw.addonManager.getConfig(get_module_name())
-    else:
-        try:
-            config_file = os.path.join(get_addon_dir(), 'config.json')
-            with open(config_file, 'r') as f:
-                config = json.loads(f.read())
-        except IOError:
-            config = None
-    return config
+        return mw.addonManager.getConfig(get_module_name())
+    return None
 
 
 def update_config(config):
     if getattr(getattr(mw, "addonManager", None), "writeConfig", None):
         mw.addonManager.writeConfig(get_module_name(), config)
-    else:
-        try:
-            config_file = os.path.join(get_addon_dir(), 'config.json')
-            with open(config_file, 'w') as f:
-                json.dump(config, f, sort_keys=True, indent=2)
-        except:
-            # TODO: Improve error handling
-            pass
 
 
 def get_version_update_notification():

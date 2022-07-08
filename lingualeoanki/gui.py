@@ -340,7 +340,7 @@ class PluginWindow(QDialog):
     @pyqtSlot(list)
     def download_words(self, words):
         self.show_progress_bar(True, 'Found {} words. Excluding already existing...'.format(len(words)))
-        self.update_window()
+        self.update()
         filtered = self.filter_words(words) if not self.checkBoxUpdateNotes.isChecked() else words
         if filtered:
             self.start_downloading_media(filtered)
@@ -444,17 +444,6 @@ class PluginWindow(QDialog):
         self.logoutButton.setEnabled(mode)
         self.allow_to_close(mode)
 
-    def update_window(self):
-        """
-        Update window by repainting and processing the events
-        It's not recommended to call self.repaint() directly,
-        but at least on MacOS Anki 2.1.16 doesn't update widget's
-        window for several seconds even when self.update() is called
-        TODO: Remove when it works as expected or repaint for Mac only
-        """
-        self.repaint()  # self.update()
-        mw.app.processEvents()
-
     def get_progress_status(self):
         progress = 'all'
         if self.rbutton_learned.isChecked():
@@ -479,7 +468,7 @@ class PluginWindow(QDialog):
         self.checkBoxUpdateNotes.setEnabled(mode)
         self.api_rbutton_new.setEnabled(mode)
         # self.api_rbutton_old.setEnabled(mode)
-        self.update_window()
+        self.update()
 
     def set_login_form_enabled(self, mode):
         """
@@ -491,7 +480,7 @@ class PluginWindow(QDialog):
         self.passField.setEnabled(mode)
         self.checkBoxStayLoggedIn.setEnabled(mode)
         self.checkBoxSavePass.setEnabled(mode)
-        self.update_window()
+        self.update()
 
     def activate_addon_window(self, optional=True):
         addon_window = getattr(mw, ADDON_NAME, None)
