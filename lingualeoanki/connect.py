@@ -1,6 +1,7 @@
 import os
-from .six.moves import http_cookiejar
-from .six.moves import urllib
+import http.cookiejar
+import urllib.request
+import urllib.error
 import socket
 import json
 import ssl
@@ -24,7 +25,7 @@ class Lingualeo(QObject):
         QObject.__init__(self, parent)
         self.email = email
         self.password = password
-        self.cj = http_cookiejar.MozillaCookieJar()
+        self.cj = http.cookiejar.MozillaCookieJar()
         if cookies_path:
             self.cookies_path = cookies_path
             if not os.path.exists(cookies_path):
@@ -34,10 +35,10 @@ class Lingualeo(QObject):
                     self.cj.load(cookies_path)
                 except (IOError, TypeError, ValueError):
                     # TODO: process exceptions separately
-                    self.cj = http_cookiejar.MozillaCookieJar()
+                    self.cj = http.cookiejar.MozillaCookieJar()
                 except:
                     # TODO: Handle corrupt cookies loading
-                    self.cj = http_cookiejar.MozillaCookieJar()
+                    self.cj = http.cookiejar.MozillaCookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
         config = utils.get_config()
         self.WORDS_PER_REQUEST = config['wordsPerRequest'] if config else 999
@@ -53,23 +54,21 @@ class Lingualeo(QObject):
 
     def get_connection(self):
         """Make sure that user is authorized and activated the supported language pair."""
-        # TODO: rewrite the method, unify handling of the exceptions
+        user_info = None
         try:
-            if not self.is_authorized():
+            user_info = self.get_user_profile()
+            if not user_info or not user_info.get('isAuthorized'):
                 status = self.auth()
                 if status.get('error_msg'):
                     self.msg = status['error_msg']
+                else:
+                    # Re-fetch profile after login to get language info
+                    user_info = self.get_user_profile()
         except urllib.error.HTTPError:
             self.msg = "We got HTTP Error. Probably API has been changed (again). " \
                        f"Please try again. If error persists, please {github_message}"
         except (urllib.error.URLError, socket.error) as e:
-            # TODO: Find better (secure) fix
-            """
-            SSLError was noticed on MacOS, because Python 3.6m used in Anki doesn't have 
-            security certificates downloaded. The easiest (but unsecure) way is to create SSL context.
-            """
             if 'SSL' in str(e) and not self.tried_ssl_fix:
-                # Problem with https connection, trying ssl fix
                 https_handler = urllib.request.HTTPSHandler(context=ssl._create_unverified_context())
                 self.opener = urllib.request.build_opener(https_handler, urllib.request.HTTPCookieProcessor(self.cj))
                 self.tried_ssl_fix = True
@@ -80,20 +79,17 @@ class Lingualeo(QObject):
             self.msg = "Error! Possibly, invalid data was received from LinguaLeo"
         except Exception as e:
             self.msg = f"There's been an unexpected error. Please {github_message}. Error: {str(e)}"
-        # TODO: Refactor, use msg instead of self.msg
         if self.msg:
             self.Error.emit(self.msg)
             self.msg = ''
             return False
-        # Check for supported language pair
-        return self.confirm_language_pair()
+        return self.confirm_language_pair(user_info)
 
-    def confirm_language_pair(self):
+    def confirm_language_pair(self, user_info=None):
         """Verify that user activated a supporting language pair in the profile"""
-        user_info = self.get_user_profile()
         if not user_info:
             return False
-        if not (user_info["nativeLang"] == "ru" and user_info["targetLang"] == "en"):
+        if not (user_info.get("nativeLang") == "ru" and user_info.get("targetLang") == "en"):
             msg = 'Only English-Russian mode is currently supported. Please go to lingualeo.com, select English to ' \
                   'study and try again. Other languages may be supported in the future. If you still have any ' \
                   f'problems please {github_message}'
@@ -113,7 +109,7 @@ class Lingualeo(QObject):
             status = response.get('status', '')
             if status == 'error':
                 msg = response['error']['message']
-            elif status == 'ok' and response['data'] and response["data"]["nativeLang"] and response["data"]["targetLang"]:
+            elif status == 'ok' and response.get('data'):
                 return response['data']
         except Exception as e:
             exc_msg = str(e)
@@ -293,13 +289,6 @@ class Lingualeo(QObject):
         # Fun fact: if user enters incorrect email, LinguaLeo will create a new account!
         self.save_cookies()
         return content
-
-    def is_authorized(self):
-        url = 'api.lingualeo.com/isauthorized'
-        full_url = self.url_prefix + url
-        response = self.opener.open(full_url)
-        status = json.loads(response.read()).get('is_authorized', False)
-        return status
 
     def get_content(self, url, values, more_headers=None):
         """

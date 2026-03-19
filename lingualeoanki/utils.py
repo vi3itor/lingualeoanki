@@ -1,5 +1,6 @@
 import os
-from .six.moves import urllib
+import urllib.request
+import urllib.error
 import socket
 import ssl
 import time
@@ -124,8 +125,8 @@ def download_media_file(url, timeout):
 
 
 def fill_note(word, note):
-    note['en'] = word.get('wordValue')
-    note['ru'] = word.get('combinedTranslation')
+    note['en'] = word.get('wordValue') or ''
+    note['ru'] = word.get('combinedTranslation') or ''
     picture_name = word.get('picture').split('/')[-1] if word.get('picture') else ''
     if word.get('context'):
         ctxt = word['context']
@@ -149,7 +150,7 @@ def fill_note(word, note):
 
 def add_word(word, model):
     word_value = word.get('wordValue')
-    if word_value == '':
+    if not word_value:
         return
     collection = mw.col
     note = notes.Note(collection, model)

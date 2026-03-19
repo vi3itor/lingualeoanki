@@ -13,8 +13,24 @@ The add-on downloads your dictionary words from [LinguaLeo][3] - another great r
 
 [LinguaLeo][4] has a user-friendly interface for adding new words to learn and a good [browser extension][5] to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several [trainings][6], you need Anki to stick them in your memory forever with as little time and effort as possible. 
 
-### Notice on recent update of LinguaLeo
-The [update][7] of Lingualeo on April 30, 2019 brought several [issues][8]. As of October, 2020 they are still experimenting and changing API from time to time. Current version of add-on (2.3.0) is fully compatible with the update. It is not possible to get context for words when using a new API. Future versions of add-on will try to bring context back. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on [Lingualeo][9] first and write to the support. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you! 
+### Notice on LinguaLeo API changes
+LinguaLeo continues to change their API from time to time. The current version of the add-on (2.4.0) is fully compatible with the latest API changes and requires Anki 2.1.49 or higher. If you find any problems with your words, translations or pictures, please check on [Lingualeo][9] first and write to the support. For the add-on problems please [create an issue on Github][10] or mail me at 4yourquestions {at} gmail.com. Thank you!
+
+### New in version 2.4.0 (2026-03-19):
+### Fixed
+- Fix authorization error caused by removed LinguaLeo API endpoint (#26, #27).
+- Fix crash when importing words with missing fields (#21).
+
+### Changed
+- Optimized authorization flow: fewer API calls when already logged in.
+- Removed the `six.py` Python 2/3 compatibility library. The add-on now uses standard Python 3 imports.
+
+### New in version 2.3.0 (2022-07-08):
+### Changed
+- Get word context.
+- Drop the support for old Anki versions. Requires Anki 2.1.49 or higher.
+- Update deprecated Anki functions.
+- Fully support Qt6.
 
 ### New in version 2.2 (2019-11-20, last updated 2022-07-07):
 ### Added
@@ -25,10 +41,10 @@ The [update][7] of Lingualeo on April 30, 2019 brought several [issues][8]. As o
 - Config options for download timeout, number of retries, sleep seconds and parallel downloads.
 - Get word context again by using old API.
 - Show busy progress bar when requesting list of words and wordsets.
-- Show number of found words in a progress bar. 
+- Show number of found words in a progress bar.
 
 ### Changed
-- Media is downloaded 3 times faster because of parallel downloads. 
+- Media is downloaded 3 times faster because of parallel downloads.
 - List of words and wordsets is requested asynchronously and doesn't freeze the GUI.
 - "Update existing notes" option will update not only media, but also translation and context.
 - Renamed 'All' radio-button to 'Any'.
@@ -83,17 +99,13 @@ The full [log of changes][11] can be found in the repository.
 
 ### Installation
 
-The easiest (and preferable) way to install the add-on is by using the Anki's built-in add-ons managing system. In this case, it will be easy to [update][12] the add-on and get the latest version with new features and bug fixes. To install the add-on go to:  
-(in Anki 2.1.x) "Tools" \> "Add-ons" \> "Get add-ons..."  
-(in Anki 2.0) "Tools" \> "Add-ons" \> "Browse & Install"  
+The easiest (and preferable) way to install the add-on is by using the Anki's built-in add-ons managing system. In this case, it will be easy to [update][12] the add-on and get the latest version with new features and bug fixes. To install the add-on go to:
+"Tools" \> "Add-ons" \> "Get add-ons..."
 and input add-on's code: 1411073333. Restart Anki.
 
-If for some reason you wish to install the add-on manually, download the archive with the latest version from the [repository on GitHub][13] ([for Anki 2.1.x][14], [for Anki 2.0][15]), open Anki on your computer, go to:  
-(in Anki 2.1.x) "Tools" \> "Add-ons" \> "View Files"  
-(in Anki 2.0) "Tools" \> "Add-ons" \> "Open Add-ons Folder"  
-and put the content of the archive there. If you use Anki 2.1.x create an additional folder named "lingualeoanki" inside "addons21" folder and put the content of the archive there. Restart Anki.  
-See the following gif for the details on manual installation in Anki 2.0 (with Russian captures):
-[how to manually install][16]
+If for some reason you wish to install the add-on manually, download the archive with the latest version from the [repository on GitHub][13] ([for Anki 2.1.x][14]), open Anki on your computer, go to:
+"Tools" \> "Add-ons" \> "View Files"
+and create a folder named "lingualeoanki" inside "addons21" folder, put the content of the archive there, and restart Anki.
 
 #### Update
 
@@ -107,7 +119,7 @@ If it is still not working - try to delete the add-on and install it again.
 
 ### Compatibility
 
-The add-on works with Anki 2.1.x and Anki 2.0 (tested on 2.0.52). It is recommended to install the latest version of Anki 2.1, because the future releases of the add-on may not support outdated Anki 2.0.52.
+The add-on requires Anki 2.1.49 or higher. Anki 2.0 is no longer supported since version 2.3.0.
 
 ### Usage
 
@@ -171,22 +183,37 @@ And to all users who gave valuable comments and feedback and helped to test on d
 
 [ЛингваЛео][38] имеет удобный интерфейс для добавления новых слов и неплохое [расширение для браузера][39] для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких [тренировок][40], Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.
 
-### Внимание! Обновление Lingualeo 30.04.2019
-В связи с [обновлением][41] сервиса Lingualeo от 30 апреля 2019 возможны временные [неполадки][42] в его работе. По состоянию на октябрь 2020 года команда Lingualeo по-прежнему продолжает экспериментировать и время от времени изменяет API. В актуальной версии дополнения (2.2.8) восстановлена его работа, но новый API не позволяет загружать контекст. Загрузка контекста планируется в новых версиях. Сайт Lingualeo по-прежнему работает нестабильно: не отображает все слова, показывает неверный контекст слов и т.п. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][43] и напишите в поддержку. Если же проблема в дополнении - [создайте issue на Github][44] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! 
+### Внимание! Изменения API LinguaLeo
+LinguaLeo продолжает время от времени изменять свой API. Актуальная версия дополнения (2.4.0) полностью совместима с последними изменениями API и требует Anki 2.1.49 или выше. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте [Lingualeo][43] и напишите в поддержку. Если же проблема в дополнении - [создайте issue на Github][44] либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо!
 
-### Новое в версии 2.2 (2019-11-20, обновлено 2021-02-23):
+### Новое в версии 2.4.0 (2026-03-19):
+### Исправлено
+- Исправлена ошибка авторизации, вызванная удалением API-эндпоинта LinguaLeo (#26, #27).
+- Исправлена ошибка при импорте слов с отсутствующими полями (#21).
+
+### Изменено
+- Оптимизирован процесс авторизации: меньше запросов к API, если пользователь уже авторизован.
+- Удалена библиотека `six.py` для совместимости Python 2/3. Дополнение теперь использует стандартные импорты Python 3.
+
+### Новое в версии 2.3.0 (2022-07-08):
+### Изменено
+- Загрузка контекста слов снова работает.
+- Старые версии Anki больше не поддерживаются. Требуется Anki 2.1.49 или выше.
+- Добавлена поддержка Qt6 и исправлены устаревшие функции Anki.
+
+### Новое в версии 2.2 (2019-11-20, обновлено 2022-07-07):
 ### Добавлено
 - Возможность выбрать API (новый или старый) для соединения с LinguaLeo.
 - Проверка наличия новой версии при запуске дополнения.
 - Отображение версии дополнения и напоминания перезапустить Anki для завершения установки обновления.
-- Параметр в конфиге для количества слов за один запрос (при загрузке списка слов). На текущий момент сервис LinguaLeo работает нестабильно и изменения этого параметра поможет найти "потерянные" слова.
+- Параметр в конфиге для количества слов за один запрос (при загрузке списка слов).
 - Параметр в конфиге для таймаута запроса, количества попыток и длительности ожидания перед повторным скачиванием.
 - Снова можно загружать контекст для слов (при использовании старого API).
-- Сообщение "Загружается...", уведомляющее пользователя, что список слов или словарей загружается (актуально для больших списков либо медленного интернета).
-- Отображение количества слов во время загрузки. 
+- Сообщение "Загружается...", уведомляющее пользователя, что список слов или словарей загружается.
+- Отображение количества слов во время загрузки.
 
 ### Изменено
-- Картинки и звуки загружаются до 3-ёх раз быстрее благодаря многопоточности. 
+- Картинки и звуки загружаются до 3-ёх раз быстрее благодаря многопоточности.
 - Список слов и словарей запрашивается асинхронно и не тормозит пользовательский интерфейс.
 - "Update existing notes" опция обновляет не только картинки и звуки, но также перевод(ы), контекст и транскрипцию.
 - Кнопка 'All' переименована на 'Any'.
@@ -241,16 +268,13 @@ And to all users who gave valuable comments and feedback and helped to test on d
 
 ### Установка
 
-Наиболее простой (и рекомендуемый) способ установки: с помощью системы управления дополнениями Anki. В таком случае вы сможете с лёгкостью обновлять дополнение и получать новые верии с новыми функциями и исправленными ошибками. Для этого выберите пункт меню программы:  
-(для Anki 2.1.x) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Скачать дополнения" (Get Add-ons...)  
-(для Anki 2.0) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Обзор и установка" (Browse & Install)  
-введите код 1411073333 и перезапустите Anki.  
+Наиболее простой (и рекомендуемый) способ установки: с помощью системы управления дополнениями Anki. В таком случае вы сможете с лёгкостью обновлять дополнение и получать новые версии с новыми функциями и исправленными ошибками. Для этого выберите пункт меню программы:
+"Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Скачать дополнения" (Get Add-ons...)
+введите код 1411073333 и перезапустите Anki.
 
-Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из [репозитория на GitHub][46] ([для Anki 2.1.x][47], [для Anki 2.0][48]), откройте Anki на вашем компьютере, выберите пункт меню:  
-(для Anki 2.1.x) "Инструменты" (Tools) \> "Дополнения" (Add-ons) и кликните на кнопку "Просмотреть файлы" (View Files)  
-(для Anki 2.0) "Инструменты" (Tools) \> "Дополнения" (Add-ons) \> "Открыть папку с дополнениями" (Open Add-ons Folder)  
-и скопируйте туда содержимое архива. Если вы используете Anki 2.1.x, создайте папку с именем "lingualeoanki" в папку "addons21" и скопируйте туда содержимое архива. Перезапустите программу.  
-Гифка с наглядным изображением процесса ручной установки для Anki 2.0: [как установить дополнение вручную][49]
+Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из [репозитория на GitHub][46] ([для Anki 2.1.x][47]), откройте Anki на вашем компьютере, выберите пункт меню:
+"Инструменты" (Tools) \> "Дополнения" (Add-ons) и кликните на кнопку "Просмотреть файлы" (View Files)
+Создайте папку с именем "lingualeoanki" в папке "addons21" и скопируйте туда содержимое архива. Перезапустите программу.
 
 ### Обновление
 
@@ -264,8 +288,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 
 ### Совместимость
 
-Дополнение работает с новыми версиями (Anki 2.1.x), а также с Анки 2.0 (тестировалось на 2.0.52).
-Рекомендуется установить Anki 2.1, актуальную версию программы, так как новые версии дополнения могут не поддерживать устаревшую версию Anki 2.0. 
+Дополнение требует Anki версии 2.1.49 или выше. Anki 2.0 больше не поддерживается начиная с версии 2.3.0.
 
 ### Как это работает?
 
@@ -326,7 +349,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [11]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md
 [12]:	#update
 [13]:	https://github.com/vi3itor/lingualeoanki/
-[14]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-9.zip
+[14]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-4-0.zip
 [15]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-1.zip
 [16]:	https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif
 [17]:	#installation
@@ -359,7 +382,7 @@ And to all users who gave valuable comments and feedback and helped to test on d
 [44]:	https://github.com/vi3itor/lingualeoanki/issues/new
 [45]:	https://github.com/vi3itor/lingualeoanki/blob/master/CHANGELOG.md#russian
 [46]:	https://github.com/vi3itor/lingualeoanki/
-[47]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-9.zip
+[47]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-4-0.zip
 [48]:	https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-1.zip
 [49]:	https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif
 [50]:	https://ankiweb.net/shared/info/1411073333

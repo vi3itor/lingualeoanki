@@ -12,9 +12,36 @@
 
 <p><a href="https://lingualeo.com/">LinguaLeo</a> has a user-friendly interface for adding new words to learn and a good <a href="https://lingualeo.com/ru/browserapps">browser extension</a> to quickly look up for translations and add words to the dictionary in one click. But once you added the words and learned them via several <a href="https://lingualeo.com/ru/training">trainings</a>, you need Anki to stick them in your memory forever with as little time and effort as possible. </p>
 
-<h3>Notice on recent update of LinguaLeo</h3>
+<h3>Notice on LinguaLeo API changes</h3>
 
-<p>The <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">update</a> of Lingualeo on April 30, 2019 brought several <a href="https://corp.lingualeo.com/ru/2019/07/12/qa-news/">issues</a>. As of July, 2020 they are still experimenting and changing API from time to time. Current version of add-on (2.2.5) is fully compatible with the update. It is not possible to get context for words when using a new API. Future versions of add-on will try to bring context back. On Lingualeo website there are still some problems with incorrect translations and not getting all the words. If you find some problems with your words, translations or pictures, please check on <a href="https://lingualeo.com/">Lingualeo</a> first and write to the support. For the add-on problems please <a href="https://github.com/vi3itor/lingualeoanki/issues/new">create an issue on Github</a> or mail me at 4yourquestions {at} gmail.com. Thank you! </p>
+<p>LinguaLeo continues to change their API from time to time. The current version of the add-on (2.4.0) is fully compatible with the latest API changes and requires Anki 2.1.49 or higher. If you find any problems with your words, translations or pictures, please check on <a href="https://lingualeo.com/">Lingualeo</a> first and write to the support. For the add-on problems please <a href="https://github.com/vi3itor/lingualeoanki/issues/new">create an issue on Github</a> or mail me at 4yourquestions {at} gmail.com. Thank you!</p>
+
+<h3>New in version 2.4.0 (2026-03-19):</h3>
+
+<h3>Fixed</h3>
+
+<ul>
+	<li>Fix authorization error caused by removed LinguaLeo API endpoint (#26, #27).</li>
+	<li>Fix crash when importing words with missing fields (#21).</li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+	<li>Optimized authorization flow: fewer API calls when already logged in.</li>
+	<li>Removed the six.py Python 2/3 compatibility library. The add-on now uses standard Python 3 imports.</li>
+</ul>
+
+<h3>New in version 2.3.0 (2022-07-08):</h3>
+
+<h3>Changed</h3>
+
+<ul>
+	<li>Get word context.</li>
+	<li>Drop the support for old Anki versions. Requires Anki 2.1.49 or higher.</li>
+	<li>Update deprecated Anki functions.</li>
+	<li>Fully support Qt6.</li>
+</ul>
 
 <h3>New in version 2.2 (2019-11-20, last updated 2020-07-11):</h3>
 
@@ -112,7 +139,7 @@
 
 <p>The easiest (and preferable) way to install the add-on is by using the Anki&#39;s built-in add-ons managing system. In this case, it will be easy to <a href="#update">update</a> the add-on and get the latest version with new features and bug fixes. To install the add-on go to:<br/>(in Anki 2.1.x) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Get add-ons...&quot;<br/>(in Anki 2.0) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Browse &amp; Install&quot;<br/>and input add-on&#39;s code: 1411073333. Restart Anki.</p>
 
-<p>If for some reason you wish to install the add-on manually, download the archive with the latest version from the <a href="https://github.com/vi3itor/lingualeoanki/">repository on GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-5.zip">for Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-1.zip">for Anki 2.0</a>), open Anki on your computer, go to:<br/>(in Anki 2.1.x) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;View Files&quot;<br/>(in Anki 2.0) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Open Add-ons Folder&quot;<br/>and put the content of the archive there. If you use Anki 2.1.x create an additional folder named &quot;lingualeoanki&quot; inside &quot;addons21&quot; folder and put the content of the archive there. Restart Anki.<br/>See the following gif for the details on manual installation in Anki 2.0 (with Russian captures):</p>
+<p>If for some reason you wish to install the add-on manually, download the archive with the latest version from the <a href="https://github.com/vi3itor/lingualeoanki/">repository on GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-4-0.zip">for Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-1.zip">for Anki 2.0</a>), open Anki on your computer, go to:<br/>(in Anki 2.1.x) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;View Files&quot;<br/>(in Anki 2.0) &quot;Tools&quot; &gt; &quot;Add-ons&quot; &gt; &quot;Open Add-ons Folder&quot;<br/>and put the content of the archive there. If you use Anki 2.1.x create an additional folder named &quot;lingualeoanki&quot; inside &quot;addons21&quot; folder and put the content of the archive there. Restart Anki.<br/>See the following gif for the details on manual installation in Anki 2.0 (with Russian captures):</p>
 
 <p><a href="https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif">how to manually install</a></p>
 
@@ -133,7 +160,7 @@
 
 <h3>Compatibility</h3>
 
-<p>The add-on works with Anki 2.1.x and Anki 2.0 (tested on 2.0.52). It is recommended to install the latest version of Anki 2.1, because the future releases of the add-on may not support outdated Anki 2.0.52.</p>
+<p>The add-on requires Anki 2.1.49 or higher. Anki 2.0 is no longer supported since version 2.3.0.</p>
 
 <h3>Usage</h3>
 
@@ -196,9 +223,35 @@
 
 <p><a href="https://lingualeo.com/">ЛингваЛео</a> имеет удобный интерфейс для добавления новых слов и неплохое <a href="https://lingualeo.com/ru/browserapps">расширение для браузера</a> для перевода незнакомых слов и мгновенного добавления в словарь вместе с контекстом. Но после того, как вы добавили слова и изучили их с помощью нескольких <a href="https://lingualeo.com/ru/training">тренировок</a>, Анки поможет вам никогда не забыть эти слова с минимальной затратой времени и усилий.</p>
 
-<h3>Внимание! Обновление Lingualeo 30.04.2019</h3>
+<h3>Внимание! Изменения API LinguaLeo</h3>
 
-<p>В связи с <a href="https://corp.lingualeo.com/ru/2019/04/30/news/">обновлением</a> сервиса Lingualeo от 30 апреля 2019 возможны временные <a href="https://corp.lingualeo.com/ru/2019/07/12/qa-news/">неполадки</a> в его работе. По состоянию на июль 2020 года команда Lingualeo по-прежнему продолжает экспериментировать и время от времени изменяет API. В актуальной версии дополнения (2.2.5) восстановлена его работа, но новый API не позволяет загружать контекст. Загрузка контекста планируется в новых версиях. Сайт Lingualeo по-прежнему работает нестабильно: не отображает все слова, показывает неверный контекст слов и т.п. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте <a href="https://lingualeo.com/">Lingualeo</a> и напишите в поддержку. Если же проблема в дополнении - <a href="https://github.com/vi3itor/lingualeoanki/issues/new">создайте issue на Github</a> либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо! </p>
+<p>LinguaLeo продолжает время от времени изменять свой API. Актуальная версия дополнения (2.4.0) полностью совместима с последними изменениями API и требует Anki 2.1.49 или выше. Если вы заметили, что ваши слова, их переводы или картинки отображаются неправильно, сначала проверьте всё ли в порядке с вашим словарём и наборами слов на сайте <a href="https://lingualeo.com/">Lingualeo</a> и напишите в поддержку. Если же проблема в дополнении - <a href="https://github.com/vi3itor/lingualeoanki/issues/new">создайте issue на Github</a> либо напишите мне на 4yourquestions {собачка} gmail.com. Спасибо!</p>
+
+<h3>Новое в версии 2.4.0 (2026-03-19):</h3>
+
+<h3>Исправлено</h3>
+
+<ul>
+	<li>Исправлена ошибка авторизации, вызванная удалением API-эндпоинта LinguaLeo (#26, #27).</li>
+	<li>Исправлена ошибка при импорте слов с отсутствующими полями (#21).</li>
+</ul>
+
+<h3>Изменено</h3>
+
+<ul>
+	<li>Оптимизирован процесс авторизации: меньше запросов к API, если пользователь уже авторизован.</li>
+	<li>Удалена библиотека six.py для совместимости Python 2/3. Дополнение теперь использует стандартные импорты Python 3.</li>
+</ul>
+
+<h3>Новое в версии 2.3.0 (2022-07-08):</h3>
+
+<h3>Изменено</h3>
+
+<ul>
+	<li>Загрузка контекста слов снова работает.</li>
+	<li>Старые версии Anki больше не поддерживаются. Требуется Anki 2.1.49 или выше.</li>
+	<li>Добавлена поддержка Qt6 и исправлены устаревшие функции Anki.</li>
+</ul>
 
 <h3>Новое в версии 2.2 (2019-11-20, обновлено 2020-07-11):</h3>
 
@@ -296,7 +349,7 @@
 
 <p>Наиболее простой (и рекомендуемый) способ установки: с помощью системы управления дополнениями Anki. В таком случае вы сможете с лёгкостью обновлять дополнение и получать новые верии с новыми функциями и исправленными ошибками. Для этого выберите пункт меню программы:<br/>(для Anki 2.1.x) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Скачать дополнения&quot; (Get Add-ons...)<br/>(для Anki 2.0) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Обзор и установка&quot; (Browse &amp; Install)<br/>введите код 1411073333 и перезапустите Anki.<br/></p>
 
-<p>Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из <a href="https://github.com/vi3itor/lingualeoanki/">репозитория на GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-2-5.zip">для Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-1.zip">для Anki 2.0</a>), откройте Anki на вашем компьютере, выберите пункт меню:<br/>(для Anki 2.1.x) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) и кликните на кнопку &quot;Просмотреть файлы&quot; (View Files)<br/>(для Anki 2.0) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Открыть папку с дополнениями&quot; (Open Add-ons Folder)<br/>и скопируйте туда содержимое архива. Если вы используете Anki 2.1.x, создайте папку с именем &quot;lingualeoanki&quot; в папку &quot;addons21&quot; и скопируйте туда содержимое архива. Перезапустите программу.<br/>Гифка с наглядным изображением процесса ручной установки для Anki 2.0: <a href="https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif">как установить дополнение вручную</a></p>
+<p>Если вы по какой-то причине хотите установить дополнение вручную: скачайте архив с исходным кодом из <a href="https://github.com/vi3itor/lingualeoanki/">репозитория на GitHub</a> (<a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_1/for_2_1_lingualeoanki-2-4-0.zip">для Anki 2.1.x</a>, <a href="https://github.com/vi3itor/lingualeoanki/blob/master/version_archive/for_anki_2_0/for_2_0_lingualeoanki-2-2-1.zip">для Anki 2.0</a>), откройте Anki на вашем компьютере, выберите пункт меню:<br/>(для Anki 2.1.x) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) и кликните на кнопку &quot;Просмотреть файлы&quot; (View Files)<br/>(для Anki 2.0) &quot;Инструменты&quot; (Tools) &gt; &quot;Дополнения&quot; (Add-ons) &gt; &quot;Открыть папку с дополнениями&quot; (Open Add-ons Folder)<br/>и скопируйте туда содержимое архива. Если вы используете Anki 2.1.x, создайте папку с именем &quot;lingualeoanki&quot; в папку &quot;addons21&quot; и скопируйте туда содержимое архива. Перезапустите программу.<br/>Гифка с наглядным изображением процесса ручной установки для Anki 2.0: <a href="https://media.giphy.com/media/3oFzm4JamA2wb86yTS/giphy.gif">как установить дополнение вручную</a></p>
 
 <h3>Обновление</h3>
 
@@ -315,9 +368,7 @@
 
 <h3>Совместимость</h3>
 
-<p>Дополнение работает с новыми версиями (Anki 2.1.x), а также с Анки 2.0 (тестировалось на 2.0.52).</p>
-
-<p>Рекомендуется установить Anki 2.1, актуальную версию программы, так как новые версии дополнения могут не поддерживать устаревшую версию Anki 2.0. </p>
+<p>Дополнение требует Anki версии 2.1.49 или выше. Anki 2.0 больше не поддерживается начиная с версии 2.3.0.</p>
 
 <h3>Как это работает?</h3>
 

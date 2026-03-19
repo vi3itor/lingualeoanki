@@ -11,7 +11,7 @@ Section to track upcoming changes
 
 ##### User Interface:
 - Add Russian localization since beginners are more comfortable with native language.
-- Additional configuration window to set up: 
+- Additional configuration window to set up:
    - what type of "Russian to English" cards to create: with typing answer or without;
    - choose from-to dates for importing words;
    - option to highlight the word in context;
@@ -21,6 +21,16 @@ Section to track upcoming changes
 - Add user dictionaries (wordsets) as tags.
 - Save problem words in json format and ask to retry downloading only them.
 - Improve duplicate search to automatically update notes when any information was changed.
+
+## [2.4.0] - 2026-03-19
+Requires Anki 2.1.49 or higher.
+### Fixed
+- Fix authorization error caused by removed LinguaLeo API endpoint (`/isauthorized` no longer exists). The add-on now uses the `ProcessTraining` endpoint to check authorization status (#26, #27).
+- Fix crash when importing words with missing fields (e.g. `wordValue` or `combinedTranslation` being `None`) (#21).
+
+### Changed
+- Optimized authorization flow: fewer API calls when the user is already logged in.
+- Removed the `six.py` Python 2/3 compatibility library (952 lines). The add-on now uses standard Python 3 imports directly.
 
 ## [2.3.0] - 2022-07-08
 Currently, requires Anki 2.1.49 or higher.
@@ -186,11 +196,11 @@ This is the last release that supports older Anki versions with Qt5.
 #### Russian
 [show in English][3]
 ## [Неизданное]
-В этом разделе будут записываться изменения, которые ожидаются в будущих релизах. 
+В этом разделе будут записываться изменения, которые ожидаются в будущих релизах.
 
 ##### Пользовательский интерфейс:
 - Русский язык интерфейса, так как начинающим комфортнее работать с дополнением на родном языке.
-- Дополнительное окно конфигурации для установки настроек импорта, таких как: 
+- Дополнительное окно конфигурации для установки настроек импорта, таких как:
    - какого типа карточки создавать: с вводом ответа или без (для русско-английских карточек);
    - выбор промежутка времени для импортирования слов;
    - опция подсветки слова в контексте;
@@ -200,6 +210,16 @@ This is the last release that supports older Anki versions with Qt5.
 - Добавлять пользовательские словари как теги.
 - Сохранять проблемные слова в json формате и предлагать пользователю попытаться снова скачать только проблемные слова.
 - Исправить функцию поиска дубликатов, чтобы автоматически обновлять карточки при любых изменениях (не только медиа).
+
+## [2.4.0] - 2026-03-19
+Требуется Anki версии 2.1.49 или выше.
+### Исправлено
+- Исправлена ошибка авторизации, вызванная удалением API-эндпоинта LinguaLeo (`/isauthorized` больше не существует). Дополнение теперь использует эндпоинт `ProcessTraining` для проверки статуса авторизации (#26, #27).
+- Исправлена ошибка при импорте слов с отсутствующими полями (например, когда `wordValue` или `combinedTranslation` равны `None`) (#21).
+
+### Изменено
+- Оптимизирован процесс авторизации: меньше запросов к API, если пользователь уже авторизован.
+- Удалена библиотека `six.py` для совместимости Python 2/3 (952 строки). Дополнение теперь использует стандартные импорты Python 3.
 
 ## [2.3.0] - 2022-07-08
 Требуется Anki версии 2.1.49 или выше.

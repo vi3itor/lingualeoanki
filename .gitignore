@@ -1,3 +1,5 @@
 meta.json
 cookies.txt
 .idea
+__pycache__/
+*.pyc
